@@ -37,7 +37,24 @@ const Login = ({ user } : any) => {
         }
     };
     return (
-        <div className="min-h-screen flex items-center justify-center">
+        <div className="min-h-screen flex items-center justify-center bg-black">
+        {error && <p className="text-red-500">{error}</p>}
+        <div className="text-center border border-red-500 p-5 rounded-md">
+            {user ? (
+                // User is logged in, display logout button
+                <div>
+                    <h1 className="text-3xl font-semibold">Welcome, {user.displayName}!</h1>
+                    <p className="mt-2">Email: {user.email}</p>
+                    <button
+                        onClick={handleLogout}
+                        className="mt-2 bg-red-500 hover:bg-red-700 text-white py-2 px-4 rounded-full"
+                    >
+                        Logout
+                    </button>
+                </div>
+            ) : (
+                // User is not logged in, display login form
+                <div className="min-h-screen flex items-center justify-center">
             <div className="bg-white p-10 rounded-lg shadow-lg max-w-4xl w-full">
                 <div className="text-center mb-6">
                     <p className="text-2xl text-black font-semibold">Log in to TeamGlu4e.com</p>
@@ -55,28 +72,33 @@ const Login = ({ user } : any) => {
                     {/* Email Form */}
                     <div className="flex-1">
                         <div className="p-1 mb-1">
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                            <label htmlFor="email" className="block text-sm font-medium text-black mb-2">
                                 Email Address or Username
                             </label>
                             <input
-                                id="email"
                                 type="text"
-                                className="p-3 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                value={username}
+                                onChange={handleUsernameChange}
+                                className="p-3 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-black"
                                 placeholder="Enter your email"
                             />
                         </div>
                         <div className="p-1 mb-1">
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                            <label htmlFor="password" className="block text-sm font-medium text-black mb-2">
                                 Password
                             </label>
                             <input
-                                id="email"
-                                type="text"
-                                className="p-3 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                type="password"
+                                value={password}
+                                onChange={handlePasswordChange}
+                                className="p-3 w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-black"
                                 placeholder="Enter your password"
                             />
                         </div>
-                        <button className="mt-4 w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600">
+                        <button 
+                            onClick={handleLogin}
+                            className="mt-4 w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600"
+                        >
                             Continue
                         </button>
                     </div>
@@ -98,7 +120,7 @@ const Login = ({ user } : any) => {
                         </button>
                         <button className="bg-black  w-full flex items-center justify-center py-3 border border-gray-300 rounded-lg hover:bg-gray-900">
                             <FaApple className="h-5 mr-2" />
-                            Continue with Google
+                            Continue with Apple
                         </button>
                         <button className="bg-black  w-full flex items-center justify-center py-3 border border-gray-300 rounded-lg hover:bg-gray-900">
                             <FaGithub className="h-5 mr-2" />
@@ -123,6 +145,9 @@ const Login = ({ user } : any) => {
                 </div>
             </div>
         </div>
+            )}
+        </div>
+    </div>
     );
 };
 

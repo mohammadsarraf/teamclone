@@ -3,7 +3,7 @@ import { FaGoogle,FaGithub, FaApple, FaEnvelope, FaPiedPiperPp } from "react-ico
 const Login: React.FC = () => {
     return (
         <div className="min-h-screen flex items-center justify-center">
-            <div className="bg-white p-10 rounded-lg shadow-lg max-w-4xl w-full">
+            <div className="bg-gray-900 p-10 rounded-lg shadow-lg max-w-4xl w-full">
                 <div className="text-center mb-6">
                     <p className="text-2xl text-black font-semibold">Log in to TeamGlu4e.com</p>
                     <p className="text-sm text-black mt-2">

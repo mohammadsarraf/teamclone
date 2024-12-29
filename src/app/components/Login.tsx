@@ -1,9 +1,44 @@
+'use client'
+import React, { useState } from 'react';
 import { FaGoogle,FaGithub, FaApple, FaEnvelope, FaPiedPiperPp } from "react-icons/fa6";
+import { signInUser, signOutUser } from './UserContext'; // Import the signInUser and signOutUser functions
 
-const Login: React.FC = () => {
+const Login = ({ user } : any) => {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+
+    const handleUsernameChange = (e: any) => {
+        setUsername(e.target.value);
+    };
+
+    const handlePasswordChange = (e : any) => {
+        setPassword(e.target.value);
+    };
+
+    const handleLogin = async () => {
+        const result = await signInUser(username, password);
+        if (result.success) {
+            // User logged in successfully
+            setError('');
+        } else {
+            // Login failed, display an error message
+            setError(result.error);
+        }
+    };
+
+    const handleLogout = async () => {
+        const result = await signOutUser();
+        if (result.success) {
+            // User logged out successfully
+        } else {
+            // Logout failed, display an error message
+            setError(result.error);
+        }
+    };
     return (
         <div className="min-h-screen flex items-center justify-center">
-            <div className="bg-gray-900 p-10 rounded-lg shadow-lg max-w-4xl w-full">
+            <div className="bg-white p-10 rounded-lg shadow-lg max-w-4xl w-full">
                 <div className="text-center mb-6">
                     <p className="text-2xl text-black font-semibold">Log in to TeamGlu4e.com</p>
                     <p className="text-sm text-black mt-2">

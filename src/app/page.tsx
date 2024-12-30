@@ -12,9 +12,9 @@ import { useUser, UserProvider, signOutUser } from './components/UserContext'; /
 export function HomePage(porps: any) { // Pass the signOut function as a prop
     const { currentUser } = useUser()
 
-    if (currentUser) {
+    if (!currentUser) {
         return (
-            <Login user={currentUser} />
+          <Login user={currentUser} />
         )
     }
 

@@ -4,13 +4,14 @@ import { useRouter } from 'next/navigation'; // Import useRouter
 import Login from '../components/Login';
 import { useUser, UserProvider, signOutUser } from '../components/UserContext';
 
-export function HomePage(props: any) {
+// Define a functional Welcome component
+const Welcome = ({ signOut }: { signOut: () => void }) => {
     const { currentUser } = useUser();
     const router = useRouter(); // Initialize the router
 
     const handleSignOut = async () => {
         try {
-            await props.signOut(); // Call the signOut function
+            await signOut(); // Call the signOut function
             router.push('/'); // Redirect to the home page after signing out
         } catch (error) {
             console.error('Error signing out:', error);
@@ -29,12 +30,14 @@ export function HomePage(props: any) {
             </button>
         </div>
     );
-}
+};
 
+// Default export of Home component
 export default function Home() {
+    // Ensure signOutUser is typed correctly as a function returning a Promise<void>
     return (
         <UserProvider>
-            <HomePage signOut={signOutUser} />
+            <Welcome signOut={signOutUser} />
         </UserProvider>
     );
 }

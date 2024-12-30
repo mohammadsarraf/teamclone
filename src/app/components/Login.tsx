@@ -87,14 +87,14 @@ const Login = ({ user }: any) => {
                         </div>
                         <button 
                             onClick={handleLogin}
-                            className="mt-4 w-full bg-[#1d4ed8] text-white py-3 rounded-lg hover:bg-[#2563eb] transition transform hover:scale-105"
+                            className="mt-4 w-full bg-[#1d4ed8] text-white py-3 rounded-lg hover:bg-[#2563eb]"
                         >
                             Continue
                         </button>
                     </div>
 
                     {/* Vertical Separator with "OR" */}
-                    <div className="flex flex-col items-center text-gray-400">
+                    <div className="flex flex-col items-center text-gray-400 px-2">
                         <div className="h-full w-px relative bg-gray-600">
                             <span className="absolute px-2 bg-[#1e1e1e] font-medium -translate-x-1/2 top-1/2 -translate-y-1/2 text-gray-400">
                                 OR

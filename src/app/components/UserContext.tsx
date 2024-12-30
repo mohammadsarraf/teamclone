@@ -1,9 +1,9 @@
 'use client'
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, doc, setDoc, addDoc, getDocs, serverTimestamp } from 'firebase/firestore';
-import { getAuth, signOut, createUserWithEmailAndPassword, updateProfile, signInWithEmailAndPassword, onAuthStateChanged, User as FirebaseUser, } from 'firebase/auth';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { getFirestore} from 'firebase/firestore';
+import { getAuth, signOut, updateProfile, signInWithEmailAndPassword, onAuthStateChanged, User as FirebaseUser, } from 'firebase/auth';
+// import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 
 const firebaseConfig = {

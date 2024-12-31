@@ -149,42 +149,6 @@ function HomeContent() {
     };
   }, []);
 
-  useEffect(() => {
-    // Load state from local storage
-    const savedTitle = localStorage.getItem("title");
-    const savedSubtitle = localStorage.getItem("subtitle");
-    const savedDescription = localStorage.getItem("description");
-    const savedTitleClassName = localStorage.getItem("titleClassName");
-    const savedSubtitleClassName = localStorage.getItem("subtitleClassName");
-    const savedDescriptionClassName = localStorage.getItem("descriptionClassName");
-    const savedTitleAlignment = localStorage.getItem("titleAlignment");
-    const savedSubtitleAlignment = localStorage.getItem("subtitleAlignment");
-    const savedDescriptionAlignment = localStorage.getItem("descriptionAlignment");
-
-    if (savedTitle) setTitle(savedTitle);
-    if (savedSubtitle) setSubtitle(savedSubtitle);
-    if (savedDescription) setDescription(savedDescription);
-    if (savedTitleClassName) setTitleClassName(savedTitleClassName);
-    if (savedSubtitleClassName) setSubtitleClassName(savedSubtitleClassName);
-    if (savedDescriptionClassName) setDescriptionClassName(savedDescriptionClassName);
-    if (savedTitleAlignment) setTitleAlignment(savedTitleAlignment);
-    if (savedSubtitleAlignment) setSubtitleAlignment(savedSubtitleAlignment);
-    if (savedDescriptionAlignment) setDescriptionAlignment(savedDescriptionAlignment);
-  }, []);
-
-  useEffect(() => {
-    // Save state to local storage
-    localStorage.setItem("title", title);
-    localStorage.setItem("subtitle", subtitle);
-    localStorage.setItem("description", description);
-    localStorage.setItem("titleClassName", titleClassName);
-    localStorage.setItem("subtitleClassName", subtitleClassName);
-    localStorage.setItem("descriptionClassName", descriptionClassName);
-    localStorage.setItem("titleAlignment", titleAlignment);
-    localStorage.setItem("subtitleAlignment", subtitleAlignment);
-    localStorage.setItem("descriptionAlignment", descriptionAlignment);
-  }, [title, subtitle, description, titleClassName, subtitleClassName, descriptionClassName, titleAlignment, subtitleAlignment, descriptionAlignment]);
-
   return (
     <>
       <div>

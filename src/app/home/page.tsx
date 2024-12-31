@@ -3,6 +3,9 @@ import { useState } from "react";
 import ContentEditable, { ContentEditableEvent } from "react-contenteditable";
 import { useUser, UserProvider, signOutUser } from "../components/UserContext";
 import { useRouter } from "next/navigation";
+import { PiFrameCornersBold } from "react-icons/pi";
+import { IoLibraryOutline } from "react-icons/io5";
+import { FaCode } from "react-icons/fa";
 
 function HomeContent() {
   const [title, setTitle] = useState("Moe Sarraf");
@@ -22,11 +25,28 @@ function HomeContent() {
   const handleSignOut = async () => {
     try {
       await signOutUser(); // Call the signOut function
-      router.push('/'); // Redirect to the home page after signing out
+      router.push("/"); // Redirect to the home page after signing out
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error("Error signing out:", error);
     }
   };
+
+  const [skillsTitle, setSkillsTitle] = useState("Skills");
+  const [skillsDescription, setSkillsDescription] = useState(
+    `I bring a diverse skill set to the table, encompassing brand design programming,and. My expertise lies not only in creating visually appealing designs and efficient code but also in imparting this knowledge through teaching.`,
+  );
+  const [frameworksTitle, setFrameworksTitle] = useState("FrameWorks");
+  const [frameworksDescription, setFrameworksDescription] = useState(
+    "My technical proficiency is anchored in a variety of frameworks that enhance the development process",
+  );
+  const [librariesTitle, setLibrariesTitle] = useState("Libraries");
+  const [librariesDescription, setLibrariesDescription] = useState(
+    "I leverage powerful libraries to process data, create machine learning models, and visualize results",
+  );
+  const [languagesTitle, setLanguagesTitle] = useState("Programming Languages");
+  const [languagesDescription, setLanguagesDescription] = useState(
+    "Proficient in multiple programming languages, enabling versatility across various projects",
+  );
 
   return (
     <>
@@ -41,7 +61,9 @@ function HomeContent() {
       <main className="bg-black px-10 md:px-20 lg:px-40">
         <section className="min-h-screen">
           <nav className="mb-12 flex justify-between py-10">
-            <h1 className="text-xl cursor-pointer" onClick={handleSignOut}>Lilglu4e</h1>
+            <h1 className="text-xl cursor-pointer" onClick={handleSignOut}>
+              Lilglu4e
+            </h1>
           </nav>
           <div className="mx-auto max-w-2xl p-10 text-center">
             <ContentEditable
@@ -70,6 +92,217 @@ function HomeContent() {
               placeholder="Enter your description..."
               style={{ whiteSpace: "pre-wrap" }}
             />
+          </div>
+        </section>
+        <section>
+          <div>
+            <ContentEditable
+              html={skillsTitle}
+              onChange={handleChange(setSkillsTitle)}
+              tagName="h3"
+              className={`text-3xl py-1 `}
+              aria-label="Skills Title"
+              placeholder="Enter skills title..."
+            />
+            <ContentEditable
+              html={skillsDescription}
+              onChange={handleChange(setSkillsDescription)}
+              tagName="p"
+              className={`text-md py-2 leading-8`}
+              aria-label="Skills Description"
+              placeholder="Enter skills description..."
+              style={{ whiteSpace: "pre-wrap" }}
+            />
+          </div>
+          <div className="lg:flex gap-10">
+            <div
+              className={`text-center shadow-lg p-10 rounded-xl my-10 flex-1`}
+            >
+              <PiFrameCornersBold
+                className={`w-16 h-16 text-teal-600 mx-auto`}
+              />
+              <ContentEditable
+                html={frameworksTitle}
+                onChange={handleChange(setFrameworksTitle)}
+                tagName="h3"
+                className="text-lg font-medium pt-8 pb-2"
+                aria-label="Frameworks Title"
+                placeholder="Enter frameworks title..."
+              />
+              <ContentEditable
+                html={frameworksDescription}
+                onChange={handleChange(setFrameworksDescription)}
+                tagName="p"
+                className="py-2"
+                aria-label="Frameworks Description"
+                placeholder="Enter frameworks description..."
+                style={{ whiteSpace: "pre-wrap" }}
+              />
+              <ContentEditable
+                html="React"
+                onChange={handleChange((value) => console.log(value))}
+                tagName="p"
+                className="text-inherit py-1"
+                aria-label="Framework React"
+                placeholder="Enter framework..."
+              />
+              <ContentEditable
+                html="Next.js"
+                onChange={handleChange((value) => console.log(value))}
+                tagName="p"
+                className="text-inherit py-1"
+                aria-label="Framework Next.js"
+                placeholder="Enter framework..."
+              />
+              <ContentEditable
+                html="Figma"
+                onChange={handleChange((value) => console.log(value))}
+                tagName="p"
+                className="text-inherit py-1"
+                aria-label="Framework Figma"
+                placeholder="Enter framework..."
+              />
+              <ContentEditable
+                html="Firebase"
+                onChange={handleChange((value) => console.log(value))}
+                tagName="p"
+                className="text-inherit py-1"
+                aria-label="Framework Firebase"
+                placeholder="Enter framework..."
+              />
+              <ContentEditable
+                html="Material-UI, Tailwind, Bootstrap"
+                onChange={handleChange((value) => console.log(value))}
+                tagName="p"
+                className="text-inherit py-1"
+                aria-label="Framework Material-UI, Tailwind, Bootstrap"
+                placeholder="Enter framework..."
+              />
+            </div>
+            <div
+              className={`text-center shadow-lg p-10 rounded-xl my-10 flex-1`}
+            >
+              <IoLibraryOutline className={`w-16 h-16 text-teal-600 mx-auto`} />
+              <ContentEditable
+                html={librariesTitle}
+                onChange={handleChange(setLibrariesTitle)}
+                tagName="h3"
+                className="text-lg font-medium pt-8 pb-2"
+                aria-label="Libraries Title"
+                placeholder="Enter libraries title..."
+              />
+              <ContentEditable
+                html={librariesDescription}
+                onChange={handleChange(setLibrariesDescription)}
+                tagName="p"
+                className="py-2"
+                aria-label="Libraries Description"
+                placeholder="Enter libraries description..."
+                style={{ whiteSpace: "pre-wrap" }}
+              />
+              <ContentEditable
+                html="Pandas"
+                onChange={handleChange((value) => console.log(value))}
+                tagName="p"
+                className="text-inherit py-1"
+                aria-label="Library Pandas"
+                placeholder="Enter library..."
+              />
+              <ContentEditable
+                html="NumPy"
+                onChange={handleChange((value) => console.log(value))}
+                tagName="p"
+                className="text-inherit py-1"
+                aria-label="Library NumPy"
+                placeholder="Enter library..."
+              />
+              <ContentEditable
+                html="TensorFlow"
+                onChange={handleChange((value) => console.log(value))}
+                tagName="p"
+                className="text-inherit py-1"
+                aria-label="Library TensorFlow"
+                placeholder="Enter library..."
+              />
+              <ContentEditable
+                html="scikit-learn, matplotlib"
+                onChange={handleChange((value) => console.log(value))}
+                tagName="p"
+                className="text-inherit py-1"
+                aria-label="Library scikit-learn, matplotlib"
+                placeholder="Enter library..."
+              />
+              <ContentEditable
+                html="matplotlib"
+                onChange={handleChange((value) => console.log(value))}
+                tagName="p"
+                className="text-inherit py-1"
+                aria-label="Library matplotlib"
+                placeholder="Enter library..."
+              />
+            </div>
+            <div
+              className={`text-center shadow-lg p-10 rounded-xl my-10 flex-1`}
+            >
+              <FaCode className={`w-16 h-16 text-teal-600 mx-auto`} />
+              <ContentEditable
+                html={languagesTitle}
+                onChange={handleChange(setLanguagesTitle)}
+                tagName="h3"
+                className="text-lg font-medium pt-8 pb-2"
+                aria-label="Languages Title"
+                placeholder="Enter languages title..."
+              />
+              <ContentEditable
+                html={languagesDescription}
+                onChange={handleChange(setLanguagesDescription)}
+                tagName="p"
+                className="py-2"
+                aria-label="Languages Description"
+                placeholder="Enter languages description..."
+                style={{ whiteSpace: "pre-wrap" }}
+              />
+              <ContentEditable
+                html="C/C++"
+                onChange={handleChange((value) => console.log(value))}
+                tagName="p"
+                className="text-inherit py-1"
+                aria-label="Language C/C++"
+                placeholder="Enter language..."
+              />
+              <ContentEditable
+                html="Python"
+                onChange={handleChange((value) => console.log(value))}
+                tagName="p"
+                className="text-inherit py-1"
+                aria-label="Language Python"
+                placeholder="Enter language..."
+              />
+              <ContentEditable
+                html="SQL"
+                onChange={handleChange((value) => console.log(value))}
+                tagName="p"
+                className="text-inherit py-1"
+                aria-label="Language SQL"
+                placeholder="Enter language..."
+              />
+        <ContentEditable
+          html="Java"
+          onChange={handleChange((value) => console.log(value))}
+          tagName="p"
+          className="text-inherit py-1"
+          aria-label="Language Java"
+          placeholder="Enter language..."
+        />
+              <ContentEditable
+                html="HTML/CSS/JavaScript"
+                onChange={handleChange((value) => console.log(value))}
+                tagName="p"
+                className="text-inherit py-1"
+                aria-label="Language HTML/CSS/JavaScript"
+                placeholder="Enter language..."
+              />
+            </div>
           </div>
         </section>
       </main>

@@ -8,22 +8,6 @@ import { IoLibraryOutline } from "react-icons/io5";
 import { FaCode } from "react-icons/fa";
 import Toolbar from "../components/Toolbar";
 
-const handleH1Click = () => {
-  document.execCommand("formatBlock", false, "h1");
-};
-
-const handleH2Click = () => {
-  document.execCommand("formatBlock", false, "h2");
-};
-
-const handleH3Click = () => {
-  document.execCommand("formatBlock", false, "h3");
-};
-
-const handlePClick = () => {
-  document.execCommand("formatBlock", false, "p");
-};
-
 function HomeContent() {
   const [title, setTitle] = useState("Moe Sarraf");
   const [subtitle, setSubtitle] = useState("Developer and designer.");
@@ -52,9 +36,9 @@ function HomeContent() {
   const [activeField, setActiveField] = useState<string | null>(null);
   const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
 
-  const [titleClassName, setTitleClassName] = useState("text-5xl");
-  const [subtitleClassName, setSubtitleClassName] = useState("text-2xl");
-  const [descriptionClassName, setDescriptionClassName] = useState("text-sm");
+  const [titleClassName, setTitleClassName] = useState("text-6xl");
+  const [subtitleClassName, setSubtitleClassName] = useState("text-4xl");
+  const [descriptionClassName, setDescriptionClassName] = useState("text-xl");
   const [skillsTitleClassName, setSkillsTitleClassName] = useState("text-3xl");
   const [skillsDescriptionClassName, setSkillsDescriptionClassName] =
     useState("text-md");
@@ -177,7 +161,7 @@ function HomeContent() {
               html={title}
               onChange={handleChange(setTitle)}
               onClick={(e: MouseEvent) => handleTextClick("title", e)}
-              tagName="h2"
+              tagName="h1"
               className={`border-b-2 border-transparent py-2 font-medium text-blue-600 focus:border-blue-600 focus:outline-none ${titleClassName}`}
               aria-label="Page Title"
               placeholder="Enter your title..."

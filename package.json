@@ -6,12 +6,14 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint 'src/app/**/*.{ts,tsx}' --fix && prettier --write 'src/app/**/*.{ts,tsx,js,jsx,json,css,md}'"
+    "lint": "eslint 'src/app/**/*.{ts,tsx}' --fix && prettier --write 'src/app/**/*.{ts,tsx,js,jsx,json,css,md}'",
+    "format": "prettier --write 'src/app/**/*.{ts,tsx,js,jsx,json,css,md}'"
   },
   "dependencies": {
     "firebase": "^11.1.0",
     "next": "15.1.3",
     "react": "^19.0.0",
+    "react-contenteditable": "^3.3.7",
     "react-dom": "^19.0.0",
     "react-icons": "^5.4.0"
   },

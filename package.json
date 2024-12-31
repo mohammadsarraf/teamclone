@@ -10,6 +10,7 @@
     "format": "prettier --write 'src/app/**/*.{ts,tsx,js,jsx,json,css,md}'"
   },
   "dependencies": {
+    "draft-js": "^0.11.7",
     "firebase": "^11.1.0",
     "next": "15.1.3",
     "react": "^19.0.0",

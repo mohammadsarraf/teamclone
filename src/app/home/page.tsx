@@ -43,9 +43,9 @@ function HomeContent() {
   const [skillsDescriptionClassName, setSkillsDescriptionClassName] =
     useState("text-md");
 
-  const [titleAlignment, setTitleAlignment] = useState("left");
-  const [subtitleAlignment, setSubtitleAlignment] = useState("left");
-  const [descriptionAlignment, setDescriptionAlignment] = useState("left");
+  const [titleAlignment, setTitleAlignment] = useState("center");
+  const [subtitleAlignment, setSubtitleAlignment] = useState("center");
+  const [descriptionAlignment, setDescriptionAlignment] = useState("center");
   const [skillsTitleAlignment, setSkillsTitleAlignment] = useState("left");
   const [skillsDescriptionAlignment, setSkillsDescriptionAlignment] = useState("left");
 
@@ -129,6 +129,14 @@ function HomeContent() {
     if (activeField === "skillsDescription") setSkillsDescriptionAlignment(option);
   };
 
+  const handleColorChange = (color: string) => {
+    if (activeField === "title") setTitleClassName(`text-6xl ${color}`);
+    if (activeField === "subtitle") setSubtitleClassName(`text-4xl ${color}`);
+    if (activeField === "description") setDescriptionClassName(`text-xl ${color}`);
+    if (activeField === "skillsTitle") setSkillsTitleClassName(`text-3xl ${color}`);
+    if (activeField === "skillsDescription") setSkillsDescriptionClassName(`text-md ${color}`);
+  };
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -168,7 +176,8 @@ function HomeContent() {
               onH2Click={handleH2Click}
               onH3Click={handleH3Click}
               onPClick={handlePClick}
-              onJustifyClick={handleJustifyClick} // Pass the new handler
+              onJustifyClick={handleJustifyClick}
+              onColorChange={handleColorChange} // Pass the new handler
             />
           )}
           <div className="mx-auto max-w-2xl p-10 text-center">

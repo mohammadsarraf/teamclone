@@ -1,19 +1,32 @@
 "use client";
 import { useState } from "react";
 import ContentEditable, { ContentEditableEvent } from "react-contenteditable";
+import { useUser, UserProvider, signOutUser } from "../components/UserContext";
+import { useRouter } from "next/navigation";
 
-export default function Home() {
+function HomeContent() {
   const [title, setTitle] = useState("Moe Sarraf");
   const [subtitle, setSubtitle] = useState("Developer and designer.");
   const [description, setDescription] = useState(
     `As a Computer Science student deeply engaged with Data Science, AI, and Full-Stack Development, I am driven by a passion to blend creativity and technology. My portfolio, featuring diverse projects such as an interactive React mini-game and an innovative NBA MVP prediction model, is a testament to my commitment to crafting engaging user experiences and leveraging the power of data-driven insights.`,
   );
+  const { currentUser } = useUser();
+  const router = useRouter(); // Initialize the router
 
   const handleChange =
     (setter: React.Dispatch<React.SetStateAction<string>>) =>
     (evt: ContentEditableEvent) => {
       setter(evt.target.value);
     };
+
+  const handleSignOut = async () => {
+    try {
+      await signOutUser(); // Call the signOut function
+      router.push('/'); // Redirect to the home page after signing out
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
 
   return (
     <>
@@ -28,7 +41,7 @@ export default function Home() {
       <main className="bg-black px-10 md:px-20 lg:px-40">
         <section className="min-h-screen">
           <nav className="mb-12 flex justify-between py-10">
-            <h1 className="text-xl">Lilglu4e</h1>
+            <h1 className="text-xl cursor-pointer" onClick={handleSignOut}>Lilglu4e</h1>
           </nav>
           <div className="mx-auto max-w-2xl p-10 text-center">
             <ContentEditable
@@ -61,5 +74,13 @@ export default function Home() {
         </section>
       </main>
     </>
+  );
+}
+
+export default function Home() {
+  return (
+    <UserProvider>
+      <HomeContent />
+    </UserProvider>
   );
 }

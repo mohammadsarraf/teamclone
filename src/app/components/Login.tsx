@@ -136,7 +136,7 @@ const Login = ({ user }: any) => {
                 Continue with Google
               </span>
             </button>
-            <button className="flex w-full items-center gap-4 rounded-lg border border-gray-600 bg-[#2a2a2a] px-6 py-3 hover:bg-[#3b3b3b]">
+            <button className="flex w-full items-center gap-4 rounded-lg border border-gray-600 bg-[#2a2a2a] px-6 py-3 hover:bg-black">
               <FaApple className="size-6 text-gray-300" />
               <span className="flex-1 text-base font-medium leading-none text-gray-200">
                 Continue with Apple

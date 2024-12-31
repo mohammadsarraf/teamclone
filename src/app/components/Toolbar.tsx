@@ -1,8 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { BiCodeAlt, BiParagraph } from "react-icons/bi";
-import { BsJustify, BsJustifyLeft, BsJustifyRight, BsTypeH1, BsTypeH2, BsTypeH3 } from "react-icons/bs";
+import {
+  BsJustify,
+  BsJustifyLeft,
+  BsJustifyRight,
+  BsTypeH1,
+  BsTypeH2,
+  BsTypeH3,
+} from "react-icons/bs";
 import { CgStyle } from "react-icons/cg";
-import { CiGrid42, CiTextAlignCenter, CiTextAlignJustify, CiTextAlignLeft, CiTextAlignRight } from "react-icons/ci";
+import {
+  CiGrid42,
+  CiTextAlignCenter,
+  CiTextAlignJustify,
+  CiTextAlignLeft,
+  CiTextAlignRight,
+} from "react-icons/ci";
 import { FaDotCircle } from "react-icons/fa";
 import { FaAlignJustify } from "react-icons/fa6";
 import { GrDiamond, GrDrag } from "react-icons/gr";

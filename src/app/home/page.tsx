@@ -47,7 +47,8 @@ function HomeContent() {
   const [subtitleAlignment, setSubtitleAlignment] = useState("center");
   const [descriptionAlignment, setDescriptionAlignment] = useState("center");
   const [skillsTitleAlignment, setSkillsTitleAlignment] = useState("left");
-  const [skillsDescriptionAlignment, setSkillsDescriptionAlignment] = useState("left");
+  const [skillsDescriptionAlignment, setSkillsDescriptionAlignment] =
+    useState("left");
 
   const handleChange =
     (setter: React.Dispatch<React.SetStateAction<string>>) =>
@@ -126,15 +127,19 @@ function HomeContent() {
     if (activeField === "subtitle") setSubtitleAlignment(option);
     if (activeField === "description") setDescriptionAlignment(option);
     if (activeField === "skillsTitle") setSkillsTitleAlignment(option);
-    if (activeField === "skillsDescription") setSkillsDescriptionAlignment(option);
+    if (activeField === "skillsDescription")
+      setSkillsDescriptionAlignment(option);
   };
 
   const handleColorChange = (color: string) => {
     if (activeField === "title") setTitleClassName(`text-6xl ${color}`);
     if (activeField === "subtitle") setSubtitleClassName(`text-4xl ${color}`);
-    if (activeField === "description") setDescriptionClassName(`text-xl ${color}`);
-    if (activeField === "skillsTitle") setSkillsTitleClassName(`text-3xl ${color}`);
-    if (activeField === "skillsDescription") setSkillsDescriptionClassName(`text-md ${color}`);
+    if (activeField === "description")
+      setDescriptionClassName(`text-xl ${color}`);
+    if (activeField === "skillsTitle")
+      setSkillsTitleClassName(`text-3xl ${color}`);
+    if (activeField === "skillsDescription")
+      setSkillsDescriptionClassName(`text-md ${color}`);
   };
 
   useEffect(() => {
@@ -226,7 +231,9 @@ function HomeContent() {
             <ContentEditable
               html={skillsDescription}
               onChange={handleChange(setSkillsDescription)}
-              onClick={(e: MouseEvent) => handleTextClick("skillsDescription", e)}
+              onClick={(e: MouseEvent) =>
+                handleTextClick("skillsDescription", e)
+              }
               tagName="p"
               className={`py-2 leading-8 ${skillsDescriptionClassName}`}
               aria-label="Skills Description"
@@ -240,7 +247,9 @@ function HomeContent() {
               <ContentEditable
                 html={frameworksTitle}
                 onChange={handleChange(setFrameworksTitle)}
-                onClick={(e: MouseEvent) => handleTextClick("frameworksTitle", e)}
+                onClick={(e: MouseEvent) =>
+                  handleTextClick("frameworksTitle", e)
+                }
                 tagName="h3"
                 className="pb-2 pt-8 text-lg font-medium"
                 aria-label="Frameworks Title"
@@ -249,7 +258,9 @@ function HomeContent() {
               <ContentEditable
                 html={frameworksDescription}
                 onChange={handleChange(setFrameworksDescription)}
-                onClick={(e: MouseEvent) => handleTextClick("frameworksDescription", e)}
+                onClick={(e: MouseEvent) =>
+                  handleTextClick("frameworksDescription", e)
+                }
                 tagName="p"
                 className="py-2"
                 aria-label="Frameworks Description"
@@ -259,7 +270,9 @@ function HomeContent() {
               <ContentEditable
                 html="React"
                 onChange={handleChange((value) => console.log(value))}
-                onClick={(e: MouseEvent) => handleTextClick("frameworkReact", e)}
+                onClick={(e: MouseEvent) =>
+                  handleTextClick("frameworkReact", e)
+                }
                 tagName="p"
                 className="py-1 text-inherit"
                 aria-label="Framework React"
@@ -268,7 +281,9 @@ function HomeContent() {
               <ContentEditable
                 html="Next.js"
                 onChange={handleChange((value) => console.log(value))}
-                onClick={(e: MouseEvent) => handleTextClick("frameworkNextjs", e)}
+                onClick={(e: MouseEvent) =>
+                  handleTextClick("frameworkNextjs", e)
+                }
                 tagName="p"
                 className="py-1 text-inherit"
                 aria-label="Framework Next.js"
@@ -277,7 +292,9 @@ function HomeContent() {
               <ContentEditable
                 html="Figma"
                 onChange={handleChange((value) => console.log(value))}
-                onClick={(e: MouseEvent) => handleTextClick("frameworkFigma", e)}
+                onClick={(e: MouseEvent) =>
+                  handleTextClick("frameworkFigma", e)
+                }
                 tagName="p"
                 className="py-1 text-inherit"
                 aria-label="Framework Figma"
@@ -286,7 +303,9 @@ function HomeContent() {
               <ContentEditable
                 html="Firebase"
                 onChange={handleChange((value) => console.log(value))}
-                onClick={(e: MouseEvent) => handleTextClick("frameworkFirebase", e)}
+                onClick={(e: MouseEvent) =>
+                  handleTextClick("frameworkFirebase", e)
+                }
                 tagName="p"
                 className="py-1 text-inherit"
                 aria-label="Framework Firebase"
@@ -295,7 +314,9 @@ function HomeContent() {
               <ContentEditable
                 html="Material-UI, Tailwind, Bootstrap"
                 onChange={handleChange((value) => console.log(value))}
-                onClick={(e: MouseEvent) => handleTextClick("frameworkMaterialUI", e)}
+                onClick={(e: MouseEvent) =>
+                  handleTextClick("frameworkMaterialUI", e)
+                }
                 tagName="p"
                 className="py-1 text-inherit"
                 aria-label="Framework Material-UI, Tailwind, Bootstrap"
@@ -307,7 +328,9 @@ function HomeContent() {
               <ContentEditable
                 html={librariesTitle}
                 onChange={handleChange(setLibrariesTitle)}
-                onClick={(e: MouseEvent) => handleTextClick("librariesTitle", e)}
+                onClick={(e: MouseEvent) =>
+                  handleTextClick("librariesTitle", e)
+                }
                 tagName="h3"
                 className="pb-2 pt-8 text-lg font-medium"
                 aria-label="Libraries Title"
@@ -316,7 +339,9 @@ function HomeContent() {
               <ContentEditable
                 html={librariesDescription}
                 onChange={handleChange(setLibrariesDescription)}
-                onClick={(e: MouseEvent) => handleTextClick("librariesDescription", e)}
+                onClick={(e: MouseEvent) =>
+                  handleTextClick("librariesDescription", e)
+                }
                 tagName="p"
                 className="py-2"
                 aria-label="Libraries Description"
@@ -344,7 +369,9 @@ function HomeContent() {
               <ContentEditable
                 html="TensorFlow"
                 onChange={handleChange((value) => console.log(value))}
-                onClick={(e: MouseEvent) => handleTextClick("libraryTensorFlow", e)}
+                onClick={(e: MouseEvent) =>
+                  handleTextClick("libraryTensorFlow", e)
+                }
                 tagName="p"
                 className="py-1 text-inherit"
                 aria-label="Library TensorFlow"
@@ -353,7 +380,9 @@ function HomeContent() {
               <ContentEditable
                 html="scikit-learn, matplotlib"
                 onChange={handleChange((value) => console.log(value))}
-                onClick={(e: MouseEvent) => handleTextClick("libraryScikitLearn", e)}
+                onClick={(e: MouseEvent) =>
+                  handleTextClick("libraryScikitLearn", e)
+                }
                 tagName="p"
                 className="py-1 text-inherit"
                 aria-label="Library scikit-learn, matplotlib"
@@ -362,7 +391,9 @@ function HomeContent() {
               <ContentEditable
                 html="matplotlib"
                 onChange={handleChange((value) => console.log(value))}
-                onClick={(e: MouseEvent) => handleTextClick("libraryMatplotlib", e)}
+                onClick={(e: MouseEvent) =>
+                  handleTextClick("libraryMatplotlib", e)
+                }
                 tagName="p"
                 className="py-1 text-inherit"
                 aria-label="Library matplotlib"
@@ -374,7 +405,9 @@ function HomeContent() {
               <ContentEditable
                 html={languagesTitle}
                 onChange={handleChange(setLanguagesTitle)}
-                onClick={(e: MouseEvent) => handleTextClick("languagesTitle", e)}
+                onClick={(e: MouseEvent) =>
+                  handleTextClick("languagesTitle", e)
+                }
                 tagName="h3"
                 className="pb-2 pt-8 text-lg font-medium"
                 aria-label="Languages Title"
@@ -383,7 +416,9 @@ function HomeContent() {
               <ContentEditable
                 html={languagesDescription}
                 onChange={handleChange(setLanguagesDescription)}
-                onClick={(e: MouseEvent) => handleTextClick("languagesDescription", e)}
+                onClick={(e: MouseEvent) =>
+                  handleTextClick("languagesDescription", e)
+                }
                 tagName="p"
                 className="py-2"
                 aria-label="Languages Description"
@@ -402,7 +437,9 @@ function HomeContent() {
               <ContentEditable
                 html="Python"
                 onChange={handleChange((value) => console.log(value))}
-                onClick={(e: MouseEvent) => handleTextClick("languagePython", e)}
+                onClick={(e: MouseEvent) =>
+                  handleTextClick("languagePython", e)
+                }
                 tagName="p"
                 className="py-1 text-inherit"
                 aria-label="Language Python"

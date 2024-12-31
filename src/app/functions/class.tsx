@@ -13,7 +13,7 @@ const firebaseConfig = {
   storageBucket: "teamclone-cd356.firebasestorage.app",
   messagingSenderId: "423064596545",
   appId: "1:423064596545:web:9b549ce43726012c5496c0",
-  measurementId: "G-YYM2JVLV8M"
+  measurementId: "G-YYM2JVLV8M",
 };
 
 // // Initialize Firebase

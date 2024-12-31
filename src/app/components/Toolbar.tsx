@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { BiCodeAlt, BiParagraph } from "react-icons/bi";
-import { BsTypeH1, BsTypeH2, BsTypeH3 } from "react-icons/bs";
+import { BsJustify, BsJustifyLeft, BsJustifyRight, BsTypeH1, BsTypeH2, BsTypeH3 } from "react-icons/bs";
 import { CgStyle } from "react-icons/cg";
-import { CiGrid42 } from "react-icons/ci";
+import { CiGrid42, CiTextAlignCenter, CiTextAlignJustify, CiTextAlignLeft, CiTextAlignRight } from "react-icons/ci";
 import { FaDotCircle } from "react-icons/fa";
 import { FaAlignJustify } from "react-icons/fa6";
 import { GrDiamond, GrDrag } from "react-icons/gr";
@@ -19,6 +19,7 @@ interface ToolbarProps {
   onH2Click: () => void;
   onH3Click: () => void;
   onPClick: () => void;
+  onJustifyClick: (option: string) => void; // Add new prop
 }
 
 const Toolbar: React.FC<ToolbarProps> = ({
@@ -30,11 +31,17 @@ const Toolbar: React.FC<ToolbarProps> = ({
   onH2Click,
   onH3Click,
   onPClick,
+  onJustifyClick, // Destructure new prop
 }) => {
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showJustifyDropdown, setShowJustifyDropdown] = useState(false);
 
   const handleSizeOption = () => {
     setShowDropdown(!showDropdown);
+  };
+
+  const handleJustifyOption = () => {
+    setShowJustifyDropdown(!showJustifyDropdown);
   };
 
   const handleOptionClick = (option: string) => {
@@ -59,6 +66,27 @@ const Toolbar: React.FC<ToolbarProps> = ({
       default:
         break;
     }
+  };
+
+  const handleJustifyClick = (option: string) => {
+    setShowJustifyDropdown(false);
+    switch (option) {
+      case "left":
+        document.execCommand("justifyLeft");
+        break;
+      case "center":
+        document.execCommand("justifyCenter");
+        break;
+      case "right":
+        document.execCommand("justifyRight");
+        break;
+      case "justify":
+        document.execCommand("justifyFull");
+        break;
+      default:
+        break;
+    }
+    onJustifyClick(option); // Call the new handler
   };
 
   useEffect(() => {
@@ -127,7 +155,39 @@ const Toolbar: React.FC<ToolbarProps> = ({
               </div>
             </div>
           )}
-          <FaAlignJustify className="m-2">...</FaAlignJustify>
+          <FaAlignJustify className="m-2" onClick={handleJustifyOption}>
+            ...
+          </FaAlignJustify>
+          {showJustifyDropdown && (
+            <div className="absolute left-40 top-full mt-1 rounded border bg-white shadow-lg">
+              <div className="flex flex-col text-sm">
+                <div
+                  className="flex cursor-pointer items-center p-2 hover:bg-gray-200"
+                  onClick={() => handleJustifyClick("left")}
+                >
+                  <CiTextAlignLeft className="mr-2" /> Left
+                </div>
+                <div
+                  className="flex cursor-pointer items-center p-2 hover:bg-gray-200"
+                  onClick={() => handleJustifyClick("center")}
+                >
+                  <CiTextAlignCenter className="mr-2" /> Center
+                </div>
+                <div
+                  className="flex cursor-pointer items-center p-2 hover:bg-gray-200"
+                  onClick={() => handleJustifyClick("right")}
+                >
+                  <CiTextAlignRight className="mr-2" /> Right
+                </div>
+                <div
+                  className="flex cursor-pointer items-center p-2 hover:bg-gray-200"
+                  onClick={() => handleJustifyClick("justify")}
+                >
+                  <CiTextAlignJustify className="mr-2" /> Justify
+                </div>
+              </div>
+            </div>
+          )}
         </div>
         <div className="flex">
           <SlOptionsVertical className="m-2">...</SlOptionsVertical>

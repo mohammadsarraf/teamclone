@@ -43,6 +43,12 @@ function HomeContent() {
   const [skillsDescriptionClassName, setSkillsDescriptionClassName] =
     useState("text-md");
 
+  const [titleAlignment, setTitleAlignment] = useState("left");
+  const [subtitleAlignment, setSubtitleAlignment] = useState("left");
+  const [descriptionAlignment, setDescriptionAlignment] = useState("left");
+  const [skillsTitleAlignment, setSkillsTitleAlignment] = useState("left");
+  const [skillsDescriptionAlignment, setSkillsDescriptionAlignment] = useState("left");
+
   const handleChange =
     (setter: React.Dispatch<React.SetStateAction<string>>) =>
     (evt: ContentEditableEvent) => {
@@ -115,6 +121,14 @@ function HomeContent() {
       setSkillsDescriptionClassName("text-base");
   };
 
+  const handleJustifyClick = (option: string) => {
+    if (activeField === "title") setTitleAlignment(option);
+    if (activeField === "subtitle") setSubtitleAlignment(option);
+    if (activeField === "description") setDescriptionAlignment(option);
+    if (activeField === "skillsTitle") setSkillsTitleAlignment(option);
+    if (activeField === "skillsDescription") setSkillsDescriptionAlignment(option);
+  };
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -154,6 +168,7 @@ function HomeContent() {
               onH2Click={handleH2Click}
               onH3Click={handleH3Click}
               onPClick={handlePClick}
+              onJustifyClick={handleJustifyClick} // Pass the new handler
             />
           )}
           <div className="mx-auto max-w-2xl p-10 text-center">
@@ -162,7 +177,7 @@ function HomeContent() {
               onChange={handleChange(setTitle)}
               onClick={(e: MouseEvent) => handleTextClick("title", e)}
               tagName="h1"
-              className={`border-b-2 border-transparent py-2 font-medium text-blue-600 focus:border-blue-600 focus:outline-none ${titleClassName}`}
+              className={`border-b-2 border-transparent py-2 font-medium text-blue-600 focus:border-blue-600 focus:outline-none ${titleClassName} text-${titleAlignment}`}
               aria-label="Page Title"
               placeholder="Enter your title..."
             />
@@ -171,7 +186,7 @@ function HomeContent() {
               onChange={handleChange(setSubtitle)}
               onClick={(e: MouseEvent) => handleTextClick("subtitle", e)}
               tagName="h3"
-              className={`border-b-2 border-transparent py-2 focus:border-blue-600 focus:outline-none ${subtitleClassName}`}
+              className={`border-b-2 border-transparent py-2 focus:border-blue-600 focus:outline-none ${subtitleClassName} text-${subtitleAlignment}`}
               aria-label="Subtitle"
               placeholder="Enter your subtitle..."
               style={{ whiteSpace: "pre-wrap" }}
@@ -181,7 +196,7 @@ function HomeContent() {
               onChange={handleChange(setDescription)}
               onClick={(e: MouseEvent) => handleTextClick("description", e)}
               tagName="p"
-              className={`border-b-2 border-transparent py-5 leading-8 text-white focus:border-blue-600 focus:outline-none ${descriptionClassName}`}
+              className={`border-b-2 border-transparent py-5 leading-8 text-white focus:border-blue-600 focus:outline-none ${descriptionClassName} text-${descriptionAlignment}`}
               aria-label="Description"
               placeholder="Enter your description..."
               style={{ whiteSpace: "pre-wrap" }}

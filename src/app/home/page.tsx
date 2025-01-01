@@ -59,8 +59,9 @@ function HomeContent() {
   const handleTextClick = (field: string, event: MouseEvent) => {
     setActiveField(field);
     const rect = (event.target as HTMLElement).getBoundingClientRect();
+    const scrollY = window.scrollY || window.pageYOffset;
     setToolbarPosition({
-      top: rect.top - 40,
+      top: rect.top + scrollY - 40,
       left: rect.left + rect.width / 2,
     });
   };
@@ -87,39 +88,57 @@ function HomeContent() {
   };
 
   const handleH1Click = () => {
+    if (activeField === "title") setTitleClassName("text-6xl");
+    if (activeField === "subtitle") setSubtitleClassName("text-6xl");
+    if (activeField === "description") setDescriptionClassName("text-6xl");
+    if (activeField === "skillsTitle") setSkillsTitleClassName("text-6xl");
+    if (activeField === "skillsDescription")
+      setSkillsDescriptionClassName("text-6xl");
+  };
+
+  const handleH2Click = () => {
     if (activeField === "title") setTitleClassName("text-5xl");
-    if (activeField === "subtitle") setSubtitleClassName("text-4xl");
-    if (activeField === "description") setDescriptionClassName("text-3xl");
+    if (activeField === "subtitle") setSubtitleClassName("text-5xl");
+    if (activeField === "description") setDescriptionClassName("text-5xl");
     if (activeField === "skillsTitle") setSkillsTitleClassName("text-5xl");
+    if (activeField === "skillsDescription")
+      setSkillsDescriptionClassName("text-5xl");
+  };
+
+  const handleH3Click = () => {
+    if (activeField === "title") setTitleClassName("text-4xl");
+    if (activeField === "subtitle") setSubtitleClassName("text-4xl");
+    if (activeField === "description") setDescriptionClassName("text-4xl");
+    if (activeField === "skillsTitle") setSkillsTitleClassName("text-4xl");
+    if (activeField === "skillsDescription")
+      setSkillsDescriptionClassName("text-4xl");
+  };
+
+  const handleH4Click = () => {
+    if (activeField === "title") setTitleClassName("text-3xl");
+    if (activeField === "subtitle") setSubtitleClassName("text-3xl");
+    if (activeField === "description") setDescriptionClassName("text-3xl");
+    if (activeField === "skillsTitle") setSkillsTitleClassName("text-3xl");
     if (activeField === "skillsDescription")
       setSkillsDescriptionClassName("text-3xl");
   };
 
-  const handleH2Click = () => {
-    if (activeField === "title") setTitleClassName("text-4xl");
-    if (activeField === "subtitle") setSubtitleClassName("text-3xl");
+  const handleH5Click = () => {
+    if (activeField === "title") setTitleClassName("text-2xl");
+    if (activeField === "subtitle") setSubtitleClassName("text-2xl");
     if (activeField === "description") setDescriptionClassName("text-2xl");
-    if (activeField === "skillsTitle") setSkillsTitleClassName("text-4xl");
+    if (activeField === "skillsTitle") setSkillsTitleClassName("text-2xl");
     if (activeField === "skillsDescription")
       setSkillsDescriptionClassName("text-2xl");
   };
 
-  const handleH3Click = () => {
-    if (activeField === "title") setTitleClassName("text-3xl");
-    if (activeField === "subtitle") setSubtitleClassName("text-2xl");
+  const handleH6Click = () => {
+    if (activeField === "title") setTitleClassName("text-xl");
+    if (activeField === "subtitle") setSubtitleClassName("text-xl");
     if (activeField === "description") setDescriptionClassName("text-xl");
-    if (activeField === "skillsTitle") setSkillsTitleClassName("text-3xl");
+    if (activeField === "skillsTitle") setSkillsTitleClassName("text-xl");
     if (activeField === "skillsDescription")
       setSkillsDescriptionClassName("text-xl");
-  };
-
-  const handlePClick = () => {
-    if (activeField === "title") setTitleClassName("text-base");
-    if (activeField === "subtitle") setSubtitleClassName("text-base");
-    if (activeField === "description") setDescriptionClassName("text-base");
-    if (activeField === "skillsTitle") setSkillsTitleClassName("text-base");
-    if (activeField === "skillsDescription")
-      setSkillsDescriptionClassName("text-base");
   };
 
   const handleJustifyClick = (option: string) => {
@@ -180,7 +199,9 @@ function HomeContent() {
               onH1Click={handleH1Click}
               onH2Click={handleH2Click}
               onH3Click={handleH3Click}
-              onPClick={handlePClick}
+              onH4Click={handleH4Click}
+              onH5Click={handleH5Click}
+              onH6Click={handleH6Click}
               onJustifyClick={handleJustifyClick}
               onColorChange={handleColorChange} // Pass the new handler
             />
@@ -203,17 +224,15 @@ function HomeContent() {
               className={`border-b-2 border-transparent py-2 focus:border-blue-600 focus:outline-none ${subtitleClassName} text-${subtitleAlignment}`}
               aria-label="Subtitle"
               placeholder="Enter your subtitle..."
-              style={{ whiteSpace: "pre-wrap" }}
             />
             <ContentEditable
               html={description}
               onChange={handleChange(setDescription)}
               onClick={(e: MouseEvent) => handleTextClick("description", e)}
               tagName="p"
-              className={`border-b-2 border-transparent py-5 leading-8 text-white focus:border-blue-600 focus:outline-none ${descriptionClassName} text-${descriptionAlignment}`}
+              className={`border-b-2 border-transparent py-5 leading-8 focus:border-blue-600 focus:outline-none ${descriptionClassName} text-${descriptionAlignment}`}
               aria-label="Description"
               placeholder="Enter your description..."
-              style={{ whiteSpace: "pre-wrap" }}
             />
           </div>
         </section>
@@ -224,7 +243,7 @@ function HomeContent() {
               onChange={handleChange(setSkillsTitle)}
               onClick={(e: MouseEvent) => handleTextClick("skillsTitle", e)}
               tagName="h3"
-              className={`py-1 ${skillsTitleClassName}`}
+              className={`py-1 ${skillsTitleClassName} text-${skillsTitleAlignment}`}
               aria-label="Skills Title"
               placeholder="Enter skills title..."
             />
@@ -235,10 +254,9 @@ function HomeContent() {
                 handleTextClick("skillsDescription", e)
               }
               tagName="p"
-              className={`py-2 leading-8 ${skillsDescriptionClassName}`}
+              className={`py-2 leading-8 ${skillsDescriptionClassName} text-${skillsDescriptionAlignment}`}
               aria-label="Skills Description"
               placeholder="Enter skills description..."
-              style={{ whiteSpace: "pre-wrap" }}
             />
           </div>
           <div className="gap-10 lg:flex">
@@ -265,7 +283,6 @@ function HomeContent() {
                 className="py-2"
                 aria-label="Frameworks Description"
                 placeholder="Enter frameworks description..."
-                style={{ whiteSpace: "pre-wrap" }}
               />
               <ContentEditable
                 html="React"
@@ -346,7 +363,6 @@ function HomeContent() {
                 className="py-2"
                 aria-label="Libraries Description"
                 placeholder="Enter libraries description..."
-                style={{ whiteSpace: "pre-wrap" }}
               />
               <ContentEditable
                 html="Pandas"
@@ -423,7 +439,6 @@ function HomeContent() {
                 className="py-2"
                 aria-label="Languages Description"
                 placeholder="Enter languages description..."
-                style={{ whiteSpace: "pre-wrap" }}
               />
               <ContentEditable
                 html="C/C++"

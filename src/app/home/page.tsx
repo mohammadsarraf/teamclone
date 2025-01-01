@@ -161,6 +161,21 @@ function HomeContent() {
       setSkillsDescriptionClassName(`text-md ${color}`);
   };
 
+  const getAlignmentClass = (alignment: string) => {
+    switch (alignment) {
+      case "left":
+        return "text-left";
+      case "center":
+        return "text-center";
+      case "right":
+        return "text-right";
+      case "justify":
+        return "text-justify";
+      default:
+        return "";
+    }
+  };
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -211,8 +226,8 @@ function HomeContent() {
               html={title}
               onChange={handleChange(setTitle)}
               onClick={(e: MouseEvent) => handleTextClick("title", e)}
-              tagName="h1"
-              className={`border-b-2 border-transparent py-2 font-medium text-blue-600 focus:border-blue-600 focus:outline-none ${titleClassName} text-${titleAlignment}`}
+              tagName="p"
+              className={`border-b-2 border-transparent py-2 font-medium text-blue-600 focus:border-blue-600 focus:outline-none ${titleClassName} ${getAlignmentClass(titleAlignment)}`}
               aria-label="Page Title"
               placeholder="Enter your title..."
             />
@@ -220,8 +235,8 @@ function HomeContent() {
               html={subtitle}
               onChange={handleChange(setSubtitle)}
               onClick={(e: MouseEvent) => handleTextClick("subtitle", e)}
-              tagName="h3"
-              className={`border-b-2 border-transparent py-2 focus:border-blue-600 focus:outline-none ${subtitleClassName} text-${subtitleAlignment}`}
+              tagName="p"
+              className={`border-b-2 border-transparent py-2 focus:border-blue-600 focus:outline-none ${subtitleClassName} ${getAlignmentClass(subtitleAlignment)}`}
               aria-label="Subtitle"
               placeholder="Enter your subtitle..."
             />
@@ -230,7 +245,7 @@ function HomeContent() {
               onChange={handleChange(setDescription)}
               onClick={(e: MouseEvent) => handleTextClick("description", e)}
               tagName="p"
-              className={`border-b-2 border-transparent py-5 leading-8 focus:border-blue-600 focus:outline-none ${descriptionClassName} text-${descriptionAlignment}`}
+              className={`border-b-2 border-transparent py-5 leading-8 focus:border-blue-600 focus:outline-none ${descriptionClassName} ${getAlignmentClass(descriptionAlignment)}`}
               aria-label="Description"
               placeholder="Enter your description..."
             />
@@ -243,7 +258,7 @@ function HomeContent() {
               onChange={handleChange(setSkillsTitle)}
               onClick={(e: MouseEvent) => handleTextClick("skillsTitle", e)}
               tagName="h3"
-              className={`py-1 ${skillsTitleClassName} text-${skillsTitleAlignment}`}
+              className={`py-1 ${skillsTitleClassName} ${getAlignmentClass(skillsTitleAlignment)}`}
               aria-label="Skills Title"
               placeholder="Enter skills title..."
             />
@@ -254,7 +269,7 @@ function HomeContent() {
                 handleTextClick("skillsDescription", e)
               }
               tagName="p"
-              className={`py-2 leading-8 ${skillsDescriptionClassName} text-${skillsDescriptionAlignment}`}
+              className={`py-2 leading-8 ${skillsDescriptionClassName} ${getAlignmentClass(skillsDescriptionAlignment)}`}
               aria-label="Skills Description"
               placeholder="Enter skills description..."
             />

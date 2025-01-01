@@ -7,6 +7,9 @@ import {
   BsTypeH1,
   BsTypeH2,
   BsTypeH3,
+  BsTypeH4,
+  BsTypeH5,
+  BsTypeH6,
 } from "react-icons/bs";
 import { CgStyle } from "react-icons/cg";
 import {
@@ -32,7 +35,9 @@ interface ToolbarProps {
   onH1Click: () => void;
   onH2Click: () => void;
   onH3Click: () => void;
-  onPClick: () => void;
+  onH4Click: () => void;
+  onH5Click: () => void;
+  onH6Click: () => void;
   onJustifyClick: (option: string) => void;
   onColorChange: (color: string) => void; // Add new prop
 }
@@ -44,35 +49,37 @@ const Toolbar: React.FC<ToolbarProps> = ({
   onItalicClick,
   onH1Click,
   onH2Click,
-  onH3Click,
-  onPClick,
+  onH3Click,  
+  onH4Click,
+  onH5Click,
+  onH6Click,
   onJustifyClick,
   onColorChange, // Destructure new prop
 }) => {
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [showSizeDropdown, setShowSizeDropdown] = useState(false);
   const [showJustifyDropdown, setShowJustifyDropdown] = useState(false);
   const [showColorDropdown, setShowColorDropdown] = useState(false);
 
   const handleSizeOption = () => {
     setShowJustifyDropdown(false);
     setShowColorDropdown(false);
-    setShowDropdown(!showDropdown);
+    setShowSizeDropdown(!showSizeDropdown);
   };
 
   const handleJustifyOption = () => {
     setShowJustifyDropdown(!showJustifyDropdown);
-    setShowDropdown(false);
+    setShowSizeDropdown(false);
     setShowColorDropdown(false);
   };
 
   const handleColorOption = () => {
     setShowColorDropdown(!showColorDropdown);
-    setShowDropdown(false);
+    setShowSizeDropdown(false);
     setShowJustifyDropdown(false);
   };
 
   const handleOptionClick = (option: string) => {
-    setShowDropdown(false);
+    setShowSizeDropdown(false);
     switch (option) {
       case "H1":
         document.execCommand("formatBlock", false, "h1");
@@ -86,10 +93,19 @@ const Toolbar: React.FC<ToolbarProps> = ({
         document.execCommand("formatBlock", false, "h3");
         onH3Click();
         break;
-      case "P":
-        document.execCommand("formatBlock", false, "p");
-        onPClick();
+      case "H4":
+        document.execCommand("formatBlock", false, "h4");
+        onH4Click();
         break;
+      case "H5":
+        document.execCommand("formatBlock", false, "h5");
+        onH5Click();
+        break;
+      case "H6":
+        document.execCommand("formatBlock", false, "h6");
+        onH6Click();
+        break;
+
       default:
         break;
     }
@@ -144,21 +160,21 @@ const Toolbar: React.FC<ToolbarProps> = ({
       }}
     >
       <div className="flex">
-        <div className="flex border-r">
+        <div className="flex border-r border-black">
           <CiGrid42 className="m-2" onClick={onBoldClick} />
         </div>
-        <div className="flex border-r">
+        <div className="flex border-r border-black">
           <BiParagraph className="m-2" onClick={onItalicClick} />
           <div className="relative">
             <GrDrag className="m-2" />
           </div>
           <BiCodeAlt className="m-2">...</BiCodeAlt>
         </div>
-        <div className="flex border-r">
+        <div className="flex border-r border-black">
           <RiFontSize2 className="m-2" onClick={handleSizeOption}>
             ...
           </RiFontSize2>
-          {showDropdown && (
+          {showSizeDropdown && (
             <div className="absolute left-0 top-full mt-1 w-full rounded border bg-gray-200 shadow-lg">
               <div className="flex flex-col text-sm">
                 <div
@@ -178,12 +194,24 @@ const Toolbar: React.FC<ToolbarProps> = ({
                   onClick={() => handleOptionClick("H3")}
                 >
                   <BsTypeH3 className="mr-2" /> Heading 3
+                </div>{" "}
+                <div
+                  className="flex cursor-pointer items-center p-2 hover:bg-white"
+                  onClick={() => handleOptionClick("H4")}
+                >
+                  <BsTypeH4 className="mr-2" /> Heading 4
                 </div>
                 <div
                   className="flex cursor-pointer items-center p-2 hover:bg-white"
-                  onClick={() => handleOptionClick("P")}
+                  onClick={() => handleOptionClick("H5")}
                 >
-                  <BiParagraph className="mr-2" /> Paragraph
+                  <BsTypeH5 className="mr-2" /> Heading 5
+                </div>
+                <div
+                  className="flex cursor-pointer items-center p-2 hover:bg-white"
+                  onClick={() => handleOptionClick("H6")}
+                >
+                  <BsTypeH6 className="mr-2" /> Heading 6
                 </div>
               </div>
             </div>
@@ -213,7 +241,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
                   <CiTextAlignRight className="mr-2" /> Right
                 </div>
                 <div
-                  className="flex cursor-pointer items-center p-2 hover:bg-white"
+                  className="flex cursor-pointer items-center p-2 hover:bg-white "
                   onClick={() => handleJustifyClick("justify")}
                 >
                   <CiTextAlignJustify className="mr-2" /> Justify

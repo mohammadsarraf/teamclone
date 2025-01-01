@@ -130,7 +130,7 @@ const Login = ({ user }: any) => {
 
           {/* Social Buttons */}
           <div className="flex-1 space-y-4">
-            <button className="flex w-full items-center gap-4 rounded-lg border border-gray-600 bg-[#2a2a2a] px-6 py-3 hover:bg-[#3b3b3b]">
+            <button className="flex w-full items-center gap-4 rounded-lg border border-gray-600 bg-[#2a2a2a] px-6 py-3 hover:bg-blue-600">
               <FaGoogle className="size-6 text-red-500" />
               <span className="flex-1 text-base font-medium leading-none text-gray-200">
                 Continue with Google
@@ -142,19 +142,19 @@ const Login = ({ user }: any) => {
                 Continue with Apple
               </span>
             </button>
-            <button className="flex w-full items-center gap-4 rounded-lg border border-gray-600 bg-[#2a2a2a] px-6 py-3 hover:bg-[#3b3b3b]">
+            <button className="flex w-full items-center gap-4 rounded-lg border border-gray-600 bg-[#2a2a2a] px-6 py-3 hover:bg-gray-700">
               <FaGithub className="size-6 text-gray-200" />
               <span className="flex-1 text-base font-medium leading-none text-gray-200">
                 Continue with GitHub
               </span>
             </button>
-            <button className="flex w-full items-center gap-4 rounded-lg border border-gray-600 bg-[#2a2a2a] px-6 py-3 hover:bg-[#3b3b3b]">
+            <button className="flex w-full items-center gap-4 rounded-lg border border-gray-600 bg-[#2a2a2a] px-6 py-3 hover:bg-yellow-700">
               <FaEnvelope className="size-6 text-yellow-500" />
               <span className="flex-1 text-base font-medium leading-none text-gray-200">
                 Email me a login link
               </span>
             </button>
-            <button className="flex w-full items-center gap-4 rounded-lg border border-gray-600 bg-[#2a2a2a] px-6 py-3 hover:bg-[#3b3b3b]">
+            <button className="flex w-full items-center gap-4 rounded-lg border border-gray-600 bg-[#2a2a2a] px-6 py-3 hover:bg-green-800">
               <FaPiedPiperPp className="size-6 text-green-400" />
               <span className="flex-1 text-base font-medium leading-none text-gray-200">
                 Log in via PiedPiper

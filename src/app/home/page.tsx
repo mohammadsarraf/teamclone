@@ -151,14 +151,11 @@ function HomeContent() {
   };
 
   const handleColorChange = (color: string) => {
-    if (activeField === "title") setTitleClassName(`text-6xl ${color}`);
-    if (activeField === "subtitle") setSubtitleClassName(`text-4xl ${color}`);
-    if (activeField === "description")
-      setDescriptionClassName(`text-xl ${color}`);
-    if (activeField === "skillsTitle")
-      setSkillsTitleClassName(`text-3xl ${color}`);
-    if (activeField === "skillsDescription")
-      setSkillsDescriptionClassName(`text-md ${color}`);
+    if (activeField === "title") setTitleClassName((prev) => `${prev.split(' ')[0]} ${color}`);
+    if (activeField === "subtitle") setSubtitleClassName((prev) => `${prev.split(' ')[0]} ${color}`);
+    if (activeField === "description") setDescriptionClassName((prev) => `${prev.split(' ')[0]} ${color}`);
+    if (activeField === "skillsTitle") setSkillsTitleClassName((prev) => `${prev.split(' ')[0]} ${color}`);
+    if (activeField === "skillsDescription") setSkillsDescriptionClassName((prev) => `${prev.split(' ')[0]} ${color}`);
   };
 
   const getAlignmentClass = (alignment: string) => {
@@ -245,7 +242,7 @@ function HomeContent() {
               onChange={handleChange(setDescription)}
               onClick={(e: MouseEvent) => handleTextClick("description", e)}
               tagName="p"
-              className={`border-b-2 border-transparent py-5 leading-8 focus:border-blue-600 focus:outline-none ${descriptionClassName} ${getAlignmentClass(descriptionAlignment)}`}
+              className={`border-b-2 border-transparent py-5 focus:border-blue-600 focus:outline-none ${descriptionClassName} ${getAlignmentClass(descriptionAlignment)}`}
               aria-label="Description"
               placeholder="Enter your description..."
             />
@@ -269,7 +266,7 @@ function HomeContent() {
                 handleTextClick("skillsDescription", e)
               }
               tagName="p"
-              className={`py-2 leading-8 ${skillsDescriptionClassName} ${getAlignmentClass(skillsDescriptionAlignment)}`}
+              className={`py-2 ${skillsDescriptionClassName} ${getAlignmentClass(skillsDescriptionAlignment)}`}
               aria-label="Skills Description"
               placeholder="Enter skills description..."
             />

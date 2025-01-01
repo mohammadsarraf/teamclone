@@ -141,7 +141,6 @@ function HomeContent() {
       setSkillsDescriptionClassName("text-xl");
   };
 
-
   const handleJustifyClick = (option: string) => {
     if (activeField === "title") setTitleAlignment(option);
     if (activeField === "subtitle") setSubtitleAlignment(option);
@@ -284,7 +283,6 @@ function HomeContent() {
                 className="py-2"
                 aria-label="Frameworks Description"
                 placeholder="Enter frameworks description..."
-
               />
               <ContentEditable
                 html="React"
@@ -365,7 +363,6 @@ function HomeContent() {
                 className="py-2"
                 aria-label="Libraries Description"
                 placeholder="Enter libraries description..."
-
               />
               <ContentEditable
                 html="Pandas"
@@ -442,7 +439,6 @@ function HomeContent() {
                 className="py-2"
                 aria-label="Languages Description"
                 placeholder="Enter languages description..."
-
               />
               <ContentEditable
                 html="C/C++"

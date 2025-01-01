@@ -49,7 +49,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
   onItalicClick,
   onH1Click,
   onH2Click,
-  onH3Click,  
+  onH3Click,
   onH4Click,
   onH5Click,
   onH6Click,

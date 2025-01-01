@@ -87,58 +87,70 @@ function HomeContent() {
     document.execCommand("italic");
   };
 
+  const updateClassName = (prev: string, newSize: string) => {
+    const classes = prev.split(' ');
+    const sizeClass = classes.find(cls => cls.startsWith('text-') && cls.includes('xl'));
+    if (sizeClass) {
+      return prev.replace(sizeClass, newSize);
+    }
+    return `${prev} ${newSize}`;
+  };
+
+  const updateColorClassName = (prev: string, newColor: string) => {
+    const classes = prev.split(' ');
+    const colorClass = classes.find(cls => cls.startsWith('text-') && !cls.includes('xl'));
+    if (colorClass) {
+      return prev.replace(colorClass, newColor);
+    }
+    return `${prev} ${newColor}`;
+  };
+
   const handleH1Click = () => {
-    if (activeField === "title") setTitleClassName("text-6xl");
-    if (activeField === "subtitle") setSubtitleClassName("text-6xl");
-    if (activeField === "description") setDescriptionClassName("text-6xl");
-    if (activeField === "skillsTitle") setSkillsTitleClassName("text-6xl");
-    if (activeField === "skillsDescription")
-      setSkillsDescriptionClassName("text-6xl");
+    if (activeField === "title") setTitleClassName((prev) => updateClassName(prev, "text-6xl"));
+    if (activeField === "subtitle") setSubtitleClassName((prev) => updateClassName(prev, "text-6xl"));
+    if (activeField === "description") setDescriptionClassName((prev) => updateClassName(prev, "text-6xl"));
+    if (activeField === "skillsTitle") setSkillsTitleClassName((prev) => updateClassName(prev, "text-6xl"));
+    if (activeField === "skillsDescription") setSkillsDescriptionClassName((prev) => updateClassName(prev, "text-6xl"));
   };
 
   const handleH2Click = () => {
-    if (activeField === "title") setTitleClassName("text-5xl");
-    if (activeField === "subtitle") setSubtitleClassName("text-5xl");
-    if (activeField === "description") setDescriptionClassName("text-5xl");
-    if (activeField === "skillsTitle") setSkillsTitleClassName("text-5xl");
-    if (activeField === "skillsDescription")
-      setSkillsDescriptionClassName("text-5xl");
+    if (activeField === "title") setTitleClassName((prev) => updateClassName(prev, "text-5xl"));
+    if (activeField === "subtitle") setSubtitleClassName((prev) => updateClassName(prev, "text-5xl"));
+    if (activeField === "description") setDescriptionClassName((prev) => updateClassName(prev, "text-5xl"));
+    if (activeField === "skillsTitle") setSkillsTitleClassName((prev) => updateClassName(prev, "text-5xl"));
+    if (activeField === "skillsDescription") setSkillsDescriptionClassName((prev) => updateClassName(prev, "text-5xl"));
   };
 
   const handleH3Click = () => {
-    if (activeField === "title") setTitleClassName("text-4xl");
-    if (activeField === "subtitle") setSubtitleClassName("text-4xl");
-    if (activeField === "description") setDescriptionClassName("text-4xl");
-    if (activeField === "skillsTitle") setSkillsTitleClassName("text-4xl");
-    if (activeField === "skillsDescription")
-      setSkillsDescriptionClassName("text-4xl");
+    if (activeField === "title") setTitleClassName((prev) => updateClassName(prev, "text-4xl"));
+    if (activeField === "subtitle") setSubtitleClassName((prev) => updateClassName(prev, "text-4xl"));
+    if (activeField === "description") setDescriptionClassName((prev) => updateClassName(prev, "text-4xl"));
+    if (activeField === "skillsTitle") setSkillsTitleClassName((prev) => updateClassName(prev, "text-4xl"));
+    if (activeField === "skillsDescription") setSkillsDescriptionClassName((prev) => updateClassName(prev, "text-4xl"));
   };
 
   const handleH4Click = () => {
-    if (activeField === "title") setTitleClassName("text-3xl");
-    if (activeField === "subtitle") setSubtitleClassName("text-3xl");
-    if (activeField === "description") setDescriptionClassName("text-3xl");
-    if (activeField === "skillsTitle") setSkillsTitleClassName("text-3xl");
-    if (activeField === "skillsDescription")
-      setSkillsDescriptionClassName("text-3xl");
+    if (activeField === "title") setTitleClassName((prev) => updateClassName(prev, "text-3xl"));
+    if (activeField === "subtitle") setSubtitleClassName((prev) => updateClassName(prev, "text-3xl"));
+    if (activeField === "description") setDescriptionClassName((prev) => updateClassName(prev, "text-3xl"));
+    if (activeField === "skillsTitle") setSkillsTitleClassName((prev) => updateClassName(prev, "text-3xl"));
+    if (activeField === "skillsDescription") setSkillsDescriptionClassName((prev) => updateClassName(prev, "text-3xl"));
   };
 
   const handleH5Click = () => {
-    if (activeField === "title") setTitleClassName("text-2xl");
-    if (activeField === "subtitle") setSubtitleClassName("text-2xl");
-    if (activeField === "description") setDescriptionClassName("text-2xl");
-    if (activeField === "skillsTitle") setSkillsTitleClassName("text-2xl");
-    if (activeField === "skillsDescription")
-      setSkillsDescriptionClassName("text-2xl");
+    if (activeField === "title") setTitleClassName((prev) => updateClassName(prev, "text-2xl"));
+    if (activeField === "subtitle") setSubtitleClassName((prev) => updateClassName(prev, "text-2xl"));
+    if (activeField === "description") setDescriptionClassName((prev) => updateClassName(prev, "text-2xl"));
+    if (activeField === "skillsTitle") setSkillsTitleClassName((prev) => updateClassName(prev, "text-2xl"));
+    if (activeField === "skillsDescription") setSkillsDescriptionClassName((prev) => updateClassName(prev, "text-2xl"));
   };
 
   const handleH6Click = () => {
-    if (activeField === "title") setTitleClassName("text-xl");
-    if (activeField === "subtitle") setSubtitleClassName("text-xl");
-    if (activeField === "description") setDescriptionClassName("text-xl");
-    if (activeField === "skillsTitle") setSkillsTitleClassName("text-xl");
-    if (activeField === "skillsDescription")
-      setSkillsDescriptionClassName("text-xl");
+    if (activeField === "title") setTitleClassName((prev) => updateClassName(prev, "text-xl"));
+    if (activeField === "subtitle") setSubtitleClassName((prev) => updateClassName(prev, "text-xl"));
+    if (activeField === "description") setDescriptionClassName((prev) => updateClassName(prev, "text-xl"));
+    if (activeField === "skillsTitle") setSkillsTitleClassName((prev) => updateClassName(prev, "text-xl"));
+    if (activeField === "skillsDescription") setSkillsDescriptionClassName((prev) => updateClassName(prev, "text-xl"));
   };
 
   const handleJustifyClick = (option: string) => {
@@ -146,16 +158,15 @@ function HomeContent() {
     if (activeField === "subtitle") setSubtitleAlignment(option);
     if (activeField === "description") setDescriptionAlignment(option);
     if (activeField === "skillsTitle") setSkillsTitleAlignment(option);
-    if (activeField === "skillsDescription")
-      setSkillsDescriptionAlignment(option);
+    if (activeField === "skillsDescription") setSkillsDescriptionAlignment(option);
   };
 
   const handleColorChange = (color: string) => {
-    if (activeField === "title") setTitleClassName((prev) => `${prev.split(' ')[0]} ${color}`);
-    if (activeField === "subtitle") setSubtitleClassName((prev) => `${prev.split(' ')[0]} ${color}`);
-    if (activeField === "description") setDescriptionClassName((prev) => `${prev.split(' ')[0]} ${color}`);
-    if (activeField === "skillsTitle") setSkillsTitleClassName((prev) => `${prev.split(' ')[0]} ${color}`);
-    if (activeField === "skillsDescription") setSkillsDescriptionClassName((prev) => `${prev.split(' ')[0]} ${color}`);
+    if (activeField === "title") setTitleClassName((prev) => updateColorClassName(prev, color));
+    if (activeField === "subtitle") setSubtitleClassName((prev) => updateColorClassName(prev, color));
+    if (activeField === "description") setDescriptionClassName((prev) => updateColorClassName(prev, color));
+    if (activeField === "skillsTitle") setSkillsTitleClassName((prev) => updateColorClassName(prev, color));
+    if (activeField === "skillsDescription") setSkillsDescriptionClassName((prev) => updateColorClassName(prev, color));
   };
 
   const getAlignmentClass = (alignment: string) => {
@@ -226,6 +237,7 @@ function HomeContent() {
               tagName="p"
               className={`border-b-2 border-transparent py-2 font-medium text-blue-600 focus:border-blue-600 focus:outline-none ${titleClassName} ${getAlignmentClass(titleAlignment)}`}
               aria-label="Page Title"
+              style={{ lineHeight: 1.5 }}
               placeholder="Enter your title..."
             />
             <ContentEditable
@@ -235,6 +247,7 @@ function HomeContent() {
               tagName="p"
               className={`border-b-2 border-transparent py-2 focus:border-blue-600 focus:outline-none ${subtitleClassName} ${getAlignmentClass(subtitleAlignment)}`}
               aria-label="Subtitle"
+              style={{ lineHeight: 1.5 }}
               placeholder="Enter your subtitle..."
             />
             <ContentEditable
@@ -244,6 +257,7 @@ function HomeContent() {
               tagName="p"
               className={`border-b-2 border-transparent py-5 focus:border-blue-600 focus:outline-none ${descriptionClassName} ${getAlignmentClass(descriptionAlignment)}`}
               aria-label="Description"
+              style={{ lineHeight: 1.5 }} // Use dynamic line-height
               placeholder="Enter your description..."
             />
           </div>

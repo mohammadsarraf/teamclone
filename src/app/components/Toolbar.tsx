@@ -11,7 +11,6 @@ import {
   BsTypeH5,
   BsTypeH6,
 } from "react-icons/bs";
-import { CgStyle } from "react-icons/cg";
 import {
   CiGrid42,
   CiTextAlignCenter,
@@ -19,11 +18,9 @@ import {
   CiTextAlignLeft,
   CiTextAlignRight,
 } from "react-icons/ci";
-import { FaDotCircle } from "react-icons/fa";
-import { FaAlignJustify } from "react-icons/fa6";
-import { GrDiamond, GrDrag } from "react-icons/gr";
+import { FaAlignJustify, FaCircle } from "react-icons/fa6";
+import { GrDrag } from "react-icons/gr";
 import { IoColorPaletteOutline } from "react-icons/io5";
-import { PiOption } from "react-icons/pi";
 import { RiFontSize2 } from "react-icons/ri";
 import { SlOptionsVertical } from "react-icons/sl";
 
@@ -39,7 +36,7 @@ interface ToolbarProps {
   onH5Click: () => void;
   onH6Click: () => void;
   onJustifyClick: (option: string) => void;
-  onColorChange: (color: string) => void; // Add new prop
+  onColorChange: (color: string) => void;
 }
 
 const Toolbar: React.FC<ToolbarProps> = ({
@@ -54,32 +51,34 @@ const Toolbar: React.FC<ToolbarProps> = ({
   onH5Click,
   onH6Click,
   onJustifyClick,
-  onColorChange, // Destructure new prop
+  onColorChange,
 }) => {
-  const [showSizeDropdown, setShowSizeDropdown] = useState(false);
-  const [showJustifyDropdown, setShowJustifyDropdown] = useState(false);
-  const [showColorDropdown, setShowColorDropdown] = useState(false);
-
-  const handleSizeOption = () => {
-    setShowJustifyDropdown(false);
-    setShowColorDropdown(false);
-    setShowSizeDropdown(!showSizeDropdown);
+  const headingIcons = {
+    H1: BsTypeH1,
+    H2: BsTypeH2,
+    H3: BsTypeH3,
+    H4: BsTypeH4,
+    H5: BsTypeH5,
+    H6: BsTypeH6,
   };
+  type HeadingKey = keyof typeof headingIcons;
 
-  const handleJustifyOption = () => {
-    setShowJustifyDropdown(!showJustifyDropdown);
-    setShowSizeDropdown(false);
-    setShowColorDropdown(false);
+  const justifyIcons = {
+    left: CiTextAlignLeft,
+    center: CiTextAlignCenter,
+    right: CiTextAlignRight,
+    justify: CiTextAlignJustify,
   };
+  type JustifyKey = keyof typeof justifyIcons;
 
-  const handleColorOption = () => {
-    setShowColorDropdown(!showColorDropdown);
-    setShowSizeDropdown(false);
-    setShowJustifyDropdown(false);
+  const [showDropdown, setShowDropdown] = useState<string | null>(null);
+
+  const toggleDropdown = (dropdown: string) => {
+    setShowDropdown((prev) => (prev === dropdown ? null : dropdown));
   };
 
   const handleOptionClick = (option: string) => {
-    setShowSizeDropdown(false);
+    setShowDropdown(null);
     switch (option) {
       case "H1":
         document.execCommand("formatBlock", false, "h1");
@@ -105,14 +104,13 @@ const Toolbar: React.FC<ToolbarProps> = ({
         document.execCommand("formatBlock", false, "h6");
         onH6Click();
         break;
-
       default:
         break;
     }
   };
 
   const handleJustifyClick = (option: string) => {
-    setShowJustifyDropdown(false);
+    setShowDropdown(null);
     switch (option) {
       case "left":
         document.execCommand("justifyLeft");
@@ -129,13 +127,13 @@ const Toolbar: React.FC<ToolbarProps> = ({
       default:
         break;
     }
-    onJustifyClick(option); // Call the new handler
+    onJustifyClick(option);
   };
 
   const handleColorClick = (color: string) => {
     document.execCommand("foreColor", false, color);
-    setShowColorDropdown(false);
-    onColorChange(color); // Call the new handler
+    setShowDropdown(null);
+    onColorChange(color);
   };
 
   useEffect(() => {
@@ -154,9 +152,9 @@ const Toolbar: React.FC<ToolbarProps> = ({
     <div
       className="absolute z-10 flex w-max items-center justify-normal gap-1 rounded bg-gray-200 text-2xl text-black shadow-lg"
       style={{
-        top: position.top - 40, // Adjust the value as needed to position above the selected div
+        top: position.top - 40,
         right: position.left,
-        transform: "translateX(0%)", // Remove centering transform
+        transform: "translateX(0%)",
       }}
     >
       <div className="flex">
@@ -165,120 +163,75 @@ const Toolbar: React.FC<ToolbarProps> = ({
         </div>
         <div className="flex border-r border-black">
           <BiParagraph className="m-2" onClick={onItalicClick} />
-          <div className="relative">
-            <GrDrag className="m-2" />
-          </div>
+          <GrDrag className="m-2" />
           <BiCodeAlt className="m-2">...</BiCodeAlt>
         </div>
         <div className="flex border-r border-black">
-          <RiFontSize2 className="m-2" onClick={handleSizeOption}>
-            ...
-          </RiFontSize2>
-          {showSizeDropdown && (
+          <RiFontSize2 className="m-2" onClick={() => toggleDropdown("size")} />
+          {showDropdown === "size" && (
             <div className="absolute left-0 top-full mt-1 w-full rounded border bg-gray-200 shadow-lg">
               <div className="flex flex-col text-sm">
-                <div
-                  className="flex cursor-pointer items-center p-2 hover:bg-white"
-                  onClick={() => handleOptionClick("H1")}
-                >
-                  <BsTypeH1 className="mr-2" /> Heading 1
-                </div>
-                <div
-                  className="flex cursor-pointer items-center p-2 hover:bg-white"
-                  onClick={() => handleOptionClick("H2")}
-                >
-                  <BsTypeH2 className="mr-2" /> Heading 2
-                </div>
-                <div
-                  className="flex cursor-pointer items-center p-2 hover:bg-white"
-                  onClick={() => handleOptionClick("H3")}
-                >
-                  <BsTypeH3 className="mr-2" /> Heading 3
-                </div>{" "}
-                <div
-                  className="flex cursor-pointer items-center p-2 hover:bg-white"
-                  onClick={() => handleOptionClick("H4")}
-                >
-                  <BsTypeH4 className="mr-2" /> Heading 4
-                </div>
-                <div
-                  className="flex cursor-pointer items-center p-2 hover:bg-white"
-                  onClick={() => handleOptionClick("H5")}
-                >
-                  <BsTypeH5 className="mr-2" /> Heading 5
-                </div>
-                <div
-                  className="flex cursor-pointer items-center p-2 hover:bg-white"
-                  onClick={() => handleOptionClick("H6")}
-                >
-                  <BsTypeH6 className="mr-2" /> Heading 6
-                </div>
+                {(["H1", "H2", "H3", "H4", "H5", "H6"] as HeadingKey[]).map(
+                  (heading) => {
+                    const Icon = headingIcons[heading];
+                    return (
+                      <div
+                        key={heading}
+                        className="flex cursor-pointer items-center p-2 hover:bg-white"
+                        onClick={() => handleOptionClick(heading)}
+                      >
+                        {React.createElement(Icon, { className: "mr-2" })}{" "}
+                        Heading {heading[1]}
+                      </div>
+                    );
+                  },
+                )}
               </div>
             </div>
           )}
-          <FaAlignJustify className="m-2" onClick={handleJustifyOption}>
-            ...
-          </FaAlignJustify>
-          {showJustifyDropdown && (
+          <FaAlignJustify
+            className="m-2"
+            onClick={() => toggleDropdown("justify")}
+          />
+          {showDropdown === "justify" && (
             <div className="absolute left-0 top-full mt-1 w-full rounded border bg-gray-200 shadow-lg">
               <div className="flex flex-col text-sm">
-                <div
-                  className="flex cursor-pointer items-center p-2 hover:bg-white"
-                  onClick={() => handleJustifyClick("left")}
-                >
-                  <CiTextAlignLeft className="mr-2" /> Left
-                </div>
-                <div
-                  className="flex cursor-pointer items-center p-2 hover:bg-white"
-                  onClick={() => handleJustifyClick("center")}
-                >
-                  <CiTextAlignCenter className="mr-2" /> Center
-                </div>
-                <div
-                  className="flex cursor-pointer items-center p-2 hover:bg-white"
-                  onClick={() => handleJustifyClick("right")}
-                >
-                  <CiTextAlignRight className="mr-2" /> Right
-                </div>
-                <div
-                  className="flex cursor-pointer items-center p-2 hover:bg-white "
-                  onClick={() => handleJustifyClick("justify")}
-                >
-                  <CiTextAlignJustify className="mr-2" /> Justify
-                </div>
+                {(["left", "center", "right", "justify"] as JustifyKey[]).map(
+                  (align) => {
+                    const Icon = justifyIcons[align];
+                    return (
+                      <div
+                        key={align}
+                        className="flex cursor-pointer items-center p-2 hover:bg-white"
+                        onClick={() => handleJustifyClick(align)}
+                      >
+                        {React.createElement(Icon, { className: "mr-2" })}{" "}
+                        {align.charAt(0).toUpperCase() + align.slice(1)}
+                      </div>
+                    );
+                  },
+                )}
               </div>
             </div>
           )}
-          <IoColorPaletteOutline className="m-2" onClick={handleColorOption}>
-            ...
-          </IoColorPaletteOutline>
-          {showColorDropdown && (
+          <IoColorPaletteOutline
+            className="m-2"
+            onClick={() => toggleDropdown("color")}
+          />
+          {showDropdown === "color" && (
             <div className="absolute left-0 top-full mt-1 w-full rounded border bg-gray-200 shadow-lg">
               <div className="flex flex-col text-sm">
-                <div
-                  className="flex cursor-pointer items-center p-2 hover:bg-white"
-                  onClick={() => handleColorClick("text-red-700")}
-                >
-                  <FaDotCircle className="mr-2 text-red-700" /> Red
-                </div>
-                <div
-                  className="flex cursor-pointer items-center p-2 hover:bg-white"
-                  onClick={() => handleColorClick("text-blue-500")}
-                >
-                  <FaDotCircle className="mr-2 text-blue-500" /> Blue
-                </div>
-                <div
-                  className="flex cursor-pointer items-center p-2 hover:bg-white"
-                  onClick={() => handleColorClick("text-green-500")}
-                >
-                  <FaDotCircle className="mr-2 text-green-500" /> Green
-                </div>
-                <div
-                  className="flex cursor-pointer items-center p-2 hover:bg-white"
-                  onClick={() => handleColorClick("text-white")}
-                >
-                  <FaDotCircle className="mr-2 text-white" /> White
-                </div>
+                {["red-700", "blue-500", "green-500", "white"].map((color) => (
+                  <div
+                    key={color}
+                    className="flex cursor-pointer items-center p-2 hover:bg-white"
+                    onClick={() => handleColorClick(`text-${color}`)}
+                  >
+                    <FaCircle className={`text- mr-2${color}`} />{" "}
+                    {color.split("-")[0].charAt(0).toUpperCase() +
+                      color.split("-")[0].slice(1)}
+                  </div>
+                ))}
               </div>
             </div>
           )}

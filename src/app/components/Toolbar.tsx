@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { BiCodeAlt, BiParagraph } from "react-icons/bi";
 import {
-  BsJustify,
-  BsJustifyLeft,
-  BsJustifyRight,
   BsTypeH1,
   BsTypeH2,
   BsTypeH3,
@@ -227,7 +224,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
                     className="flex cursor-pointer items-center p-2 hover:bg-white"
                     onClick={() => handleColorClick(`text-${color}`)}
                   >
-                    <FaCircle className={`text- mr-2${color}`} />{" "}
+                    <FaCircle className={`text-${color} mr-2`} />{" "}
                     {color.split("-")[0].charAt(0).toUpperCase() +
                       color.split("-")[0].slice(1)}
                   </div>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { signOutUser, useUser } from "../components/UserContext";
+import { signOutUser } from "../components/UserContext";
 import { useRouter } from "next/navigation";
 import Toolbar from "../components/Toolbar";
 import { PiFrameCornersBold } from "react-icons/pi";

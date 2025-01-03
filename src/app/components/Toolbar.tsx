@@ -224,7 +224,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
                     className="flex cursor-pointer items-center p-2 hover:bg-white"
                     onClick={() => handleColorClick(`text-${color}`)}
                   >
-                    <FaCircle className={`text-${color} mr-2`} />{" "}
+                    <FaCircle className={`mr-2 text-${color}`} />{" "}
                     {color.split("-")[0].charAt(0).toUpperCase() +
                       color.split("-")[0].slice(1)}
                   </div>

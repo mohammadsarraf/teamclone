@@ -164,7 +164,12 @@ const Toolbar: React.FC<ToolbarProps> = ({
           {showDropdown === "color" && (
             <div className="absolute left-0 top-full mt-1 w-full rounded border bg-gray-200 shadow-lg">
               <div className="flex flex-col text-sm">
-                {["text-red-700", "text-blue-700", "text-green-500", "text-white"].map((color) => (
+                {[
+                  "text-red-700",
+                  "text-blue-700",
+                  "text-green-500",
+                  "text-white",
+                ].map((color) => (
                   <div
                     key={color}
                     className="flex cursor-pointer items-center p-2 hover:bg-white"

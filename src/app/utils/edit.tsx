@@ -17,7 +17,7 @@ export default function HomeContent() {
   const [title, setTitle] = useState("Moe Sarraf");
   const [subtitle, setSubtitle] = useState("Developer and designer.");
   const [description, setDescription] = useState(
-    `As a Computer Science student deeply engaged with Data Science, AI, and Full-Stack Development, I am driven by a passion to blend creativity and technology. My portfolio, featuring diverse projects such as an interactive React mini-game and an innovative NBA MVP prediction model, is a testament to my commitment to crafting engaging user experiences and leveraging the power of data-driven insights.`
+    `As a Computer Science student deeply engaged with Data Science, AI, and Full-Stack Development, I am driven by a passion to blend creativity and technology. My portfolio, featuring diverse projects such as an interactive React mini-game and an innovative NBA MVP prediction model, is a testament to my commitment to crafting engaging user experiences and leveraging the power of data-driven insights.`,
   );
   const router = useRouter();
 

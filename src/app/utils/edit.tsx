@@ -57,15 +57,7 @@ export default function HomeContent() {
   const handleCloseToolbar = () => {
     setActiveField(null);
   };
-
-  const handleBoldClick = () => {
-    document.execCommand("bold");
-  };
-
-  const handleItalicClick = () => {
-    document.execCommand("italic");
-  };
-
+  
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -111,8 +103,6 @@ export default function HomeContent() {
             <Toolbar
               position={toolbarPosition}
               onClose={handleCloseToolbar}
-              onBoldClick={handleBoldClick}
-              onItalicClick={handleItalicClick}
               onH1Click={() =>
                 handleHClick(activeField, setClassNames, "text-6xl")
               }
@@ -140,7 +130,7 @@ export default function HomeContent() {
             />
           )}
           <div className="mx-auto max-w-2xl p-10 text-center">
-            <EditableComp
+          <EditableComp
               html={title}
               onChange={setTitle}
               onClick={handleTextClick}

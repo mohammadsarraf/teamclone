@@ -3,14 +3,18 @@ import React, { useState } from "react";
 interface WidthLengthDropdownProps {
   onWidthChange: (width: string) => void;
   onLengthChange: (length: string) => void;
+  initialWidth: string;
+  initialLength: string;
 }
 
 const WidthLengthDropdown: React.FC<WidthLengthDropdownProps> = ({
   onWidthChange,
   onLengthChange,
+  initialWidth,
+  initialLength,
 }) => {
-  const [width, setWidth] = useState<string | null>("20"); // default width
-  const [length, setLength] = useState<string | null>("20"); // default length
+  const [width, setWidth] = useState<string | null>(initialWidth); // use initialWidth from props
+  const [length, setLength] = useState<string | null>(initialLength); // use initialLength from props
 
   const incrementWidth = () => {
     const newWidth = (parseInt(width || "0") + 1).toString();
@@ -76,7 +80,7 @@ const WidthLengthDropdown: React.FC<WidthLengthDropdownProps> = ({
             <input
               type="text"
               className="w-12 p-1 text-center"
-              value={width || ""}
+              value={initialWidth}
               onChange={handleWidthInputChange}
               onKeyDown={handleWidthKeyDown}
             />
@@ -94,7 +98,7 @@ const WidthLengthDropdown: React.FC<WidthLengthDropdownProps> = ({
             <input
               type="text"
               className="w-12 p-1 text-center"
-              value={length || ""}
+              value={initialLength}
               onChange={handleLengthInputChange}
               onKeyDown={handleLengthKeyDown}
             />

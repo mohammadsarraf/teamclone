@@ -5,8 +5,6 @@ import Toolbar from "../components/Toolbar";
 interface EditableCompProps {
   html: string;
   onChange: React.Dispatch<React.SetStateAction<string>>;
-  onClick: (event: MouseEvent) => void;
-  dataField: string;
   className: string;
   ariaLabel: string;
   placeholder: string;
@@ -15,28 +13,23 @@ interface EditableCompProps {
   fontAlignment: string;
   widthSize: string;
   lengthSize: string;
+  updateProperty: (property: string, value: string) => void;
 }
 
 const EditableComp: React.FC<EditableCompProps> = ({
   html,
   onChange,
-  onClick,
-  dataField,
   className,
-  widthSize,
-  lengthSize,
-  ariaLabel,
-  placeholder,
   fontSize,
   fontColor,
   fontAlignment,
+  widthSize,
+  lengthSize,
+  updateProperty,
+  ariaLabel,
+  placeholder,
 }) => {
   const [isClicked, setIsClicked] = useState(false);
-  const [currentFontSize, setCurrentFontSize] = useState(fontSize);
-  const [currentFontColor, setCurrentFontColor] = useState(fontColor);
-  const [currentFontAlignment, setCurrentFontAlignment] = useState(fontAlignment);
-  const [currentWidth, setCurrentWidth] = useState(widthSize);
-  const [currentLength, setCurrentLength] = useState(lengthSize);
   const toolbarRef = useRef<HTMLDivElement>(null);
   const editableCompRef = useRef<HTMLDivElement>(null);
 
@@ -62,27 +55,39 @@ const EditableComp: React.FC<EditableCompProps> = ({
     onChange(evt.target.value);
   };
 
+  const handleClick = () => {
+    setIsClicked(true);
+  };
+
   return (
-    <div>
+    <div style={{ position: "relative" }}>
       {isClicked && (
-        <div ref={toolbarRef} className="mb-40 flex">
+        <div
+          ref={toolbarRef}
+          className="flex"
+          style={{ position: "absolute", top: "-40px", left: "0", zIndex: 20 }}
+        >
           <Toolbar
+            onClose={() => setIsClicked(false)}
             onSizeClick={(size) => {
-              setCurrentFontSize(size);
+              console.log(`Font size changed to: ${size}`);
+              updateProperty("fontSize", size);
             }}
             onColorClick={(color) => {
-              setCurrentFontColor(color);
+              console.log(`Font color changed to: ${color}`);
+              updateProperty("fontColor", color);
             }}
             onJustifyClick={(alignment) => {
-              setCurrentFontAlignment(alignment);
+              console.log(`Font alignment changed to: ${alignment}`);
+              updateProperty("fontAlignment", alignment);
             }}
             onWidthChange={(newWidth) => {
-              console.log(newWidth);
-              setCurrentWidth(newWidth);
+              console.log(`Width changed to: ${newWidth}rem`);
+              updateProperty("widthSize", newWidth);
             }}
             onLengthChange={(newLength) => {
-              console.log(newLength);
-              setCurrentLength(newLength);
+              console.log(`Length changed to: ${newLength}rem`);
+              updateProperty("lengthSize", newLength);
             }}
           />
         </div>
@@ -91,15 +96,14 @@ const EditableComp: React.FC<EditableCompProps> = ({
         <ContentEditable
           html={html}
           onChange={handleChange}
-          onClick={() => setIsClicked(!isClicked)}
-          data-field={dataField}
+          onClick={handleClick}
           tagName="p"
-          className={`${className} ${currentFontSize} ${currentFontColor} ${currentFontAlignment}`}
+          className={`${className} ${fontSize} ${fontColor} ${fontAlignment}`}
           aria-label={ariaLabel}
           style={{
             lineHeight: 1.5,
-            width: `${currentWidth}rem`,
-            height: `${currentLength}rem`,
+            width: `${widthSize}rem`,
+            height: `${lengthSize}rem`,
           }}
           placeholder={placeholder}
         />

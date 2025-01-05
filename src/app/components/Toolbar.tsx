@@ -1,15 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { BiCodeAlt } from "react-icons/bi";
-import { CiGrid42 } from "react-icons/ci";
+import {
+  BsTypeH1,
+  BsTypeH2,
+  BsTypeH3,
+  BsTypeH4,
+  BsTypeH5,
+  BsTypeH6,
+} from "react-icons/bs";
+import {
+  CiGrid42,
+  CiTextAlignCenter,
+  CiTextAlignJustify,
+  CiTextAlignLeft,
+  CiTextAlignRight,
+} from "react-icons/ci";
+import { FaAlignJustify, FaCircle } from "react-icons/fa6";
 import { GrDrag } from "react-icons/gr";
-import { RiFontSize2 } from "react-icons/ri";
-import { FaAlignJustify } from "react-icons/fa6";
 import { IoColorPaletteOutline } from "react-icons/io5";
+import { RiFontSize2 } from "react-icons/ri";
 import { SlOptionsVertical } from "react-icons/sl";
-import SizeDropdown from "./SizeDropdown";
-import JustifyDropdown from "./JustifyDropdown";
-import ColorDropdown from "./ColorDropdown";
-import WidthLengthDropdown from "./WidthLengthDropdown";
 
 interface ToolbarProps {
   onClose: () => void;
@@ -28,10 +38,107 @@ const Toolbar: React.FC<ToolbarProps> = ({
   onWidthChange,
   onLengthChange,
 }) => {
+  const headingIcons = {
+    H1: BsTypeH1,
+    H2: BsTypeH2,
+    H3: BsTypeH3,
+    H4: BsTypeH4,
+    H5: BsTypeH5,
+    H6: BsTypeH6,
+  };
+  type HeadingKey = keyof typeof headingIcons;
+
+  const justifyIcons = {
+    left: CiTextAlignLeft,
+    center: CiTextAlignCenter,
+    right: CiTextAlignRight,
+    justify: CiTextAlignJustify,
+  };
+  type JustifyKey = keyof typeof justifyIcons;
+
   const [showDropdown, setShowDropdown] = useState<string | null>(null);
+  const [length, setLength] = useState<string | null>('20'); // default length
+  const [width, setWidth] = useState<string | null>('20'); // default width
 
   const toggleDropdown = (dropdown: string) => {
     setShowDropdown((prev) => (prev === dropdown ? null : dropdown));
+  };
+
+  const handleSizeChange = (size: string) => {
+    setShowDropdown(null);
+    onSizeClick(size);
+  };
+
+  const handleAlignmentChange = (alignment: string) => {
+    setShowDropdown(null);
+    onJustifyClick(alignment);
+  };
+
+  const handleColorChange = (color: string) => {
+    setShowDropdown(null);
+    onColorClick(color);
+  };
+
+  const handleLengthChange = (length: string) => {
+    setShowDropdown(null);
+    onLengthChange(length);
+  };
+
+  const handleWidthChange = (width: string) => {
+    setShowDropdown(null);
+    onWidthChange(width);
+  };
+
+  const incrementWidth = () => {
+    const newWidth = (parseInt(width || "0") + 1).toString();
+    setWidth(newWidth);
+    onWidthChange(newWidth);
+  };
+
+  const decrementWidth = () => {
+    const newWidth = (parseInt(width || "0") - 1).toString();
+    setWidth(newWidth);
+    onWidthChange(newWidth);
+  };
+
+  const incrementLength = () => {
+    const newLength = (parseInt(length || "0") + 1).toString();
+    setLength(newLength);
+    onLengthChange(newLength);
+  };
+  
+  const decrementLength = () => {
+    const newLength = (parseInt(length || "0") - 1).toString();
+    setLength(newLength);
+    onLengthChange(newLength);
+  };
+
+  const handleWidthInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newWidth = e.target.value;
+    setWidth(newWidth);
+    onWidthChange(newWidth);
+  };
+
+  const handleLengthInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newLength = e.target.value;
+    setLength(newLength);
+    onLengthChange(newLength);
+  };
+
+  const handleWidthKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "ArrowUp") {
+      incrementWidth();
+    } else if (e.key === "ArrowDown") {
+      decrementWidth();
+    }
+  };
+
+  const handleLengthKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "ArrowUp") {
+      incrementLength();
+    } else if (e.key === "ArrowDown") {
+      decrementLength();
+    }
   };
 
   useEffect(() => {
@@ -59,21 +166,90 @@ const Toolbar: React.FC<ToolbarProps> = ({
         <div className="relative flex border-r border-black">
           <RiFontSize2 className="m-2" onClick={() => toggleDropdown("size")} />
           {showDropdown === "size" && (
-            <SizeDropdown onSizeClick={onSizeClick} />
+            <div className="absolute left-0 top-full mt-1 w-full rounded border bg-gray-200 shadow-lg">
+              <div className="flex flex-col text-sm">
+                {(
+                  [
+                    "text-6xl",
+                    "text-5xl",
+                    "text-4xl",
+                    "text-3xl",
+                    "text-2xl",
+                    "text-xl",
+                  ] as string[]
+                ).map((size, index) => {
+                  const heading = `H${index + 1}`;
+                  const Icon = headingIcons[heading as HeadingKey];
+                  return (
+                    <div
+                      key={size}
+                      className="flex cursor-pointer items-center p-2 hover:bg-white"
+                      onClick={() => handleSizeChange(size)}
+                    >
+                      {React.createElement(Icon, { className: "mr-2" })} Heading{" "}
+                      {heading[1]}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           )}
           <FaAlignJustify
             className="m-2"
             onClick={() => toggleDropdown("justify")}
           />
           {showDropdown === "justify" && (
-            <JustifyDropdown onJustifyClick={onJustifyClick} />
+            <div className="absolute left-0 top-full mt-1 w-full rounded border bg-gray-200 shadow-lg">
+              <div className="flex flex-col text-sm">
+                {(
+                  [
+                    "text-left",
+                    "text-center",
+                    "text-right",
+                    "text-justify",
+                  ] as string[]
+                ).map((align) => {
+                  const Icon = justifyIcons[align.split("-")[1] as JustifyKey];
+                  return (
+                    <div
+                      key={align}
+                      className="flex cursor-pointer items-center p-2 hover:bg-white"
+                      onClick={() => handleAlignmentChange(align)}
+                    >
+                      {React.createElement(Icon, { className: "mr-2" })}{" "}
+                      {align.split("-")[1].charAt(0).toUpperCase() +
+                        align.split("-")[1].slice(1)}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           )}
           <IoColorPaletteOutline
             className="m-2"
             onClick={() => toggleDropdown("color")}
           />
           {showDropdown === "color" && (
-            <ColorDropdown onColorClick={onColorClick} />
+            <div className="absolute left-0 top-full mt-1 w-full rounded border bg-gray-200 shadow-lg">
+              <div className="flex flex-col text-sm">
+                {[
+                  "text-red-700",
+                  "text-blue-700",
+                  "text-green-500",
+                  "text-white",
+                ].map((color) => (
+                  <div
+                    key={color}
+                    className="flex cursor-pointer items-center p-2 hover:bg-white"
+                    onClick={() => handleColorChange(`${color}`)}
+                  >
+                    <FaCircle className={`mr-2 ${color}`} />{" "}
+                    {color.split("-")[1].charAt(0).toUpperCase() +
+                      color.split("-")[1].slice(1)}
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
         </div>
         <div className="relative flex">
@@ -82,10 +258,58 @@ const Toolbar: React.FC<ToolbarProps> = ({
             onClick={() => toggleDropdown("widthMenu")}
           />
           {showDropdown === "widthMenu" && (
-            <WidthLengthDropdown
-              onWidthChange={onWidthChange}
-              onLengthChange={onLengthChange}
-            />
+            <div className="absolute top-full mt-1 w-auto rounded border bg-gray-200 shadow-lg">
+              <div className="flex flex-col text-sm p-2">
+                <label className="flex items-center">
+                  Width:
+                  <div className="flex items-center ml-2 border rounded">
+                    <button
+                      className="px-2 py-1 border-r"
+                      onClick={decrementWidth}
+                    >
+                      -
+                    </button>
+                    <input
+                      type="text"
+                      className="w-12 p-1 text-center"
+                      value={width || ""}
+                      onChange={handleWidthInputChange}
+                      onKeyDown={handleWidthKeyDown}
+                    />
+                    <button
+                      className="px-2 py-1 border-l"
+                      onClick={incrementWidth}
+                    >
+                      +
+                    </button>
+                  </div>
+                </label>
+                <label className="flex items-center mt-2">
+                  Length:
+                  <div className="flex items-center ml-2 border rounded">
+                    <button
+                      className="px-2 py-1 border-r"
+                      onClick={decrementLength}
+                    >
+                      -
+                    </button>
+                    <input
+                      type="text"
+                      className="w-12 p-1 text-center"
+                      value={length || ""}
+                      onChange={handleLengthInputChange}
+                      onKeyDown={handleLengthKeyDown}
+                    />
+                    <button
+                      className="px-2 py-1 border-l"
+                      onClick={incrementLength}
+                    >
+                      +
+                    </button>
+                  </div>
+                </label>
+              </div>
+            </div>
           )}
         </div>
       </div>

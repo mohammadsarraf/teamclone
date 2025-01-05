@@ -9,6 +9,11 @@ interface EditableCompProps {
   className: string;
   ariaLabel: string;
   placeholder: string;
+  fontSize: string; // Added prop
+  fontColor: string; // Added prop
+  fontAlignment: string; // Added prop
+  widthSize: string;
+  lengthSize: string;
 }
 
 const EditableComp: React.FC<EditableCompProps> = ({
@@ -17,8 +22,13 @@ const EditableComp: React.FC<EditableCompProps> = ({
   onClick,
   dataField,
   className,
+  widthSize,
+  lengthSize,
   ariaLabel,
   placeholder,
+  fontSize, // Added prop
+  fontColor, // Added prop
+  fontAlignment, // Added prop
 }) => {
   const handleChange = (evt: ContentEditableEvent) => {
     onChange(evt.target.value);
@@ -31,9 +41,9 @@ const EditableComp: React.FC<EditableCompProps> = ({
       onClick={onClick}
       data-field={dataField}
       tagName="p"
-      className={className}
+      className={`${className} ${fontSize} ${fontColor} ${fontAlignment}`} // Applied props
       aria-label={ariaLabel}
-      style={{ lineHeight: 1.5 }}
+      style={{ lineHeight: 1.5, width: `${widthSize}rem`, height: `${lengthSize}rem` }}
       placeholder={placeholder}
     />
   );

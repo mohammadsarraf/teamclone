@@ -12,7 +12,8 @@ export default function Home() {
   const [fontColor, setFontColor] = useState("text-white");
   const [fontAlignment, setFontAlignment] = useState("text-justify");
   const [isclicked, setIsclicked] = useState(false);
-
+  const [width, setWidth] = useState("w-[22rem]");
+  const [length, setLength] = useState("h-[10rem]");
   const toolbarRef = useRef<HTMLDivElement>(null);
   const editableCompRef = useRef<HTMLDivElement>(null);
 
@@ -49,6 +50,14 @@ export default function Home() {
               onJustifyClick={(alignment) => {
                 setFontAlignment(alignment);
               }}
+              onWidthChange={(newWidth) => {
+                console.log(newWidth);
+                setWidth(newWidth);
+              }}
+              onLengthChange={(newLength) => {
+                console.log(newLength);
+                setLength(newLength);
+              }}
             />
           </div>
           <div ref={editableCompRef}>
@@ -56,9 +65,14 @@ export default function Home() {
               html={title}
               onChange={setTitle}
               onClick={() => setIsclicked(!isclicked)} // Add onClick handler here
-              className={`border-b-2 border-transparent py-2 font-medium focus:border-blue-600 focus:outline-none ${fontSize} ${fontAlignment} ${fontColor} w-80`}
+              className={`border-b-2 border-transparent py-2 font-medium focus:border-blue-600 focus:outline-none ${width} ${length}`}
               ariaLabel="Page Title"
               placeholder="Enter your title..."
+              fontSize={fontSize} // Passed prop
+              fontColor={fontColor} // Passed prop
+              fontAlignment={fontAlignment} // Passed prop
+              widthSize={width}
+              lengthSize={length}
             />
           </div>
         </>
@@ -68,9 +82,14 @@ export default function Home() {
             html={title}
             onChange={setTitle}
             onClick={() => setIsclicked(!isclicked)}
-            className={`border-b-2 border-transparent py-2 font-medium focus:border-blue-600 focus:outline-none ${fontSize} ${fontAlignment} ${fontColor} w-80`}
+            className={`border-b-2 border-transparent py-2 font-medium focus:border-blue-600 focus:outline-none ${width} ${length}`}
             ariaLabel="Page Title"
             placeholder="Enter your title..."
+            fontSize={fontSize} // Passed prop
+            fontColor={fontColor} // Passed prop
+            fontAlignment={fontAlignment} // Passed prop
+            widthSize={width}
+            lengthSize={length}
           />
         </div>
       )}

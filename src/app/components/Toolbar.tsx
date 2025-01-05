@@ -18,6 +18,8 @@ interface ToolbarProps {
   onColorClick: (color: string) => void;
   onWidthChange: (width: string) => void;
   onLengthChange: (length: string) => void;
+  initialWidth: string; // Add this line
+  initialLength: string; // Add this line
 }
 
 const Toolbar: React.FC<ToolbarProps> = ({
@@ -27,6 +29,8 @@ const Toolbar: React.FC<ToolbarProps> = ({
   onColorClick,
   onWidthChange,
   onLengthChange,
+  initialWidth, // Add this line
+  initialLength, // Add this line
 }) => {
   const [showDropdown, setShowDropdown] = useState<string | null>(null);
 
@@ -83,8 +87,11 @@ const Toolbar: React.FC<ToolbarProps> = ({
           />
           {showDropdown === "widthMenu" && (
             <WidthLengthDropdown
+              key="widthLengthDropdown"
               onWidthChange={onWidthChange}
               onLengthChange={onLengthChange}
+              initialWidth={initialWidth} // Update this line
+              initialLength={initialLength} // Update this line
             />
           )}
         </div>

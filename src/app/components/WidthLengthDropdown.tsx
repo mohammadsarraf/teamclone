@@ -13,29 +13,29 @@ const WidthLengthDropdown: React.FC<WidthLengthDropdownProps> = ({
   initialWidth,
   initialLength,
 }) => {
-  const [width, setWidth] = useState<string | null>(initialWidth); // use initialWidth from props
-  const [length, setLength] = useState<string | null>(initialLength); // use initialLength from props
+  const [width, setWidth] = useState<string>(initialWidth); // use initialWidth from props
+  const [length, setLength] = useState<string>(initialLength); // use initialLength from props
 
   const incrementWidth = () => {
-    const newWidth = (parseInt(width || "0") + 1).toString();
+    const newWidth = `${parseFloat(width || "0") + 1}`;
     setWidth(newWidth);
     onWidthChange(newWidth);
   };
 
   const decrementWidth = () => {
-    const newWidth = (parseInt(width || "0") - 1).toString();
+    const newWidth = `${parseFloat(width || "0") - 1}`;
     setWidth(newWidth);
     onWidthChange(newWidth);
   };
 
   const incrementLength = () => {
-    const newLength = (parseInt(length || "0") + 1).toString();
+    const newLength = `${parseFloat(length || "0") + 1}`;
     setLength(newLength);
     onLengthChange(newLength);
   };
 
   const decrementLength = () => {
-    const newLength = (parseInt(length || "0") - 1).toString();
+    const newLength = `${parseFloat(length || "0") - 1}`;
     setLength(newLength);
     onLengthChange(newLength);
   };
@@ -80,7 +80,7 @@ const WidthLengthDropdown: React.FC<WidthLengthDropdownProps> = ({
             <input
               type="text"
               className="w-12 p-1 text-center"
-              value={initialWidth}
+              value={width}
               onChange={handleWidthInputChange}
               onKeyDown={handleWidthKeyDown}
             />
@@ -98,7 +98,7 @@ const WidthLengthDropdown: React.FC<WidthLengthDropdownProps> = ({
             <input
               type="text"
               className="w-12 p-1 text-center"
-              value={initialLength}
+              value={length}
               onChange={handleLengthInputChange}
               onKeyDown={handleLengthKeyDown}
             />

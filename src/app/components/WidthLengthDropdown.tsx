@@ -9,8 +9,8 @@ const WidthLengthDropdown: React.FC<WidthLengthDropdownProps> = ({
   onWidthChange,
   onLengthChange,
 }) => {
-  const [width, setWidth] = useState<string | null>('20'); // default width
-  const [length, setLength] = useState<string | null>('20'); // default length
+  const [width, setWidth] = useState<string | null>("20"); // default width
+  const [length, setLength] = useState<string | null>("20"); // default length
 
   const incrementWidth = () => {
     const newWidth = (parseInt(width || "0") + 1).toString();
@@ -29,7 +29,7 @@ const WidthLengthDropdown: React.FC<WidthLengthDropdownProps> = ({
     setLength(newLength);
     onLengthChange(newLength);
   };
-  
+
   const decrementLength = () => {
     const newLength = (parseInt(length || "0") - 1).toString();
     setLength(newLength);
@@ -66,14 +66,11 @@ const WidthLengthDropdown: React.FC<WidthLengthDropdownProps> = ({
 
   return (
     <div className="absolute top-full mt-1 w-auto rounded border bg-gray-200 shadow-lg">
-      <div className="flex flex-col text-sm p-2">
+      <div className="flex flex-col p-2 text-sm">
         <label className="flex items-center">
           Width:
-          <div className="flex items-center ml-2 border rounded">
-            <button
-              className="px-2 py-1 border-r"
-              onClick={decrementWidth}
-            >
+          <div className="ml-2 flex items-center rounded border">
+            <button className="border-r px-2 py-1" onClick={decrementWidth}>
               -
             </button>
             <input
@@ -83,21 +80,15 @@ const WidthLengthDropdown: React.FC<WidthLengthDropdownProps> = ({
               onChange={handleWidthInputChange}
               onKeyDown={handleWidthKeyDown}
             />
-            <button
-              className="px-2 py-1 border-l"
-              onClick={incrementWidth}
-            >
+            <button className="border-l px-2 py-1" onClick={incrementWidth}>
               +
             </button>
           </div>
         </label>
-        <label className="flex items-center mt-2">
+        <label className="mt-2 flex items-center">
           Length:
-          <div className="flex items-center ml-2 border rounded">
-            <button
-              className="px-2 py-1 border-r"
-              onClick={decrementLength}
-            >
+          <div className="ml-2 flex items-center rounded border">
+            <button className="border-r px-2 py-1" onClick={decrementLength}>
               -
             </button>
             <input
@@ -107,10 +98,7 @@ const WidthLengthDropdown: React.FC<WidthLengthDropdownProps> = ({
               onChange={handleLengthInputChange}
               onKeyDown={handleLengthKeyDown}
             />
-            <button
-              className="px-2 py-1 border-l"
-              onClick={incrementLength}
-            >
+            <button className="border-l px-2 py-1" onClick={incrementLength}>
               +
             </button>
           </div>

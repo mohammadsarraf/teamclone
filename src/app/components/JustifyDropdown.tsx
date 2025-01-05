@@ -10,7 +10,9 @@ interface JustifyDropdownProps {
   onJustifyClick: (option: string) => void;
 }
 
-const JustifyDropdown: React.FC<JustifyDropdownProps> = ({ onJustifyClick }) => {
+const JustifyDropdown: React.FC<JustifyDropdownProps> = ({
+  onJustifyClick,
+}) => {
   const justifyIcons = {
     left: CiTextAlignLeft,
     center: CiTextAlignCenter,
@@ -27,12 +29,7 @@ const JustifyDropdown: React.FC<JustifyDropdownProps> = ({ onJustifyClick }) => 
     <div className="absolute left-0 top-full mt-1 w-full rounded border bg-gray-200 shadow-lg">
       <div className="flex flex-col text-sm">
         {(
-          [
-            "text-left",
-            "text-center",
-            "text-right",
-            "text-justify",
-          ] as string[]
+          ["text-left", "text-center", "text-right", "text-justify"] as string[]
         ).map((align) => {
           const Icon = justifyIcons[align.split("-")[1] as JustifyKey];
           return (

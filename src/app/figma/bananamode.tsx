@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { SiGamebanana } from "react-icons/si";
 import { AiOutlineClose } from "react-icons/ai";
+import { db, useUser } from "../components/UserContext";
+import { collection, addDoc, getDocs, deleteDoc, doc, setDoc, query, orderBy } from "firebase/firestore";
+
 
 interface Title {
   html: string;
@@ -18,14 +21,20 @@ interface BananamodeProps {
 
 const Bananamode: React.FC<BananamodeProps> = ({ loadDesign, saveDesign }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [savedDesigns, setSavedDesigns] = useState<{ name: string; design: Title[] }[]>([]);
+  const [savedDesigns, setSavedDesigns] = useState<{ name: string; design: Title[]; timestamp: number }[]>([]);
+  const { currentUser } = useUser();
 
   useEffect(() => {
-    const savedData = localStorage.getItem("savedDesigns");
-    if (savedData) {
-      setSavedDesigns(JSON.parse(savedData));
-    }
-  }, []);
+    const fetchDesigns = async () => {
+      if (currentUser) {
+        const q = query(collection(db, `designs/${currentUser.uid}/userDesigns`), orderBy("timestamp", "desc"));
+        const querySnapshot = await getDocs(q);
+        const designs = querySnapshot.docs.map(doc => ({ name: doc.id, design: doc.data().design, timestamp: doc.data().timestamp }));
+        setSavedDesigns(designs);
+      }
+    };
+    fetchDesigns();
+  }, [currentUser]);
 
   useEffect(() => {
     const savedData = JSON.stringify(saveDesign);
@@ -50,25 +59,26 @@ const Bananamode: React.FC<BananamodeProps> = ({ loadDesign, saveDesign }) => {
     toggleWindow();
   };
 
-  const handleSaveDesign = () => {
-    const designName = prompt("Enter design name:", `Unnamed Design ${savedDesigns.length + 1}`);
-    if (designName) {
-      const newDesigns = [...savedDesigns, { name: designName, design: saveDesign }];
-      setSavedDesigns(newDesigns);
-      localStorage.setItem("savedDesigns", JSON.stringify(newDesigns));
+  const handleSaveDesign = async () => {
+    if (currentUser) {
+      const designName = prompt("Enter design name:", `Unnamed Design ${savedDesigns.length + 1}`);
+      if (designName) {
+        const designRef = doc(db, `designs/${currentUser.uid}/userDesigns`, designName);
+        await setDoc(designRef, { design: saveDesign, timestamp: Date.now() });
+        console.log("Design saved!", `designs/${currentUser.uid}/userDesigns/${designName}`);
+        setSavedDesigns([{ name: designName, design: saveDesign, timestamp: Date.now() }, ...savedDesigns]);
+      }
     }
   };
 
-  const handleDeleteDesign = (index: number) => {
-    const updatedDesigns = savedDesigns.filter((_, i) => i !== index);
-    setSavedDesigns(updatedDesigns);
-    localStorage.setItem("savedDesigns", JSON.stringify(updatedDesigns));
+  const handleDeleteDesign = async (index: number) => {
+    if (currentUser) {
+      const designToDelete = savedDesigns[index];
+      await deleteDoc(doc(db, `designs/${currentUser.uid}/userDesigns`, designToDelete.name));
+      setSavedDesigns(savedDesigns.filter((_, i) => i !== index));
+    }
   };
 
-  const handleDeleteAllDesigns = () => {
-    setSavedDesigns([]);
-    localStorage.removeItem("savedDesigns");
-  };
 
   return (
     <div>
@@ -84,9 +94,6 @@ const Bananamode: React.FC<BananamodeProps> = ({ loadDesign, saveDesign }) => {
           <h2 className="mb-4 text-lg font-bold text-white">Saved Designs</h2>
           <button onClick={handleSaveDesign} className="mb-4 w-full rounded bg-blue-500 p-2 text-white">
             Save Current Design
-          </button>
-          <button onClick={handleDeleteAllDesigns} className="mb-4 w-full rounded bg-red-500 p-2 text-white">
-            Delete All Designs
           </button>
           <ul className="space-y-2">
             {savedDesigns.map((item, index) => (

@@ -2,6 +2,10 @@
 import { useState } from "react";
 import EditableComp from "../components/EditableComp";
 import Bananamode from "./bananamode";
+import { useUser } from "../components/UserContext";
+import { collection, addDoc, getDocs, deleteDoc, doc } from "firebase/firestore";
+import { db } from "../utils/class";
+import { UserProvider } from "../components/UserContext";
 
 interface Title {
   html: string;
@@ -13,6 +17,7 @@ interface Title {
 }
 
 export default function Home() {
+  
   const [titleList, setTitleList] = useState<Title[]>([
     {
       html: "Moe Sarraf",
@@ -117,64 +122,66 @@ export default function Home() {
   };
 
   return (
-    <div className="m-40 flex-col">
-      <Bananamode loadDesign={setTitleList} saveDesign={titleList} />
-      <div>
-        <button
-          onClick={addTitle}
-          className="mx-1 mb-4 rounded bg-blue-500 p-2 text-white"
-        >
-          Add Title
-        </button>
-        <button
-          onClick={resetWork}
-          className="mx-1 mb-4 rounded bg-red-500 p-2 text-white"
-        >
-          Reset
-        </button>
-        <button
-          onClick={undoLastChange}
-          className="mx-1 mb-4 rounded bg-yellow-500 p-2 text-white"
-        >
-          Undo
-        </button>
-        <button
-          onClick={redoLastChange}
-          className="mx-1 mb-4 rounded bg-green-500 p-2 text-white"
-        >
-          Redo
-        </button>
-      </div>
-      {titleList.map((title, index) => (
-        <div
-          key={index}
-          draggable
-          onDragStart={() => handleDragStart(index)}
-          onDragOver={(event) => handleDragOver(event, index)}
-          onDrop={() => handleDrop(index)}
-          className={`max-w-max ${dragOverIndex === index ? "bg-gray-600 bg-opacity-20" : ""}`}
-        >
-          <EditableComp
-            html={title.html}
-            onChange={(newTitle: string) =>
-              updateTitleProperty(index, "html", newTitle)
-            }
-            className={`items-center border-2 border-dashed border-gray-700 p-3 font-medium focus:border-blue-600 focus:outline-none`}
-            ariaLabel="Page Title"
-            placeholder="Enter your title..."
-            fontSize={title.fontSize}
-            fontColor={title.fontColor}
-            fontAlignment={title.fontAlignment}
-            widthSize={title.widthSize}
-            lengthSize={title.lengthSize}
-            updateProperty={(property: keyof Title, value: string) =>
-              updateTitleProperty(index, property, value)
-            }
-            initialWidth={title.widthSize}
-            initialLength={title.lengthSize}
-          />
+    <UserProvider>
+      <div className="m-40 flex-col">
+        <Bananamode loadDesign={setTitleList} saveDesign={titleList} />
+        <div>
+          <button
+            onClick={addTitle}
+            className="mx-1 mb-4 rounded bg-blue-500 p-2 text-white"
+          >
+            Add Title
+          </button>
+          <button
+            onClick={resetWork}
+            className="mx-1 mb-4 rounded bg-red-500 p-2 text-white"
+          >
+            Reset
+          </button>
+          <button
+            onClick={undoLastChange}
+            className="mx-1 mb-4 rounded bg-yellow-500 p-2 text-white"
+          >
+            Undo
+          </button>
+          <button
+            onClick={redoLastChange}
+            className="mx-1 mb-4 rounded bg-green-500 p-2 text-white"
+          >
+            Redo
+          </button>
         </div>
-      ))}
-    </div>
+        {titleList.map((title, index) => (
+          <div
+            key={index}
+            draggable
+            onDragStart={() => handleDragStart(index)}
+            onDragOver={(event) => handleDragOver(event, index)}
+            onDrop={() => handleDrop(index)}
+            className={`max-w-max ${dragOverIndex === index ? "bg-gray-600 bg-opacity-20" : ""}`}
+          >
+            <EditableComp
+              html={title.html}
+              onChange={(newTitle: string) =>
+                updateTitleProperty(index, "html", newTitle)
+              }
+              className={`items-center border-2 border-dashed border-gray-700 p-3 font-medium focus:border-blue-600 focus:outline-none`}
+              ariaLabel="Page Title"
+              placeholder="Enter your title..."
+              fontSize={title.fontSize}
+              fontColor={title.fontColor}
+              fontAlignment={title.fontAlignment}
+              widthSize={title.widthSize}
+              lengthSize={title.lengthSize}
+              updateProperty={(property: keyof Title, value: string) =>
+                updateTitleProperty(index, property, value)
+              }
+              initialWidth={title.widthSize}
+              initialLength={title.lengthSize}
+            />
+          </div>
+        ))}
+      </div>
+    </UserProvider>
   );
 }

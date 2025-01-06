@@ -49,16 +49,22 @@ const Login: React.FC<LoginProps> = ({ user }) => {
 
   const handleGoogleLoginClick = async () => {
     try {
+      console.log("Attempting to open Google login...");
       await handleGoogleLogin();
+      console.log("Google login opened successfully.");
     } catch (error) {
+      console.error("Failed to open Google login:", error);
       setError("Failed to open Google login. Please try again.");
     }
   };
 
   const handleGithubLoginClick = async () => {
     try {
+      console.log("Attempting to open GitHub login...");
       await handleGithubLogin();
+      console.log("GitHub login opened successfully.");
     } catch (error) {
+      console.error("Failed to open GitHub login:", error);
       setError("Failed to open GitHub login. Please try again.");
     }
   };

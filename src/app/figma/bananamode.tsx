@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { SiGamebanana } from "react-icons/si";
 import { AiOutlineClose } from "react-icons/ai";
 import { db, useUser } from "../components/UserContext";
-import { collection, addDoc, getDocs, deleteDoc, doc, setDoc, query, orderBy } from "firebase/firestore";
+import { collection, getDocs, deleteDoc, doc, setDoc, query, orderBy } from "firebase/firestore";
 
 
 interface Title {
@@ -78,7 +78,6 @@ const Bananamode: React.FC<BananamodeProps> = ({ loadDesign, saveDesign }) => {
       setSavedDesigns(savedDesigns.filter((_, i) => i !== index));
     }
   };
-
 
   return (
     <div>

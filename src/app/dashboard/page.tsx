@@ -1,11 +1,10 @@
 "use client";
-import { UserProvider } from "../components/UserContext";
-import HomeContent from "../utils/edit";
+import Navbar from "./navbar";
 
 export default function Home() {
   return (
-    <UserProvider>
-      <HomeContent />
-    </UserProvider>
+    <div className="w-screen justify-between">
+      <Navbar />
+    </div>
   );
 }

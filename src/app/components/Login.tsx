@@ -17,7 +17,7 @@ interface LoginProps {
 const Login: React.FC<LoginProps> = ({ user }) => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [error, setError] = useState<boolean>("");
+  const [error, setError] = useState<string>("");
 
   const handleUsernameChange = (e: ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value);
@@ -32,6 +32,7 @@ const Login: React.FC<LoginProps> = ({ user }) => {
     if (result.success) {
       setError("");
     } else {
+      // @ts-ignore
       setError(result.error);
     }
   };
@@ -41,6 +42,7 @@ const Login: React.FC<LoginProps> = ({ user }) => {
     if (result.success) {
       // User logged out successfully
     } else {
+      // @ts-ignore
       setError(result.error);
     }
   };

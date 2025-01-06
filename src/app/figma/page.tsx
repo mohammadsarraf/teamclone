@@ -3,7 +3,13 @@ import { useState } from "react";
 import EditableComp from "../components/EditableComp";
 import Bananamode from "./bananamode";
 import { useUser } from "../components/UserContext";
-import { collection, addDoc, getDocs, deleteDoc, doc } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 import { db } from "../utils/class";
 import { UserProvider } from "../components/UserContext";
 
@@ -17,7 +23,6 @@ interface Title {
 }
 
 export default function Home() {
-  
   const [titleList, setTitleList] = useState<Title[]>([
     {
       html: "Moe Sarraf",

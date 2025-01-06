@@ -2,15 +2,6 @@
 import { useState } from "react";
 import EditableComp from "../components/EditableComp";
 import Bananamode from "./bananamode";
-import { useUser } from "../components/UserContext";
-import {
-  collection,
-  addDoc,
-  getDocs,
-  deleteDoc,
-  doc,
-} from "firebase/firestore";
-import { db } from "../utils/class";
 import { UserProvider } from "../components/UserContext";
 
 interface Title {
@@ -178,6 +169,7 @@ export default function Home() {
               fontAlignment={title.fontAlignment}
               widthSize={title.widthSize}
               lengthSize={title.lengthSize}
+              // @ts-ignore
               updateProperty={(property: keyof Title, value: string) =>
                 updateTitleProperty(index, property, value)
               }

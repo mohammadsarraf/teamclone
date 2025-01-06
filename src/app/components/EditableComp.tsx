@@ -4,7 +4,7 @@ import Toolbar from "../components/Toolbar";
 
 interface EditableCompProps {
   html: string;
-  onChange: React.Dispatch<React.SetStateAction<string>>;
+  onChange: (newTitle: string) => void;
   className: string;
   ariaLabel: string;
   placeholder: string;

@@ -1,13 +1,13 @@
 "use client";
 import { FaPiedPiper } from "react-icons/fa6";
-import { UserProvider } from "../components/UserContext";
 import { PiUserCircleDuotone } from "react-icons/pi";
 import { useState, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import DropdownMenu from "./dropdown";
 
 export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
   const pathname = usePathname();
 
   const toggleDropdown = () => {
@@ -57,27 +57,7 @@ export default function Navbar() {
           className="cursor-pointer text-4xl text-green-600"
           onClick={toggleDropdown}
         />
-        {dropdownOpen && (
-          <div
-            ref={dropdownRef}
-            className="absolute right-5 top-12 mt-2 w-80 bg-white text-black shadow-lg"
-          >
-            <div className="border-b p-4">
-              <p className="font-bold">Username</p>
-              <p className="text-sm text-gray-600">user@example.com</p>
-            </div>
-            <div className="cursor-pointer p-4 hover:bg-gray-100">Profile</div>
-            <div className="cursor-pointer p-4 hover:bg-gray-100">
-              Account Security
-            </div>
-            <div className="cursor-pointer p-4 hover:bg-gray-100">
-              Notifications
-            </div>
-            <div className="cursor-pointer p-4 hover:bg-gray-100">Language</div>
-            <div className="cursor-pointer p-4 hover:bg-gray-100">Help</div>
-            <div className="cursor-pointer p-4 hover:bg-gray-100">Logout</div>
-          </div>
-        )}
+        {dropdownOpen && <DropdownMenu dropdownRef={dropdownRef} />}
       </div>
     </nav>
   );

@@ -64,7 +64,7 @@ const Login: React.FC<LoginProps> = ({ user }) => {
 
   useEffect(() => {
     if (user) {
-      router.push("/home");
+      router.push("/dashboard");
     }
   }, [user, router]);
 

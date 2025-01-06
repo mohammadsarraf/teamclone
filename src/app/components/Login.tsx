@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, ChangeEvent } from "react";
 import {
   FaGoogle,
   FaGithub,
@@ -7,19 +7,23 @@ import {
   FaEnvelope,
   FaPiedPiperPp,
 } from "react-icons/fa6";
-import { signInUser, signOutUser } from "./UserContext";
 import { useRouter } from "next/navigation";
+import { handleGoogleLogin, handleGithubLogin, signInUser, signOutUser } from "../services/authService";
 
-const Login = ({ user }: any) => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+interface LoginProps {
+  user: any;
+}
 
-  const handleUsernameChange = (e: any) => {
+const Login: React.FC<LoginProps> = ({ user }) => {
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [error, setError] = useState<boolean>("");
+
+  const handleUsernameChange = (e: ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value);
   };
 
-  const handlePasswordChange = (e: any) => {
+  const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
   };
 
@@ -62,7 +66,7 @@ const Login = ({ user }: any) => {
       <div className="w-full max-w-4xl rounded-lg bg-[#1e1e1e] p-10 shadow-lg">
         <div className="mb-6 text-center">
           <p className="text-2xl font-semibold text-gray-200">
-            Log in to TeamGlu4e.com
+            Log in to FrozenMango.com
           </p>
           <p className="mt-2 text-sm text-gray-400">
             Just a little reminder that by continuing with any of the options
@@ -130,31 +134,39 @@ const Login = ({ user }: any) => {
 
           {/* Social Buttons */}
           <div className="flex-1 space-y-4">
-            <button className="flex w-full items-center gap-4 rounded-lg border border-gray-600 bg-[#2a2a2a] px-6 py-3 hover:bg-blue-600">
+            <button
+              onClick={handleGoogleLogin}
+              className="flex w-full items-center gap-4 rounded-lg border border-gray-600 bg-[#2a2a2a] px-6 py-3 hover:bg-blue-600"
+            >
               <FaGoogle className="size-6 text-red-500" />
               <span className="flex-1 text-base font-medium leading-none text-gray-200">
                 Continue with Google
               </span>
             </button>
-            <button className="flex w-full items-center gap-4 rounded-lg border border-gray-600 bg-[#2a2a2a] px-6 py-3 hover:bg-black">
-              <FaApple className="size-6 text-gray-300" />
-              <span className="flex-1 text-base font-medium leading-none text-gray-200">
-                Continue with Apple
-              </span>
-            </button>
-            <button className="flex w-full items-center gap-4 rounded-lg border border-gray-600 bg-[#2a2a2a] px-6 py-3 hover:bg-gray-700">
+            <button
+              onClick={handleGithubLogin}
+              className="flex w-full items-center gap-4 rounded-lg border border-gray-600 bg-[#2a2a2a] px-6 py-3 hover:bg-gray-700"
+            >
               <FaGithub className="size-6 text-gray-200" />
               <span className="flex-1 text-base font-medium leading-none text-gray-200">
                 Continue with GitHub
               </span>
             </button>
-            <button className="flex w-full items-center gap-4 rounded-lg border border-gray-600 bg-[#2a2a2a] px-6 py-3 hover:bg-yellow-700">
+            <button
+              className="flex w-full items-center gap-4 rounded-lg border border-gray-600 bg-[#2a2a2a] px-6 py-3 hover:bg-black cursor-not-allowed"
+            >
+              <FaApple className="size-6 text-gray-300" />
+              <span className="flex-1 text-base font-medium leading-none text-gray-200">
+                Continue with Apple
+              </span>
+            </button>
+            <button className="flex w-full items-center gap-4 rounded-lg border border-gray-600 bg-[#2a2a2a] px-6 py-3 hover:bg-yellow-700 cursor-not-allowed">
               <FaEnvelope className="size-6 text-yellow-500" />
               <span className="flex-1 text-base font-medium leading-none text-gray-200">
                 Email me a login link
               </span>
             </button>
-            <button className="flex w-full items-center gap-4 rounded-lg border border-gray-600 bg-[#2a2a2a] px-6 py-3 hover:bg-green-800">
+            <button className="flex w-full items-center gap-4 rounded-lg border border-gray-600 bg-[#2a2a2a] px-6 py-3 hover:bg-green-800 cursor-not-allowed">
               <FaPiedPiperPp className="size-6 text-green-400" />
               <span className="flex-1 text-base font-medium leading-none text-gray-200">
                 Log in via PiedPiper
@@ -165,7 +177,7 @@ const Login = ({ user }: any) => {
 
         {/* Footer Links */}
         <div className="mt-6 text-center">
-          <a href="#" className="text-sm text-[#5b9aff] underline">
+          <a href="" className="text-sm text-[#5b9aff] underline">
             Lost your password?
           </a>
         </div>

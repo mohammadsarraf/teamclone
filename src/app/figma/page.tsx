@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import EditableComp from "../components/EditableComp";
 import Bananamode from "./bananamode";
 
@@ -56,33 +56,8 @@ export default function Home() {
     );
   };
 
-  const saveWork = () => {
-    const savedData = JSON.stringify(titleList);
-    localStorage.setItem("savedTitles", savedData);
-    console.log("Work saved!", savedData);
-  };
-
-  const saveDesign = (name: string) => {
-    const savedDesigns = JSON.parse(localStorage.getItem("savedDesigns") || "[]");
-    const existingDesignIndex = savedDesigns.findIndex((design: { name: string }) => design.name === name);
-
-    if (existingDesignIndex !== -1) {
-      savedDesigns[existingDesignIndex].design = titleList;
-    } else {
-      savedDesigns.push({ name, design: titleList });
-    }
-
-    localStorage.setItem("savedDesigns", JSON.stringify(savedDesigns));
-    console.log("Design saved!", name);
-  };
-
-  const loadDesign = (design: Title[]) => {
-    setTitleList(design);
-  };
-
   const resetWork = () => {
     setHistory([...history, [...titleList]]);
-    localStorage.removeItem("savedTitles");
     setTitleList([
       {
         html: "Empty...",
@@ -114,18 +89,6 @@ export default function Home() {
     }
   };
 
-  useEffect(() => {
-    const savedData = localStorage.getItem("savedTitles");
-    if (savedData) {
-      setTitleList(JSON.parse(savedData));
-      console.log("Work loaded!", savedData);
-    }
-  }, []);
-
-  useEffect(() => {
-    saveWork();
-  }, [titleList]);
-
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
@@ -155,7 +118,7 @@ export default function Home() {
 
   return (
     <div className="m-40 flex-col">
-      <Bananamode loadDesign={loadDesign} saveDesign={saveDesign} />
+      <Bananamode loadDesign={setTitleList} saveDesign={titleList} />
       <div>
         <button
           onClick={addTitle}
@@ -180,17 +143,6 @@ export default function Home() {
           className="mx-1 mb-4 rounded bg-green-500 p-2 text-white"
         >
           Redo
-        </button>
-        <button
-          onClick={() => {
-            const designName = prompt("Enter design name:", `Unnamed Design ${JSON.parse(localStorage.getItem("savedDesigns") || "[]").length + 1}`);
-            if (designName) {
-              saveDesign(designName);
-            }
-          }}
-          className="mx-1 mb-4 rounded bg-purple-500 p-2 text-white"
-        >
-          Save Design
         </button>
       </div>
       {titleList.map((title, index) => (

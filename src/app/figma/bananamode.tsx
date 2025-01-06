@@ -13,7 +13,7 @@ interface Title {
 
 interface BananamodeProps {
   loadDesign: (design: Title[]) => void;
-  saveDesign: (name: string) => void;
+  saveDesign: Title[];
 }
 
 const Bananamode: React.FC<BananamodeProps> = ({ loadDesign, saveDesign }) => {
@@ -24,6 +24,20 @@ const Bananamode: React.FC<BananamodeProps> = ({ loadDesign, saveDesign }) => {
     const savedData = localStorage.getItem("savedDesigns");
     if (savedData) {
       setSavedDesigns(JSON.parse(savedData));
+    }
+  }, []);
+
+  useEffect(() => {
+    const savedData = JSON.stringify(saveDesign);
+    localStorage.setItem("savedTitles", savedData);
+    console.log("Work saved!", savedData);
+  }, [saveDesign]);
+
+  useEffect(() => {
+    const savedData = localStorage.getItem("savedTitles");
+    if (savedData) {
+      loadDesign(JSON.parse(savedData));
+      console.log("Work loaded!", savedData);
     }
   }, []);
 
@@ -39,7 +53,9 @@ const Bananamode: React.FC<BananamodeProps> = ({ loadDesign, saveDesign }) => {
   const handleSaveDesign = () => {
     const designName = prompt("Enter design name:", `Unnamed Design ${savedDesigns.length + 1}`);
     if (designName) {
-      saveDesign(designName);
+      const newDesigns = [...savedDesigns, { name: designName, design: saveDesign }];
+      setSavedDesigns(newDesigns);
+      localStorage.setItem("savedDesigns", JSON.stringify(newDesigns));
     }
   };
 

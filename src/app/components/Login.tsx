@@ -8,7 +8,12 @@ import {
   FaPiedPiperPp,
 } from "react-icons/fa6";
 import { useRouter } from "next/navigation";
-import { handleGoogleLogin, handleGithubLogin, signInUser, signOutUser } from "../services/authService";
+import {
+  handleGoogleLogin,
+  handleGithubLogin,
+  signInUser,
+  signOutUser,
+} from "../services/authService";
 
 interface LoginProps {
   user: any;
@@ -162,21 +167,19 @@ const Login: React.FC<LoginProps> = ({ user }) => {
                 Continue with GitHub
               </span>
             </button>
-            <button
-              className="flex w-full items-center gap-4 rounded-lg border border-gray-600 bg-[#2a2a2a] px-6 py-3 hover:bg-black cursor-not-allowed"
-            >
+            <button className="flex w-full cursor-not-allowed items-center gap-4 rounded-lg border border-gray-600 bg-[#2a2a2a] px-6 py-3 hover:bg-black">
               <FaApple className="size-6 text-gray-300" />
               <span className="flex-1 text-base font-medium leading-none text-gray-200">
                 Continue with Apple
               </span>
             </button>
-            <button className="flex w-full items-center gap-4 rounded-lg border border-gray-600 bg-[#2a2a2a] px-6 py-3 hover:bg-yellow-700 cursor-not-allowed">
+            <button className="flex w-full cursor-not-allowed items-center gap-4 rounded-lg border border-gray-600 bg-[#2a2a2a] px-6 py-3 hover:bg-yellow-700">
               <FaEnvelope className="size-6 text-yellow-500" />
               <span className="flex-1 text-base font-medium leading-none text-gray-200">
                 Email me a login link
               </span>
             </button>
-            <button className="flex w-full items-center gap-4 rounded-lg border border-gray-600 bg-[#2a2a2a] px-6 py-3 hover:bg-green-800 cursor-not-allowed">
+            <button className="flex w-full cursor-not-allowed items-center gap-4 rounded-lg border border-gray-600 bg-[#2a2a2a] px-6 py-3 hover:bg-green-800">
               <FaPiedPiperPp className="size-6 text-green-400" />
               <span className="flex-1 text-base font-medium leading-none text-gray-200">
                 Log in via PiedPiper

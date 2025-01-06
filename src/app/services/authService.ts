@@ -1,4 +1,9 @@
-import { getAuth, signInWithPopup, GoogleAuthProvider, GithubAuthProvider } from "firebase/auth";
+import {
+  getAuth,
+  signInWithPopup,
+  GoogleAuthProvider,
+  GithubAuthProvider,
+} from "firebase/auth";
 
 export const signInUser = async (username: string, password: string) => {
   // Implement sign-in logic here

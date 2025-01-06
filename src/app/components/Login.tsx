@@ -47,6 +47,22 @@ const Login: React.FC<LoginProps> = ({ user }) => {
     }
   };
 
+  const handleGoogleLoginClick = async () => {
+    try {
+      await handleGoogleLogin();
+    } catch (error) {
+      setError("Failed to open Google login. Please try again.");
+    }
+  };
+
+  const handleGithubLoginClick = async () => {
+    try {
+      await handleGithubLogin();
+    } catch (error) {
+      setError("Failed to open GitHub login. Please try again.");
+    }
+  };
+
   const router = useRouter();
 
   useEffect(() => {
@@ -137,7 +153,7 @@ const Login: React.FC<LoginProps> = ({ user }) => {
           {/* Social Buttons */}
           <div className="flex-1 space-y-4">
             <button
-              onClick={handleGoogleLogin}
+              onClick={handleGoogleLoginClick}
               className="flex w-full items-center gap-4 rounded-lg border border-gray-600 bg-[#2a2a2a] px-6 py-3 hover:bg-blue-600"
             >
               <FaGoogle className="size-6 text-red-500" />
@@ -146,7 +162,7 @@ const Login: React.FC<LoginProps> = ({ user }) => {
               </span>
             </button>
             <button
-              onClick={handleGithubLogin}
+              onClick={handleGithubLoginClick}
               className="flex w-full items-center gap-4 rounded-lg border border-gray-600 bg-[#2a2a2a] px-6 py-3 hover:bg-gray-700"
             >
               <FaGithub className="size-6 text-gray-200" />

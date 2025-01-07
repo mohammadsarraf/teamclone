@@ -36,17 +36,17 @@ export default function Navbar() {
         <FaPiedPiper className="mr-4 text-6xl text-green-500" />
         <p className="text-3xl font-bold text-green-500">FrozenMango</p>
       </div>
-      <div className="flex-grow flex justify-center">
-        <button className="flex px-4 py-2 rounded-md bg-transparnet  text-white items-center">
+      <div className="flex grow justify-center">
+        <button className="bg-transparnet flex items-center rounded-md px-4  py-2 text-white">
           PRODUCTS
-          <TiArrowSortedDown  className="flex ml-1"/>
+          <TiArrowSortedDown className="ml-1 flex" />
         </button>
-        <button className="flex px-4 py-2 rounded-md bg-transparnet  text-white items-center">
+        <button className="bg-transparnet flex items-center rounded-md px-4  py-2 text-white">
           TEMPLATES
         </button>
-        <button className="flex px-4 py-2 rounded-md bg-transparnet  text-white items-center">
+        <button className="bg-transparnet flex items-center rounded-md px-4  py-2 text-white">
           RESOURCES
-          <TiArrowSortedDown  className="flex ml-1"/>
+          <TiArrowSortedDown className="ml-1 flex" />
         </button>
       </div>
       <div className="ml-auto flex items-center gap-4">

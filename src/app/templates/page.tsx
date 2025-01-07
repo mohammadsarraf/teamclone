@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import { useState } from "react";
 import Navbar from "./navbar";
 import Header from "./Header";
@@ -12,7 +12,7 @@ export default function Home() {
     setSelectedOptions((prev) =>
       prev.includes(option)
         ? prev.filter((item) => item !== option)
-        : [...prev, option]
+        : [...prev, option],
     );
   };
 
@@ -24,11 +24,14 @@ export default function Home() {
     <div className="min-h-screen w-screen justify-between bg-white">
       <Navbar />
       <Header />
-      <div className="flex justify-between items-center px-10 py-4">
-        <p className="text-black mr-2">29 Results</p>
-        <div className="flex flex-wrap items-center flex-grow">
+      <div className="flex items-center justify-between px-10 py-4">
+        <p className="mr-2 text-black">29 Results</p>
+        <div className="flex grow flex-wrap items-center">
           {selectedOptions.map((option) => (
-            <span key={option} className="bg-gray-200 text-black px-3 py-1 m-1 rounded-full flex items-center overflow-auto">
+            <span
+              key={option}
+              className="m-1 flex items-center overflow-auto rounded-full bg-gray-200 px-3 py-1 text-black"
+            >
               {option}
               <button
                 className="ml-2 text-gray-500"
@@ -39,9 +42,12 @@ export default function Home() {
             </span>
           ))}
         </div>
-        <button className="text-black p-2 border ml-2">Build with AI</button>
+        <button className="ml-2 border p-2 text-black">Build with AI</button>
       </div>
-      <MainContent selectedOptions={selectedOptions} handleBgChange={handleBgChange} />
+      <MainContent
+        selectedOptions={selectedOptions}
+        handleBgChange={handleBgChange}
+      />
       <Footer />
     </div>
   );

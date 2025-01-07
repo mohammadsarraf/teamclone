@@ -13,13 +13,18 @@ export default function Home() {
     tertiaryColor: "text-white",
   });
 
-  const handleColorChange = (primary: string, secondary: string, tertiary: string) => {
+  const handleColorChange = (
+    primary: string,
+    secondary: string,
+    tertiary: string,
+  ) => {
     setColors({
       primaryColor: primary,
       secondaryColor: secondary,
       tertiaryColor: tertiary,
     });
   };
+  const bgColorClass = colors.secondaryColor.replace("text-", "bg-");
 
   return (
     <div className="flex h-screen w-screen flex-row bg-gray-100">
@@ -37,11 +42,13 @@ export default function Home() {
           </div>
         </div>
         <div className="m-10 flex-1 rounded-lg">
-          <div className="flex size-full overflow-auto rounded-lg bg-black p-4">
-            <Edit 
-              primaryColor={colors.primaryColor} 
-              secondaryColor={colors.secondaryColor} 
-              tertiaryColor={colors.tertiaryColor} 
+          <div
+            className={`flex size-full overflow-auto rounded-lg ${bgColorClass} p-4`}
+          >
+            <Edit
+              primaryColor={colors.primaryColor}
+              secondaryColor={colors.secondaryColor}
+              tertiaryColor={colors.tertiaryColor}
             />
           </div>
         </div>
@@ -61,73 +68,127 @@ export default function Home() {
           </p>
         </div>
         <div className="grid grid-cols-3 gap-4">
-          <button 
+          <button
             className="flex h-10 w-full transition duration-300 hover:shadow-lg"
-            onClick={() => handleColorChange("text-red-500", "text-yellow-500", "text-blue-500")}
+            onClick={() =>
+              handleColorChange(
+                "text-red-500",
+                "text-yellow-500",
+                "text-blue-500",
+              )
+            }
           >
             <div className="h-full w-1/3 rounded-l-full bg-red-500"></div>
             <div className="h-full w-1/3 bg-yellow-500"></div>
             <div className="h-full w-1/3 rounded-r-full bg-blue-500"></div>
           </button>
-          <button 
+          <button
             className="flex h-10 w-full transition duration-300 hover:shadow-lg"
-            onClick={() => handleColorChange("text-purple-500", "text-green-500", "text-orange-500")}
+            onClick={() =>
+              handleColorChange(
+                "text-purple-500",
+                "text-green-500",
+                "text-orange-500",
+              )
+            }
           >
             <div className="h-full w-1/3 rounded-l-full bg-purple-500"></div>
             <div className="h-full w-1/3 bg-green-500"></div>
             <div className="h-full w-1/3 rounded-r-full bg-orange-500"></div>
           </button>
-          <button 
+          <button
             className="flex h-10 w-full transition duration-300 hover:shadow-lg"
-            onClick={() => handleColorChange("text-pink-500", "text-teal-500", "text-indigo-500")}
+            onClick={() =>
+              handleColorChange(
+                "text-pink-500",
+                "text-teal-500",
+                "text-indigo-500",
+              )
+            }
           >
             <div className="h-full w-1/3 rounded-l-full bg-pink-500"></div>
             <div className="h-full w-1/3 bg-teal-500"></div>
             <div className="h-full w-1/3 rounded-r-full bg-indigo-500"></div>
           </button>
-          <button 
+          <button
             className="flex h-10 w-full transition duration-300 hover:shadow-lg"
-            onClick={() => handleColorChange("text-gray-500", "text-red-500", "text-yellow-500")}
+            onClick={() =>
+              handleColorChange(
+                "text-gray-500",
+                "text-red-500",
+                "text-yellow-500",
+              )
+            }
           >
             <div className="h-full w-1/3 rounded-l-full bg-gray-500"></div>
             <div className="h-full w-1/3 bg-red-500"></div>
             <div className="h-full w-1/3 rounded-r-full bg-yellow-500"></div>
           </button>
-          <button 
+          <button
             className="flex h-10 w-full transition duration-300 hover:shadow-lg"
-            onClick={() => handleColorChange("text-green-500", "text-blue-500", "text-purple-500")}
+            onClick={() =>
+              handleColorChange(
+                "text-green-500",
+                "text-blue-500",
+                "text-purple-500",
+              )
+            }
           >
             <div className="h-full w-1/3 rounded-l-full bg-green-500"></div>
             <div className="h-full w-1/3 bg-blue-500"></div>
             <div className="h-full w-1/3 rounded-r-full bg-purple-500"></div>
           </button>
-          <button 
+          <button
             className="flex h-10 w-full transition duration-300 hover:shadow-lg"
-            onClick={() => handleColorChange("text-orange-500", "text-pink-500", "text-teal-500")}
+            onClick={() =>
+              handleColorChange(
+                "text-orange-500",
+                "text-pink-500",
+                "text-teal-500",
+              )
+            }
           >
             <div className="h-full w-1/3 rounded-l-full bg-orange-500"></div>
             <div className="h-full w-1/3 bg-pink-500"></div>
             <div className="h-full w-1/3 rounded-r-full bg-teal-500"></div>
           </button>
-          <button 
+          <button
             className="flex h-10 w-full transition duration-300 hover:shadow-lg"
-            onClick={() => handleColorChange("text-indigo-500", "text-gray-500", "text-red-500")}
+            onClick={() =>
+              handleColorChange(
+                "text-indigo-500",
+                "text-gray-500",
+                "text-red-500",
+              )
+            }
           >
             <div className="h-full w-1/3 rounded-l-full bg-indigo-500"></div>
             <div className="h-full w-1/3 bg-gray-500"></div>
             <div className="h-full w-1/3 rounded-r-full bg-red-500"></div>
           </button>
-          <button 
+          <button
             className="flex h-10 w-full transition duration-300 hover:shadow-lg"
-            onClick={() => handleColorChange("text-yellow-500", "text-green-500", "text-blue-500")}
+            onClick={() =>
+              handleColorChange(
+                "text-yellow-500",
+                "text-green-500",
+                "text-blue-500",
+              )
+            }
           >
             <div className="h-full w-1/3 rounded-l-full bg-yellow-500"></div>
             <div className="h-full w-1/3 bg-green-500"></div>
             <div className="h-full w-1/3 rounded-r-full bg-blue-500"></div>
           </button>
-          <button 
+          <button
             className="flex h-10 w-full transition duration-300 hover:shadow-lg"
-            onClick={() => handleColorChange("text-purple-500", "text-orange-500", "text-pink-500")}
+            onClick={() =>
+              handleColorChange(
+                "text-purple-500",
+                "text-orange-500",
+                "text-pink-500",
+              )
+            }
           >
             <div className="h-full w-1/3 rounded-l-full bg-purple-500"></div>
             <div className="h-full w-1/3 bg-orange-500"></div>

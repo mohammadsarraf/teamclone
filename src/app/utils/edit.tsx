@@ -19,7 +19,11 @@ interface EditProps {
   tertiaryColor: string;
 }
 
-export default function Edit({ primaryColor, secondaryColor, tertiaryColor }: EditProps) {
+export default function Edit({
+  primaryColor,
+  secondaryColor,
+  tertiaryColor,
+}: EditProps) {
   const [titleList, setTitleList] = useState<Title[]>([
     {
       html: "Moe Sarraf",
@@ -97,7 +101,10 @@ export default function Edit({ primaryColor, secondaryColor, tertiaryColor }: Ed
       <main className={`size-full ${bgColorClass} px-10 lg:px-40`}>
         <section className="size-full">
           <nav className="mb-12 flex justify-between py-10">
-            <h1 className={`cursor-pointer text-xl ${primaryColor}`} onClick={() => {}}>
+            <h1
+              className={`cursor-pointer text-xl ${primaryColor}`}
+              onClick={() => {}}
+            >
               Lilglu4e
             </h1>
           </nav>

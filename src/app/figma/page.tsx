@@ -1,18 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
-import { signOutUser } from "../components/UserContext";
-import { useRouter } from "next/navigation";
-import Toolbar from "../components/Toolbar";
-import { PiFrameCornersBold } from "react-icons/pi";
-import { IoLibraryOutline } from "react-icons/io5";
-import { FaCode } from "react-icons/fa6";
-import {
-  handleHClick,
-  handleJustifyClick,
-  handleColorChange,
-  getAlignmentClass,
-} from "./textHandlers";
+import { useState } from "react";
 import EditableComp from "../components/EditableComp";
+import Bananamode from "./bananamode";
+import { UserProvider } from "../components/UserContext";
 
 interface Title {
   html: string;
@@ -21,58 +11,83 @@ interface Title {
   fontAlignment: string;
   widthSize: string;
   lengthSize: string;
-  className: string;
 }
 
-export default function Edit() {
+export default function Home() {
   const [titleList, setTitleList] = useState<Title[]>([
     {
       html: "Moe Sarraf",
-      fontSize: "text-6xl",
-      fontColor: "text-blue-600",
-      fontAlignment: "text-justify",
-      widthSize: "22",
-      lengthSize: "7",
-      className:
-        "items-center border-2 border-dashed border-gray-700 p-3 font-medium focus:border-blue-600 focus:outline-none",
-    },
-    {
-      html: "Software Developer",
-      fontSize: "text-4xl",
-      fontColor: "text-white",
-      fontAlignment: "text-justify",
-      widthSize: "22",
-      lengthSize: "7",
-      className:
-        "items-center border-2 border-dashed border-gray-700 p-3 font-medium focus:border-blue-600 focus:outline-none",
-    },
-    {
-      html: "As a Computer Science student deeply engaged with Data Science, AI, and Full-Stack Development, I am driven by a passion to blend creativity and technology. My portfolio, featuring diverse projects such as an interactive React mini-game and an innovative NBA MVP prediction model, is a testament to my commitment to crafting engaging user experiences and leveraging the power of data-driven insights.",
       fontSize: "text-xl",
       fontColor: "text-white",
       fontAlignment: "text-justify",
       widthSize: "22",
       lengthSize: "7",
-      className:
-        "items-center border-2 border-dashed border-gray-700 p-3 font-medium focus:border-blue-600 focus:outline-none",
     },
   ]);
+  const [history, setHistory] = useState<Title[][]>([]);
+  const [redoHistory, setRedoHistory] = useState<Title[][]>([]);
 
-  const router = useRouter();
-
-  const [activeField, setActiveField] = useState<string | null>(null);
-  const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
+  const addTitle = () => {
+    setHistory([...history, [...titleList]]);
+    setRedoHistory([]);
+    setTitleList([
+      ...titleList,
+      {
+        html: "New Title",
+        fontSize: "text-2xl",
+        fontColor: "text-white",
+        fontAlignment: "text-justify",
+        widthSize: "22",
+        lengthSize: "7",
+      },
+    ]);
+  };
 
   const updateTitleProperty = (
     index: number,
     property: keyof Title,
     value: string,
   ) => {
+    setHistory([...history, [...titleList]]);
+    setRedoHistory([]);
     setTitleList(
       titleList.map((title, i) =>
         i === index ? { ...title, [property]: value } : title,
       ),
     );
+  };
+
+  const resetWork = () => {
+    setHistory([...history, [...titleList]]);
+    setTitleList([
+      {
+        html: "Empty...",
+        fontSize: "text-xl",
+        fontColor: "text-white",
+        fontAlignment: "text-justify",
+        widthSize: "22",
+        lengthSize: "5",
+      },
+    ]);
+    setRedoHistory([]);
+  };
+
+  const undoLastChange = () => {
+    if (history.length > 0) {
+      const previousState = history[history.length - 1];
+      setHistory(history.slice(0, -1));
+      setRedoHistory([...redoHistory, [...titleList]]);
+      setTitleList(previousState);
+    }
+  };
+
+  const redoLastChange = () => {
+    if (redoHistory.length > 0) {
+      const nextState = redoHistory[redoHistory.length - 1];
+      setRedoHistory(redoHistory.slice(0, -1));
+      setHistory([...history, [...titleList]]);
+      setTitleList(nextState);
+    }
   };
 
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
@@ -103,52 +118,67 @@ export default function Edit() {
   };
 
   return (
-    <div className="size-full">
-      <div>
-        <title>{"Untitled Page"}</title>
-        <meta name="description" content={"No description available."} />
-        <link rel="icon" href="/favicon.ico" />
+    <UserProvider>
+      <div className="m-40 flex-col">
+        <Bananamode loadDesign={setTitleList} saveDesign={titleList} />
+        <div>
+          <button
+            onClick={addTitle}
+            className="mx-1 mb-4 rounded bg-blue-500 p-2 text-white"
+          >
+            Add Title
+          </button>
+          <button
+            onClick={resetWork}
+            className="mx-1 mb-4 rounded bg-red-500 p-2 text-white"
+          >
+            Reset
+          </button>
+          <button
+            onClick={undoLastChange}
+            className="mx-1 mb-4 rounded bg-yellow-500 p-2 text-white"
+          >
+            Undo
+          </button>
+          <button
+            onClick={redoLastChange}
+            className="mx-1 mb-4 rounded bg-green-500 p-2 text-white"
+          >
+            Redo
+          </button>
+        </div>
+        {titleList.map((title, index) => (
+          <div
+            key={index}
+            draggable
+            onDragStart={() => handleDragStart(index)}
+            onDragOver={(event) => handleDragOver(event, index)}
+            onDrop={() => handleDrop(index)}
+            className={`max-w-max ${dragOverIndex === index ? "bg-gray-600 bg-opacity-20" : ""}`}
+          >
+            <EditableComp
+              html={title.html}
+              onChange={(newTitle: string) =>
+                updateTitleProperty(index, "html", newTitle)
+              }
+              className={`items-center border-2 border-dashed border-gray-700 p-3 font-medium focus:border-blue-600 focus:outline-none`}
+              ariaLabel="Page Title"
+              placeholder="Enter your title..."
+              fontSize={title.fontSize}
+              fontColor={title.fontColor}
+              fontAlignment={title.fontAlignment}
+              widthSize={title.widthSize}
+              lengthSize={title.lengthSize}
+              // @ts-ignore
+              updateProperty={(property: keyof Title, value: string) =>
+                updateTitleProperty(index, property, value)
+              }
+              initialWidth={title.widthSize}
+              initialLength={title.lengthSize}
+            />
+          </div>
+        ))}
       </div>
-      <main className="size-full bg-black px-10 lg:px-40">
-        <section className="size-full">
-          <nav className="mb-12 flex justify-between py-10">
-            <h1 className="cursor-pointer text-xl" onClick={() => {}}>
-              Lilglu4e
-            </h1>
-          </nav>
-          {titleList.map((title, index) => (
-            <div
-              key={index}
-              draggable
-              onDragStart={() => handleDragStart(index)}
-              onDragOver={(event) => handleDragOver(event, index)}
-              onDrop={() => handleDrop(index)}
-              className={`max-w-max ${dragOverIndex === index ? "bg-gray-600 bg-opacity-20" : ""}`}
-            >
-              <EditableComp
-                html={title.html}
-                onChange={(newTitle: string) =>
-                  updateTitleProperty(index, "html", newTitle)
-                }
-                className={`items-center border-2 border-dashed border-gray-700 p-3 font-medium focus:border-blue-600 focus:outline-none`}
-                ariaLabel="Page Title"
-                placeholder="Enter your title..."
-                fontSize={title.fontSize}
-                fontColor={title.fontColor}
-                fontAlignment={title.fontAlignment}
-                widthSize={title.widthSize}
-                lengthSize={title.lengthSize}
-                // @ts-ignore
-                updateProperty={(property: keyof Title, value: string) =>
-                  updateTitleProperty(index, property, value)
-                }
-                initialWidth={title.widthSize}
-                initialLength={title.lengthSize}
-              />
-            </div>
-          ))}
-        </section>
-      </main>
-    </div>
+    </UserProvider>
   );
 }

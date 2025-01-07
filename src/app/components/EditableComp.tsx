@@ -14,8 +14,8 @@ interface EditableCompProps {
   widthSize: string;
   lengthSize: string;
   updateProperty: (property: string, value: string) => void;
-  initialWidth: string; // Add this line
-  initialLength: string; // Add this line
+  initialWidth: string;
+  initialLength: string;
 }
 
 const EditableComp: React.FC<EditableCompProps> = ({
@@ -30,8 +30,8 @@ const EditableComp: React.FC<EditableCompProps> = ({
   updateProperty,
   ariaLabel,
   placeholder,
-  initialWidth, // Add this line
-  initialLength, // Add this line
+  initialWidth,
+  initialLength,
 }) => {
   const [isClicked, setIsClicked] = useState(false);
   const toolbarRef = useRef<HTMLDivElement>(null);
@@ -93,8 +93,8 @@ const EditableComp: React.FC<EditableCompProps> = ({
               console.log(`Length changed to: ${newLength}rem`);
               updateProperty("lengthSize", newLength);
             }}
-            initialWidth={initialWidth} // Add this line
-            initialLength={initialLength} // Add this line
+            initialWidth={widthSize}
+            initialLength={lengthSize}
           />
         </div>
       )}

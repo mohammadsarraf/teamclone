@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import EditableComp from "../components/EditableComp";
 
@@ -16,13 +16,13 @@ interface Title {
 interface EditProps {
   primaryColor: string;
   secondaryColor: string;
-  tertiaryColor: string;
+  bgColor: string;
 }
 
 export default function Edit({
   primaryColor,
   secondaryColor,
-  tertiaryColor,
+  bgColor,
 }: EditProps) {
   const [titleList, setTitleList] = useState<Title[]>([
     {
@@ -48,7 +48,7 @@ export default function Edit({
     {
       html: "As a Computer Science student deeply engaged with Data Science, AI, and Full-Stack Development, I am driven by a passion to blend creativity and technology. My portfolio, featuring diverse projects such as an interactive React mini-game and an innovative NBA MVP prediction model, is a testament to my commitment to crafting engaging user experiences and leveraging the power of data-driven insights.",
       fontSize: "text-xl",
-      fontColor: tertiaryColor,
+      fontColor: secondaryColor,
       fontAlignment: "text-justify",
       widthSize: "22",
       lengthSize: "7",
@@ -56,6 +56,17 @@ export default function Edit({
         "items-center border-2 border-dashed border-gray-700 p-3 font-medium focus:border-blue-600 focus:outline-none",
     },
   ]);
+
+  useEffect(() => {
+    setTitleList((prevTitleList) =>
+      prevTitleList.map((title, index) => ({
+        ...title,
+        fontColor: index === 0 ? primaryColor : secondaryColor,
+      }))
+    );
+  }, [primaryColor, secondaryColor]);
+
+  console.log(typeof primaryColor, typeof secondaryColor, typeof bgColor)
 
   const router = useRouter();
 
@@ -89,7 +100,6 @@ export default function Edit({
     setDragOverIndex(index);
   };
 
-  const bgColorClass = secondaryColor.replace("text-", "bg-");
 
   return (
     <div className="size-full">
@@ -98,7 +108,7 @@ export default function Edit({
         <meta name="description" content={"No description available."} />
         <link rel="icon" href="/favicon.ico" />
       </div>
-      <main className={`size-full ${bgColorClass} px-10 lg:px-40`}>
+      <main className={`size-full ${bgColor} px-10 lg:px-40`}>
         <section className="size-full">
           <nav className="mb-12 flex justify-between py-10">
             <h1
@@ -109,24 +119,16 @@ export default function Edit({
             </h1>
           </nav>
           {titleList.map((title, index) => (
-            <div
-              key={index}
-              draggable
-              onDragStart={() => handleDragStart(index)}
-              onDragOver={(event) => handleDragOver(event, index)}
-              onDrop={() => {}}
-              className={`max-w-max ${dragOverIndex === index ? "bg-gray-600 bg-opacity-20" : ""}`}
-            >
               <EditableComp
                 html={title.html}
                 onChange={(newTitle: string) =>
                   updateTitleProperty(index, "html", newTitle)
                 }
-                className={`items-center  p-3 font-medium focus:border-blue-600 focus:outline-none`}
+                className={title.className}
                 ariaLabel="Page Title"
                 placeholder="Enter your title..."
                 fontSize={title.fontSize}
-                fontColor={primaryColor}
+                fontColor={title.fontColor}
                 fontAlignment={title.fontAlignment}
                 widthSize={title.widthSize}
                 lengthSize={title.lengthSize}
@@ -137,7 +139,6 @@ export default function Edit({
                 initialWidth={title.widthSize}
                 initialLength={title.lengthSize}
               />
-            </div>
           ))}
         </section>
       </main>

@@ -98,14 +98,14 @@ export default function Edit({
   };
 
   return (
-    <div className="size-full">
+    <div className="h-full w-full">
       <div>
         <title>{"Untitled Page"}</title>
         <meta name="description" content={"No description available."} />
         <link rel="icon" href="/favicon.ico" />
       </div>
-      <main className={`size-full ${bgColor} px-10`}>
-        <section className="size-full">
+      <main className={`h-full w-full ${bgColor} px-10`} style={{ backgroundColor: bgColor }}>
+        <section className="h-full w-full flex flex-col">
           <nav className="mb-5 flex justify-between py-10">
             <h1
               className={`cursor-pointer text-xl ${secondaryColor}`}
@@ -114,7 +114,7 @@ export default function Edit({
               Lilglu4e
             </h1>
           </nav>
-          <section className="flex size-full flex-col items-center justify-center">
+          <section className="flex-grow flex flex-col items-center justify-center">
             {titleList.map((title, index) => (
               <EditableComp
                 key={index}

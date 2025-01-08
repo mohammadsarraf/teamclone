@@ -173,8 +173,7 @@ export default function Home() {
               updateProperty={(property: keyof Title, value: string) =>
                 updateTitleProperty(index, property, value)
               }
-              initialWidth={title.widthSize}
-              initialLength={title.lengthSize}
+              edit={true}
             />
           </div>
         ))}

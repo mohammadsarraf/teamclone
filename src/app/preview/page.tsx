@@ -1,9 +1,10 @@
 "use client";
 import { MdOutlinePhoneIphone } from "react-icons/md";
 import { TbDeviceImac } from "react-icons/tb";
-import Edit from "../utils/edit";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import Edit from "../utils/edit";
+import colorOptions from "../utils/colorOptions";
 
 interface ColorButtonProps {
   colors: string[];
@@ -12,7 +13,7 @@ interface ColorButtonProps {
 
 const ColorButton = ({ colors, onClick }: ColorButtonProps) => (
   <button
-    className="flex h-10 w-full transition duration-300 hover:shadow-lg"
+    className="flex h-10 w-full transition hover:rounded-full hover:shadow-2xl"
     onClick={onClick}
   >
     <div className={`h-full w-1/3 rounded-l-full ${colors[0]}`}></div>
@@ -24,9 +25,9 @@ const ColorButton = ({ colors, onClick }: ColorButtonProps) => (
 export default function Home() {
   const router = useRouter();
   const [colors, setColors] = useState({
-    primaryColor: "text-blue-600",
-    secondaryColor: "text-white",
-    bgColor: "text-white",
+    primaryColor: "text-blue-500",
+    secondaryColor: "text-red-500",
+    bgColor: "bg-gray-900",
   });
 
   const handleColorChange = (
@@ -61,12 +62,12 @@ export default function Home() {
         </div>
         <div className="m-10 flex-1 rounded-lg">
           <div
-            className={`flex size-full overflow-auto rounded-lg ${colors.bgColor} p-4`}
+            className={`flex size-full overflow-auto rounded-lg ${colors.bgColor}`}
           >
             <Edit
               primaryColor={colors.primaryColor}
               secondaryColor={colors.secondaryColor}
-              bgColor={``}
+              bgColor={colors.bgColor}
             />
           </div>
         </div>
@@ -86,96 +87,19 @@ export default function Home() {
           </p>
         </div>
         <div className="grid grid-cols-3 gap-4">
-          <ColorButton
-            colors={["bg-red-500", "bg-yellow-500", "bg-blue-500"]}
-            onClick={() =>
-              handleColorChange(
-                `text-red-500`,
-                "text-yellow-500",
-                "bg-blue-500",
-              )
-            }
-          />
-          <ColorButton
-            colors={["bg-purple-500", "bg-green-500", "bg-orange-500"]}
-            onClick={() =>
-              handleColorChange(
-                "text-purple-500",
-                "text-green-500",
-                "bg-orange-500",
-              )
-            }
-          />
-          <ColorButton
-            colors={["bg-pink-500", "bg-teal-500", "bg-indigo-500"]}
-            onClick={() =>
-              handleColorChange(
-                "text-pink-500",
-                "text-teal-500",
-                "bg-indigo-500",
-              )
-            }
-          />
-          <ColorButton
-            colors={["bg-gray-500", "bg-red-500", "bg-yellow-500"]}
-            onClick={() =>
-              handleColorChange(
-                "text-gray-500",
-                "text-red-500",
-                "bg-yellow-500",
-              )
-            }
-          />
-          <ColorButton
-            colors={["bg-green-500", "bg-blue-500", "bg-purple-500"]}
-            onClick={() =>
-              handleColorChange(
-                "text-green-500",
-                "text-blue-500",
-                "bg-purple-500",
-              )
-            }
-          />
-          <ColorButton
-            colors={["bg-orange-500", "bg-pink-500", "bg-teal-500"]}
-            onClick={() =>
-              handleColorChange(
-                "text-orange-500",
-                "text-pink-500",
-                "bg-teal-500",
-              )
-            }
-          />
-          <ColorButton
-            colors={["bg-indigo-500", "bg-gray-500", "bg-red-500"]}
-            onClick={() =>
-              handleColorChange(
-                "text-indigo-500",
-                "text-gray-500",
-                "bg-red-500",
-              )
-            }
-          />
-          <ColorButton
-            colors={["bg-yellow-500", "bg-green-500", "bg-blue-500"]}
-            onClick={() =>
-              handleColorChange(
-                "text-yellow-500",
-                "text-green-500",
-                "bg-blue-500",
-              )
-            }
-          />
-          <ColorButton
-            colors={["bg-purple-500", "bg-orange-500", "bg-pink-500"]}
-            onClick={() =>
-              handleColorChange(
-                "text-purple-500",
-                "text-orange-500",
-                "bg-pink-500",
-              )
-            }
-          />
+          {colorOptions.map((option, index) => (
+            <ColorButton
+              key={index}
+              colors={option.colors}
+              onClick={() =>
+                handleColorChange(
+                  option.primaryColor,
+                  option.secondaryColor,
+                  option.bgColor,
+                )
+              }
+            />
+          ))}
         </div>
       </div>
     </div>

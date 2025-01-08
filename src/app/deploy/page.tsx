@@ -18,12 +18,13 @@ function Content() {
   const bgColor = searchParams.get("bgColor");
 
   return (
-    <main className="flex h-screen w-screen overflow-auto">
+    <div className="flex overflow-auto">
       <Edit
         primaryColor={primaryColor || "text-blue-500"}
         secondaryColor={secondaryColor || "text-red-500"}
         bgColor={bgColor || "bg-gray-900"}
+        isEdit={true}
       />
-    </main>
+    </div>
   );
 }

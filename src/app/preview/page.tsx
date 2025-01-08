@@ -78,7 +78,14 @@ export default function Home() {
           Continue to customize styles, add features, and more when you start a
           trial.
         </p>
-        <button className="m-10 flex items-center justify-center rounded-lg border bg-black px-6 py-3 text-white transition duration-300 hover:bg-gray-800">
+        <button
+          onClick={() =>
+            router.push(
+              `/deploy?primaryColor=${colors.primaryColor}&secondaryColor=${colors.secondaryColor}&bgColor=${colors.bgColor}`,
+            )
+          }
+          className="m-10 flex items-center justify-center rounded-lg border bg-black px-6 py-3 text-white transition duration-300 hover:bg-gray-800"
+        >
           Start with this design
         </button>
         <div className="flex">

@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import { useSearchParams } from "next/navigation";
 import Edit from "../utils/edit";
 import { Suspense } from "react";

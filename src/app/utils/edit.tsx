@@ -65,10 +65,6 @@ export default function Edit({
 
   console.log(typeof primaryColor, typeof secondaryColor, typeof bgColor);
 
-  const router = useRouter();
-
-  const [activeField, setActiveField] = useState<string | null>(null);
-  const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
 
   const updateTitleProperty = (
     index: number,

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "./navbar";
 import Header from "./Header";
 import MainContent from "./MainContent";
@@ -7,6 +7,18 @@ import Footer from "./Footer";
 
 export default function Home() {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const options = params.getAll("filter");
+    setSelectedOptions(options);
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams();
+    selectedOptions.forEach((option) => params.append("filter", option));
+    window.history.replaceState(null, "", `?${params.toString()}`);
+  }, [selectedOptions]);
 
   const handleBgChange = (option: string) => {
     setSelectedOptions((prev) =>

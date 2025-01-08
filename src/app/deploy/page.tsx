@@ -1,8 +1,17 @@
 'use client';
 import { useSearchParams } from "next/navigation";
 import Edit from "../utils/edit";
+import { Suspense } from "react";
 
 export default function Home() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Content />
+    </Suspense>
+  );
+}
+
+function Content() {
   const searchParams = useSearchParams();
   const primaryColor = searchParams.get("primaryColor");
   const secondaryColor = searchParams.get("secondaryColor");

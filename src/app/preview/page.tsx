@@ -68,6 +68,7 @@ export default function Home() {
               primaryColor={colors.primaryColor}
               secondaryColor={colors.secondaryColor}
               bgColor={colors.bgColor}
+              isEdit={false}
             />
           </div>
         </div>

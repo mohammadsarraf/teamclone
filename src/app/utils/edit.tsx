@@ -70,6 +70,30 @@ export default function Edit({
 
   console.log(typeof primaryColor, typeof secondaryColor, typeof bgColor);
 
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+
+  const handleDragStart = (index: number) => {
+    setDraggedIndex(index);
+  };
+
+  const handleDragOver = (
+    event: React.DragEvent<HTMLDivElement>,
+    index: number,
+  ) => {
+    event.preventDefault();
+    setDragOverIndex(index);
+  };
+
+  const handleDrop = (index: number) => {
+    if (draggedIndex === null) return;
+    const newTitleList = [...titleList];
+    const [draggedItem] = newTitleList.splice(draggedIndex, 1);
+    newTitleList.splice(index, 0, draggedItem);
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+    setTitleList(newTitleList);
+  };
 
   const updateTitleProperty = (
     index: number,
@@ -104,28 +128,37 @@ export default function Edit({
           </nav>
           <section className="flex grow flex-col items-center justify-center">
             {titleList.map((title, index) => (
-              <EditableComp
+              <div
                 key={index}
-                html={title.html}
-                onChange={(newTitle: string) =>
-                  updateTitleProperty(index, "html", newTitle)
-                }
-                className={title.className}
-                ariaLabel="Page Title"
-                placeholder="Enter your title..."
-                fontSize={title.fontSize}
-                fontColor={title.fontColor}
-                fontAlignment={title.fontAlignment}
-                widthSize={title.widthSize}
-                lengthSize={title.lengthSize}
-                // @ts-ignore
-                updateProperty={(property: keyof Title, value: string) =>
-                  updateTitleProperty(index, property, value)
-                }
-                initialWidth={title.widthSize}
-                initialLength={title.lengthSize}
-                edit={isEdit}
-              />
+                draggable
+                onDragStart={() => handleDragStart(index)}
+                onDragOver={(event) => handleDragOver(event, index)}
+                onDrop={() => handleDrop(index)}
+                className={`max-w-max ${dragOverIndex === index ? "bg-gray-600 bg-opacity-20" : ""}`}
+              >
+                <EditableComp
+                  key={index}
+                  html={title.html}
+                  onChange={(newTitle: string) =>
+                    updateTitleProperty(index, "html", newTitle)
+                  }
+                  className={title.className}
+                  ariaLabel="Page Title"
+                  placeholder="Enter your title..."
+                  fontSize={title.fontSize}
+                  fontColor={title.fontColor}
+                  fontAlignment={title.fontAlignment}
+                  widthSize={title.widthSize}
+                  lengthSize={title.lengthSize}
+                  // @ts-ignore
+                  updateProperty={(property: keyof Title, value: string) =>
+                    updateTitleProperty(index, property, value)
+                  }
+                  initialWidth={title.widthSize}
+                  initialLength={title.lengthSize}
+                  edit={isEdit}
+                />
+              </div>
             ))}
           </section>
           <section>

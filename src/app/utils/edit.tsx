@@ -35,9 +35,9 @@ export default function Edit({
       fontSize: "text-6xl",
       fontColor: primaryColor,
       fontAlignment: "text-center",
-      widthSize: ``,
+      widthSize: "",
       lengthSize: "",
-      className: `text-5xl py-2 font-medium md:text-6xl`,
+      className: `py-2`,
     },
     {
       html: "Software Developer",
@@ -46,16 +46,16 @@ export default function Edit({
       fontAlignment: "text-center",
       widthSize: "",
       lengthSize: "",
-      className: `text-2xl py-2`,
+      className: `py-2`,
     },
     {
       html: "As a Computer Science student deeply engaged with Data Science, AI, and Full-Stack Development, I am driven by a passion to blend creativity and technology. My portfolio, featuring diverse projects such as an interactive React mini-game and an innovative NBA MVP prediction model, is a testament to my commitment to crafting engaging user experiences and leveraging the power of data-driven insights.",
-      fontSize: "text-md",
+      fontSize: "text-xl",
       fontColor: secondaryColor,
       fontAlignment: "text-center",
       widthSize: "",
       lengthSize: "",
-      className: `text-xl py-5 leading-8 max-w-xl mx-auto `,
+      className: ` py-5 leading-8 max-w-xl mx-auto `,
     },
   ]);
 

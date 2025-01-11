@@ -38,7 +38,7 @@ const TemplateList = () => {
               </div>
             ) : (
               <img
-                src={template.thumbnail}
+                
                 alt={template.name}
                 className="mb-4 h-40 w-full rounded-md object-cover"
               />

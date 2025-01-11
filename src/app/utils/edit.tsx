@@ -177,7 +177,7 @@ export default function Edit({
               programming and teaching.
             </p> */}
           </div>
-          <div className="flex gap-10">
+          <div className="flex gap-10 overflow-auto">
             <div className={`text-center  shadow-lg p-10 rounded-xl my-10  bg-gray-700 flex-1`}>
               <PiFrameCornersBold className={`w-16 h-16 text-teal-600 mx-auto`} />
               <h3 className="text-lg font-medium pt-8 pb-2  ">

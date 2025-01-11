@@ -34,6 +34,7 @@ const EditableComp: React.FC<EditableCompProps> = ({
   const [isClicked, setIsClicked] = useState(false);
   const toolbarRef = useRef<HTMLDivElement>(null);
   const editableCompRef = useRef<HTMLDivElement>(null);
+  const [formatClass, setFormatClass] = useState<string>("");
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -59,6 +60,24 @@ const EditableComp: React.FC<EditableCompProps> = ({
 
   const handleClick = () => {
     setIsClicked(true);
+  };
+
+  const applyFormat = (format: string) => {
+    let newFormatClass = "";
+    switch (format) {
+      case "bold":
+        newFormatClass = "font-bold";
+        break;
+      case "underline":
+        newFormatClass = "underline";
+        break;
+      case "italic":
+        newFormatClass = "italic";
+        break;
+      default:
+        newFormatClass = "";
+    }
+    setFormatClass(newFormatClass);
   };
 
   return (
@@ -100,6 +119,10 @@ const EditableComp: React.FC<EditableCompProps> = ({
                 }}
                 initialWidth={widthSize}
                 initialLength={lengthSize}
+                onFormatClick={(format) => {
+                  console.log(`Format changed to: ${format}`);
+                  applyFormat(format);
+                }}
               />
             </div>
           )}
@@ -109,7 +132,7 @@ const EditableComp: React.FC<EditableCompProps> = ({
               onChange={handleChange}
               onClick={handleClick}
               tagName="p"
-              className={`${className} ${fontSize} ${fontColor} ${fontAlignment}`}
+              className={`${className} ${fontSize} ${fontColor} ${fontAlignment} ${formatClass}`}
               aria-label={ariaLabel}
               style={{
                 lineHeight: 1.5,
@@ -121,7 +144,7 @@ const EditableComp: React.FC<EditableCompProps> = ({
           </div>
         </div>
       ) : (
-        <p className={`${className} ${fontSize} ${fontColor} ${fontAlignment}`}>
+        <p className={`${className} ${fontSize} ${fontColor} ${fontAlignment} ${formatClass}`}>
           {html}
         </p>
       )}

@@ -10,6 +10,7 @@ import SizeDropdown from "./SizeDropdown";
 import JustifyDropdown from "./JustifyDropdown";
 import ColorDropdown from "./ColorDropdown";
 import WidthLengthDropdown from "./WidthLengthDropdown";
+import FormatDropdown from "./FormatDropdown"; // Add this line
 
 interface ToolbarProps {
   onClose: () => void;
@@ -20,6 +21,7 @@ interface ToolbarProps {
   onLengthChange: (length: string) => void;
   initialWidth: string; // Add this line
   initialLength: string; // Add this line
+  onFormatClick: (option: string) => void; // Add this line
 }
 
 const Toolbar: React.FC<ToolbarProps> = ({
@@ -31,6 +33,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
   onLengthChange,
   initialWidth, // Add this line
   initialLength, // Add this line
+  onFormatClick, // Add this line
 }) => {
   const [showDropdown, setShowDropdown] = useState<string | null>(null);
 
@@ -58,7 +61,12 @@ const Toolbar: React.FC<ToolbarProps> = ({
         </div>
         <div className="flex border-r border-black">
           <GrDrag className="m-2" />
-          <BiCodeAlt className="m-2" />
+          <div className="relative">
+            <BiCodeAlt className="m-2" onClick={() => toggleDropdown("format")} />
+            {showDropdown === "format" && (
+              <FormatDropdown onFormatClick={onFormatClick} />
+            )}
+          </div>
         </div>
         <div className="relative flex border-r border-black">
           <RiFontSize2 className="m-2" onClick={() => toggleDropdown("size")} />

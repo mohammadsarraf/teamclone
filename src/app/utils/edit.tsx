@@ -35,9 +35,9 @@ export default function Edit({
       fontSize: "text-6xl",
       fontColor: primaryColor,
       fontAlignment: "text-center",
-      widthSize: ``,
+      widthSize: "",
       lengthSize: "",
-      className: `text-5xl py-2 font-medium md:text-6xl`,
+      className: `py-2`,
     },
     {
       html: "Software Developer",
@@ -46,16 +46,16 @@ export default function Edit({
       fontAlignment: "text-center",
       widthSize: "",
       lengthSize: "",
-      className: `text-2xl py-2`,
+      className: `py-2`,
     },
     {
       html: "As a Computer Science student deeply engaged with Data Science, AI, and Full-Stack Development, I am driven by a passion to blend creativity and technology. My portfolio, featuring diverse projects such as an interactive React mini-game and an innovative NBA MVP prediction model, is a testament to my commitment to crafting engaging user experiences and leveraging the power of data-driven insights.",
-      fontSize: "text-md",
+      fontSize: "text-xl",
       fontColor: secondaryColor,
       fontAlignment: "text-center",
       widthSize: "",
       lengthSize: "",
-      className: `text-xl py-5 leading-8 max-w-xl mx-auto `,
+      className: ` py-5 leading-8 max-w-xl mx-auto `,
     },
   ]);
 
@@ -70,6 +70,30 @@ export default function Edit({
 
   console.log(typeof primaryColor, typeof secondaryColor, typeof bgColor);
 
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+
+  const handleDragStart = (index: number) => {
+    setDraggedIndex(index);
+  };
+
+  const handleDragOver = (
+    event: React.DragEvent<HTMLDivElement>,
+    index: number,
+  ) => {
+    event.preventDefault();
+    setDragOverIndex(index);
+  };
+
+  const handleDrop = (index: number) => {
+    if (draggedIndex === null) return;
+    const newTitleList = [...titleList];
+    const [draggedItem] = newTitleList.splice(draggedIndex, 1);
+    newTitleList.splice(index, 0, draggedItem);
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+    setTitleList(newTitleList);
+  };
 
   const updateTitleProperty = (
     index: number,
@@ -104,28 +128,37 @@ export default function Edit({
           </nav>
           <section className="flex grow flex-col items-center justify-center">
             {titleList.map((title, index) => (
-              <EditableComp
+              <div
                 key={index}
-                html={title.html}
-                onChange={(newTitle: string) =>
-                  updateTitleProperty(index, "html", newTitle)
-                }
-                className={title.className}
-                ariaLabel="Page Title"
-                placeholder="Enter your title..."
-                fontSize={title.fontSize}
-                fontColor={title.fontColor}
-                fontAlignment={title.fontAlignment}
-                widthSize={title.widthSize}
-                lengthSize={title.lengthSize}
-                // @ts-ignore
-                updateProperty={(property: keyof Title, value: string) =>
-                  updateTitleProperty(index, property, value)
-                }
-                initialWidth={title.widthSize}
-                initialLength={title.lengthSize}
-                edit={isEdit}
-              />
+                draggable
+                onDragStart={() => handleDragStart(index)}
+                onDragOver={(event) => handleDragOver(event, index)}
+                onDrop={() => handleDrop(index)}
+                className={`max-w-max ${dragOverIndex === index ? "bg-gray-600 bg-opacity-20" : ""}`}
+              >
+                <EditableComp
+                  key={index}
+                  html={title.html}
+                  onChange={(newTitle: string) =>
+                    updateTitleProperty(index, "html", newTitle)
+                  }
+                  className={title.className}
+                  ariaLabel="Page Title"
+                  placeholder="Enter your title..."
+                  fontSize={title.fontSize}
+                  fontColor={title.fontColor}
+                  fontAlignment={title.fontAlignment}
+                  widthSize={title.widthSize}
+                  lengthSize={title.lengthSize}
+                  // @ts-ignore
+                  updateProperty={(property: keyof Title, value: string) =>
+                    updateTitleProperty(index, property, value)
+                  }
+                  initialWidth={title.widthSize}
+                  initialLength={title.lengthSize}
+                  edit={isEdit}
+                />
+              </div>
             ))}
           </section>
           <section>
@@ -144,7 +177,7 @@ export default function Edit({
               programming and teaching.
             </p> */}
           </div>
-          <div className="flex gap-10">
+          <div className="flex gap-10 overflow-auto">
             <div className={`text-center  shadow-lg p-10 rounded-xl my-10  bg-gray-700 flex-1`}>
               <PiFrameCornersBold className={`w-16 h-16 text-teal-600 mx-auto`} />
               <h3 className="text-lg font-medium pt-8 pb-2  ">

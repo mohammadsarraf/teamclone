@@ -33,12 +33,13 @@ const TemplateList = () => {
             }}
           >
             {template.component ? (
-              <div className={`mb-4 w-full h-48 rounded-md overflow-auto transition-transform duration-300 hover:scale-105 ${template.bgColor}`}>
+              <div
+                className={`mb-4 h-48 w-full overflow-auto rounded-md transition-transform duration-300 hover:scale-105 ${template.bgColor}`}
+              >
                 {template.component}
               </div>
             ) : (
               <img
-                
                 alt={template.name}
                 className="mb-4 h-40 w-full rounded-md object-cover"
               />

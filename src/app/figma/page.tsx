@@ -1,183 +1,91 @@
 "use client";
 import { useState } from "react";
-import EditableComp from "../components/EditableComp";
-import Bananamode from "./bananamode";
-import { UserProvider } from "../components/UserContext";
+import Sidebar from "./Sidebar";
+import TopMenue from "./isEdit";
+import { MdDragHandle } from "react-icons/md";
+import DesignMenu from "./desginMenu";
 
-interface Title {
-  html: string;
-  fontSize: string;
-  fontColor: string;
-  fontAlignment: string;
-  widthSize: string;
-  lengthSize: string;
-}
+export default function Page() {
+  const [isEditing, setIsEditing] = useState(true);
+  const [isHeaderHovered, setIsHeaderHovered] = useState(false);
+  const [isHeaderEditing, setIsHeaderEditing] = useState(false);
+  const [headerHeight, setHeaderHeight] = useState(100); // Initial height of the header
+  const [isResizing, setIsResizing] = useState(false);
+  const [isDesignMenuVisible, setIsDesignMenuVisible] = useState(false);
 
-export default function Home() {
-  const [titleList, setTitleList] = useState<Title[]>([
-    {
-      html: "Moe Sarraf",
-      fontSize: "text-xl",
-      fontColor: "text-white",
-      fontAlignment: "text-justify",
-      widthSize: "22",
-      lengthSize: "7",
-    },
-  ]);
-  const [history, setHistory] = useState<Title[][]>([]);
-  const [redoHistory, setRedoHistory] = useState<Title[][]>([]);
-
-  const addTitle = () => {
-    setHistory([...history, [...titleList]]);
-    setRedoHistory([]);
-    setTitleList([
-      ...titleList,
-      {
-        html: "New Title",
-        fontSize: "text-2xl",
-        fontColor: "text-white",
-        fontAlignment: "text-justify",
-        widthSize: "22",
-        lengthSize: "7",
-      },
-    ]);
-  };
-
-  const updateTitleProperty = (
-    index: number,
-    property: keyof Title,
-    value: string,
-  ) => {
-    setHistory([...history, [...titleList]]);
-    setRedoHistory([]);
-    setTitleList(
-      titleList.map((title, i) =>
-        i === index ? { ...title, [property]: value } : title,
-      ),
-    );
-  };
-
-  const resetWork = () => {
-    setHistory([...history, [...titleList]]);
-    setTitleList([
-      {
-        html: "Empty...",
-        fontSize: "text-xl",
-        fontColor: "text-white",
-        fontAlignment: "text-justify",
-        widthSize: "22",
-        lengthSize: "5",
-      },
-    ]);
-    setRedoHistory([]);
-  };
-
-  const undoLastChange = () => {
-    if (history.length > 0) {
-      const previousState = history[history.length - 1];
-      setHistory(history.slice(0, -1));
-      setRedoHistory([...redoHistory, [...titleList]]);
-      setTitleList(previousState);
+  const handleMouseMove = (e) => {
+    if (isResizing) {
+      setHeaderHeight(e.clientY);
     }
   };
 
-  const redoLastChange = () => {
-    if (redoHistory.length > 0) {
-      const nextState = redoHistory[redoHistory.length - 1];
-      setRedoHistory(redoHistory.slice(0, -1));
-      setHistory([...history, [...titleList]]);
-      setTitleList(nextState);
-    }
-  };
-
-  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
-  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
-
-  const handleDragStart = (index: number) => {
-    setDraggedIndex(index);
-  };
-
-  const handleDragOver = (
-    event: React.DragEvent<HTMLDivElement>,
-    index: number,
-  ) => {
-    event.preventDefault();
-    setDragOverIndex(index);
-  };
-
-  const handleDrop = (index: number) => {
-    if (draggedIndex === null) return;
-    setHistory([...history, [...titleList]]);
-    setRedoHistory([]);
-    const newTitleList = [...titleList];
-    const [draggedItem] = newTitleList.splice(draggedIndex, 1);
-    newTitleList.splice(index, 0, draggedItem);
-    setDraggedIndex(null);
-    setDragOverIndex(null);
-    setTitleList(newTitleList);
+  const handleMouseUp = () => {
+    setIsResizing(false);
   };
 
   return (
-    <UserProvider>
-      <div className="m-40 flex-col">
-        <Bananamode loadDesign={setTitleList} saveDesign={titleList} />
-        <div>
-          <button
-            onClick={addTitle}
-            className="mx-1 mb-4 rounded bg-blue-500 p-2 text-white"
+    <div
+      className="flex h-screen w-screen bg-white transition-all duration-500"
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+    >
+      {!isEditing && <Sidebar />}
+      <main
+        className={`bg-gray-900 ${isEditing ? "w-full" : "w-4/5"} flex h-full flex-col p-4 transition-all duration-500`}
+      >
+        {!isEditing && <TopMenue setIsEditing={setIsEditing} />}
+        <div
+          className={`flex grow flex-col bg-gray-500 transition-all duration-500`}
+        >
+          <header
+            className={`relative flex bg-red-400 p-4 text-white shadow-md hover:bg-gray-700 ${isHeaderHovered ? "bg-gray-700" : ""}`}
+            style={{ height: `${headerHeight}px` }}
+            onMouseEnter={() => setIsHeaderHovered(true)}
+            onMouseLeave={() => setIsHeaderHovered(false)}
           >
-            Add Title
-          </button>
-          <button
-            onClick={resetWork}
-            className="mx-1 mb-4 rounded bg-red-500 p-2 text-white"
-          >
-            Reset
-          </button>
-          <button
-            onClick={undoLastChange}
-            className="mx-1 mb-4 rounded bg-yellow-500 p-2 text-white"
-          >
-            Undo
-          </button>
-          <button
-            onClick={redoLastChange}
-            className="mx-1 mb-4 rounded bg-green-500 p-2 text-white"
-          >
-            Redo
-          </button>
+            <h1 className="text-2xl font-bold">Header</h1>
+            {isHeaderHovered && !isHeaderEditing && (
+              <button
+                className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 rounded bg-blue-500 px-2 py-1 text-white"
+                onClick={() => setIsHeaderEditing(true)}
+              >
+                Edit Header
+              </button>
+            )}
+            {isHeaderEditing && (
+              <MdDragHandle
+                className="absolute -bottom-2 right-0 cursor-row-resize bg-gray-700"
+                size={24} // Set the size of the icon here
+                onMouseDown={() => setIsResizing(true)}
+              />
+            )}
+          </header>
+          {isHeaderEditing && (
+            <div className="my-10 flex flex-col">
+              <div className="flex justify-between">
+                <button className="mx-10 rounded bg-white px-2 py-1 text-black">
+                  Add Element
+                </button>
+                <div className="relative mx-10">
+                  <button
+                    className="rounded bg-white px-2 py-1 text-black"
+                    onClick={() => setIsDesignMenuVisible(!isDesignMenuVisible)}
+                  >
+                    Edit Design
+                  </button>
+                  {isDesignMenuVisible && <DesignMenu />}
+                </div>
+              </div>
+            </div>
+          )}
+          <section className="grow p-4">
+            {/* Section content goes here */}
+          </section>
+          <footer className="flex bg-blue-600 p-4 text-white shadow-md">
+            <p className="text-lg">Footer</p>
+          </footer>
         </div>
-        {titleList.map((title, index) => (
-          <div
-            key={index}
-            draggable
-            onDragStart={() => handleDragStart(index)}
-            onDragOver={(event) => handleDragOver(event, index)}
-            onDrop={() => handleDrop(index)}
-            className={`max-w-max ${dragOverIndex === index ? "bg-gray-600 bg-opacity-20" : ""}`}
-          >
-            <EditableComp
-              html={title.html}
-              onChange={(newTitle: string) =>
-                updateTitleProperty(index, "html", newTitle)
-              }
-              className={`items-center border-2 border-dashed border-gray-700 p-3 font-medium focus:border-blue-600 focus:outline-none`}
-              ariaLabel="Page Title"
-              placeholder="Enter your title..."
-              fontSize={title.fontSize}
-              fontColor={title.fontColor}
-              fontAlignment={title.fontAlignment}
-              widthSize={title.widthSize}
-              lengthSize={title.lengthSize}
-              // @ts-ignore
-              updateProperty={(property: keyof Title, value: string) =>
-                updateTitleProperty(index, property, value)
-              }
-              edit={true}
-            />
-          </div>
-        ))}
-      </div>
-    </UserProvider>
+      </main>
+    </div>
   );
 }

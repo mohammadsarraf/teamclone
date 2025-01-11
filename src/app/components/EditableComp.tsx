@@ -144,7 +144,9 @@ const EditableComp: React.FC<EditableCompProps> = ({
           </div>
         </div>
       ) : (
-        <p className={`${className} ${fontSize} ${fontColor} ${fontAlignment} ${formatClass}`}>
+        <p
+          className={`${className} ${fontSize} ${fontColor} ${fontAlignment} ${formatClass}`}
+        >
           {html}
         </p>
       )}

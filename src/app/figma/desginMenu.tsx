@@ -130,7 +130,7 @@ export default function DesignMenu({
     <ul className="flex grow flex-col gap-2 overflow-auto px-4 text-black">
       <div className="mb-4 border-b pb-2">
         Layout
-        <li className="relative mt-2 cursor-pointer rounded px-4 py-2 bg-gray-100">
+        <li className="relative mt-2 cursor-pointer rounded bg-gray-100 px-4 py-2">
           <div
             className="flex h-20 items-center justify-between rounded-lg bg-gray-800 p-2 text-white "
             onClick={() => setShowDropdown(!showDropdown)}

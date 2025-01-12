@@ -31,16 +31,20 @@ const HeaderContent = ({
           <button className="rounded px-2 py-1 text-2xl font-bold text-white">
             Reservation
           </button>
-          <div className="flex gap-2 justify-center items-center text-center">
-          {isAccount && <MdAccountCircle className="text-xl"/>}
-          {isSocial &&  (
-            <div className="flex gap-2">
-              <FaTwitter/> <FaInstagram/> <FaGithub/>
-            </div>
-          )}
-          {isCart && <FaShoppingCart />}
-          {isButton && <button className="bg-white  rounded-full text-black px-2">Button</button>}
-        </div>
+          <div className="flex items-center justify-center gap-2 text-center">
+            {isAccount && <MdAccountCircle className="text-xl" />}
+            {isSocial && (
+              <div className="flex gap-2">
+                <FaTwitter /> <FaInstagram /> <FaGithub />
+              </div>
+            )}
+            {isCart && <FaShoppingCart />}
+            {isButton && (
+              <button className="rounded-full  bg-white px-2 text-black">
+                Button
+              </button>
+            )}
+          </div>
         </div>
       </>
     ),
@@ -55,11 +59,19 @@ const HeaderContent = ({
         <button className="text-whit rounded px-2 py-1 text-2xl font-bold">
           Reservation
         </button>
-        <div className="flex gap-2 justify-center items-center text-center">
-          {isAccount && <MdAccountCircle className=""/>}
-          {isSocial && <button>Social</button>}
-          {isCart && <button>Cart</button>}
-          {isButton && <button>Button</button>}
+        <div className="flex items-center justify-center gap-2 text-center">
+          {isAccount && <MdAccountCircle className="text-xl" />}
+          {isSocial && (
+            <div className="flex gap-2">
+              <FaTwitter /> <FaInstagram /> <FaGithub />
+            </div>
+          )}
+          {isCart && <FaShoppingCart />}
+          {isButton && (
+            <button className="rounded-full  bg-white px-2 text-black">
+              Button
+            </button>
+          )}
         </div>
       </>
     ),
@@ -72,13 +84,20 @@ const HeaderContent = ({
         <button className="text-whit rounded px-2 py-1 text-2xl font-bold ">
           Reservation
         </button>
-        <div className="flex gap-2">
-          {isAccount && <MdAccountCircle />
-}
-          {isSocial && <button>Social</button>}
-          {isCart && <button>Cart</button>}
-          {isButton && <button>Button</button>}
-          </div>
+        <div className="flex items-center justify-center gap-2 text-center">
+          {isAccount && <MdAccountCircle className="text-xl" />}
+          {isSocial && (
+            <div className="flex gap-2">
+              <FaTwitter /> <FaInstagram /> <FaGithub />
+            </div>
+          )}
+          {isCart && <FaShoppingCart />}
+          {isButton && (
+            <button className="rounded-full  bg-white px-2 text-black">
+              Button
+            </button>
+          )}
+        </div>
       </>
     ),
     "Option 4": (
@@ -90,13 +109,20 @@ const HeaderContent = ({
         <button className="rounded px-2 py-1 text-2xl font-bold text-white">
           Reservation
         </button>
-        <div className="flex gap-2">
-          {isAccount && <MdAccountCircle />
-}
-          {isSocial && <button>Social</button>}
-          {isCart && <button>Cart</button>}
-          {isButton && <button>Button</button>}
-          </div>
+        <div className="flex items-center justify-center gap-2 text-center">
+          {isAccount && <MdAccountCircle className="text-xl" />}
+          {isSocial && (
+            <div className="flex gap-2">
+              <FaTwitter /> <FaInstagram /> <FaGithub />
+            </div>
+          )}
+          {isCart && <FaShoppingCart />}
+          {isButton && (
+            <button className="rounded-full  bg-white px-2 text-black">
+              Button
+            </button>
+          )}
+        </div>
       </>
     ),
   };
@@ -113,10 +139,10 @@ export default function Page() {
   const [isDesignMenuVisible, setIsDesignMenuVisible] = useState(false);
   const [isElementMenuVisible, setIsElementMenuVisible] = useState(false);
 
-  const [isButton, setIsButton] = useState(false)
+  const [isButton, setIsButton] = useState(false);
   const [isSocial, setIsSocial] = useState(false);
-  const [isCart, setIsCart] = useState(false)
-  const [isAccount, setIsAccount] = useState(false)
+  const [isCart, setIsCart] = useState(false);
+  const [isAccount, setIsAccount] = useState(false);
 
   const [selectedLayout, setSelectedLayout] = useState("Option 1"); // Default to "Option 1"
   const [bgColor, setBgColor] = useState("bg-black"); // Default background color
@@ -221,7 +247,6 @@ export default function Page() {
                         className={`absolute left-0  mt-2 flex w-80 flex-col  rounded-lg bg-white p-4 shadow-lg`}
                       >
                         <p className=" mb-4 border-b py-2 text-left">
-
                           Add Elements
                         </p>
                         <div className="h-full text-left">

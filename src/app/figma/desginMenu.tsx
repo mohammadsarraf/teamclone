@@ -125,8 +125,8 @@ export default function DesignMenu({
   ];
 
   return (
-    <div className="relative">
-      <div className="absolute right-0 top-full mt-2 h-96 w-80 overflow-auto rounded-lg bg-white p-4 shadow-lg">
+    <div className="relative flex flex-col h-full">
+      <div className="absolute right-0 top-full mt-2 h-96 w-80 rounded-lg bg-white  p-4 shadow-lg flex flex-col">
         <div className="mb-4 flex gap-4 border-b border-gray-300 text-black">
           <button
             className={` px-4 py-2  ${activeMenu === "design" ? "border-b-2 border-blue-400" : ""}`}
@@ -142,7 +142,7 @@ export default function DesignMenu({
           </button>
         </div>
         {activeMenu === "design" && (
-          <ul className="flex flex-col gap-2 text-black">
+          <ul className="flex flex-col gap-2 text-black overflow-auto flex-grow px-4">
             <div className="mb-4 border-b pb-2">
               Layout
               <li className="relative mt-2 cursor-pointer rounded px-4 py-2">

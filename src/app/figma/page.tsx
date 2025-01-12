@@ -11,8 +11,12 @@ const HeaderContent = ({ selectedLayout }: { selectedLayout: string }) => {
       <>
         <h1 className="text-2xl font-bold">YourWebsiteTitle</h1>
         <div className="flex space-x-4">
-          <button className="rounded px-2 py-1 text-white">Menu</button>
-          <button className="rounded px-2 py-1 text-white">Reservation</button>
+          <button className="rounded px-2 py-1 text-2xl font-bold text-white">
+            Menu
+          </button>
+          <button className="rounded px-2 py-1 text-2xl font-bold text-white">
+            Reservation
+          </button>
         </div>
       </>
     ),
@@ -20,23 +24,35 @@ const HeaderContent = ({ selectedLayout }: { selectedLayout: string }) => {
       <>
         <div className="flex space-x-4">
           <h1 className="text-2xl font-bold">Menu</h1>
-          <button className="rounded px-2 py-1 text-white">YourWebsiteTitle</button>
+          <button className="rounded px-2 py-1 text-2xl font-bold text-white">
+            YourWebsiteTitle
+          </button>
         </div>
-        <button className="rounded px-2 py-1 text-white">Reservation</button>
+        <button className="text-whit rounded px-2 py-1 text-2xl font-bold">
+          Reservation
+        </button>
       </>
     ),
     "Option 3": (
       <>
         <h1 className="text-2xl font-bold">YourWebsiteTitle</h1>
-        <button className="rounded px-2 py-1 text-white">Menu</button>
-        <button className="rounded px-2 py-1 text-white">Reservation</button>
+        <h1 className="rounded px-2 py-1 text-2xl font-bold text-white">
+          Menu
+        </h1>
+        <button className="text-whit rounded px-2 py-1 text-2xl font-bold ">
+          Reservation
+        </button>
       </>
     ),
     "Option 4": (
       <>
-        <button className="rounded px-2 py-1 text-white">Menu</button>
+        <button className="rounded px-2 py-1 text-2xl font-bold text-white">
+          Menu
+        </button>
         <h1 className="text-2xl font-bold">YourWebsiteTitle</h1>
-        <button className="rounded px-2 py-1 text-white">Reservation</button>
+        <button className="rounded px-2 py-1 text-2xl font-bold text-white">
+          Reservation
+        </button>
       </>
     ),
   };
@@ -55,7 +71,10 @@ export default function Page() {
 
   const handleMouseMove = (e: MouseEvent) => {
     if (isResizing) {
-      setHeaderHeight((prevHeight) => prevHeight + (e.movementY * 0.1)); // Adjust the scaling factor as needed
+      setHeaderHeight((prevHeight) => {
+        const newHeight = prevHeight + e.movementY * 0.1; // Adjust the scaling factor as needed
+        return newHeight > 12 ? 12 : newHeight; // Ensure the height does not exceed 12vw
+      });
     }
   };
 
@@ -63,11 +82,11 @@ export default function Page() {
     setIsResizing(false);
   };
 
-  const handleLayoutSelection = (layout : string) => {
+  const handleLayoutSelection = (layout: string) => {
     setSelectedLayout(layout);
   };
 
-  const handleHeightChange = (height:number) => {
+  const handleHeightChange = (height: number) => {
     setHeaderHeight(height + 2);
   };
 
@@ -86,7 +105,7 @@ export default function Page() {
           className={`flex grow flex-col bg-gray-500 transition-all duration-500`}
         >
           <header
-            className={`relative flex justify-between items-center bg-red-400 p-4 text-white shadow-md hover:bg-opacity-70 ${isHeaderHovered ? "bg-gray-700" : ""}`}
+            className={`relative flex items-center justify-between bg-black p-4 text-white shadow-md hover:bg-opacity-70 ${isHeaderHovered ? "bg-gray-700" : ""}`}
             style={{ height: `${headerHeight}vw` }}
             onMouseEnter={() => setIsHeaderHovered(true)}
             onMouseLeave={() => setIsHeaderHovered(false)}

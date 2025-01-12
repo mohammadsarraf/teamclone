@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import ColorMenu from "./colorMenu";
 import DesignMenu from "./desginMenu";
+import { handleColorChange } from "../utils/textHandlers";
 
 interface ToolbarProps {
   onOptionChange: (option: string) => void;
@@ -10,6 +11,8 @@ interface ToolbarProps {
   initialHeight?: number;
   initialWidth?: string;
   onHeightChange: (height: number) => void;
+  onBgColorChange: (color: string) => void;
+  onbgColorChange?: (color: string) => void;
 }
 
 export default function Toolbar({
@@ -20,6 +23,7 @@ export default function Toolbar({
   initialHeight = 0,
   initialWidth = "full",
   onHeightChange,
+  onBgColorChange,
 }: ToolbarProps) {
   const [activeMenu, setActiveMenu] = useState("design");
   const [layoutOption, setLayoutOption] = useState(initialLayoutOption);
@@ -28,6 +32,7 @@ export default function Toolbar({
   const [elementSpacing, setElementSpacing] = useState(initialElementSpacing);
   const [height, setHeight] = useState(initialHeight);
   const [width, setWidth] = useState(initialWidth);
+  const [bgColor, setBgColor] = useState("bg-black");
 
   useEffect(() => {
     setLayoutOption(initialLayoutOption);
@@ -128,7 +133,9 @@ export default function Toolbar({
 
   return (
     <div className="relative flex h-full flex-col">
-      <div className="absolute right-0 top-full mt-2 flex h-96 w-80 flex-col  rounded-lg bg-white p-4 shadow-lg">
+      <div
+        className={`absolute right-0 top-full mt-2 flex h-96 w-80 flex-col  rounded-lg bg-white p-4 shadow-lg`}
+      >
         <div className="mb-4 flex gap-4 border-b border-gray-300 text-black">
           <button
             className={` px-4 py-2  ${activeMenu === "design" ? "border-b-2 border-blue-400" : ""}`}
@@ -156,7 +163,14 @@ export default function Toolbar({
             setShowDropdown={setShowDropdown}
           />
         )}
-        {activeMenu === "color" && <ColorMenu />}
+        {activeMenu === "color" && (
+          <ColorMenu
+            onColorChange={(color: string) => {
+              setBgColor(color); // Update the local state
+              onBgColorChange(color); // Notify the parent
+            }}
+          />
+        )}
       </div>
       {showDropdown && (
         <ul

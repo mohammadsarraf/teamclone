@@ -54,7 +54,7 @@ export default function DesignMenu({
     {
       name: "Option 1",
       layout: (
-        <div className="flex h-20 w-full items-center rounded-lg bg-gray-800 p-2 text-white hover:bg-gray-600">
+        <div className="flex h-20 w-full items-center rounded-lg bg-gray-800 p-2 text-white ">
           <div className="flex w-full items-center">
             <p className="text-white">Logo</p>
             <div className="ml-auto flex items-center gap-2">
@@ -74,7 +74,7 @@ export default function DesignMenu({
     {
       name: "Option 2",
       layout: (
-        <div className="flex h-20 w-full items-center rounded-lg bg-gray-800 p-2 text-white hover:bg-gray-600">
+        <div className="flex h-20 w-full items-center rounded-lg bg-gray-800 p-2 text-white ">
           <div className="flex w-full items-center">
             <div className="flex gap-1">
               <div className="size-2 rounded-full bg-white"></div>
@@ -92,7 +92,7 @@ export default function DesignMenu({
     {
       name: "Option 3",
       layout: (
-        <div className="flex h-20 w-full items-center rounded-lg bg-gray-800 p-2 text-white hover:bg-gray-600">
+        <div className="flex h-20 w-full items-center rounded-lg bg-gray-800 p-2 text-white ">
           <div className="flex w-full items-center">
             <p className="text-white">Logo</p>
             <div className="mx-auto flex gap-1">
@@ -110,7 +110,7 @@ export default function DesignMenu({
     {
       name: "Option 4",
       layout: (
-        <div className="flex h-20 w-full items-center rounded-lg bg-gray-800 p-2 text-white hover:bg-gray-600">
+        <div className="flex h-20 w-full items-center rounded-lg bg-gray-800 p-2 text-white ">
           <div className="flex w-full items-center">
             <div className="flex gap-1">
               <div className="size-2 rounded-full bg-white"></div>
@@ -130,9 +130,9 @@ export default function DesignMenu({
     <ul className="flex grow flex-col gap-2 overflow-auto px-4 text-black">
       <div className="mb-4 border-b pb-2">
         Layout
-        <li className="relative mt-2 cursor-pointer rounded px-4 py-2">
+        <li className="relative mt-2 cursor-pointer rounded px-4 py-2 bg-gray-100">
           <div
-            className="flex h-20 items-center justify-between rounded-lg bg-gray-800 p-2 text-white hover:bg-gray-600"
+            className="flex h-20 items-center justify-between rounded-lg bg-gray-800 p-2 text-white "
             onClick={() => setShowDropdown(!showDropdown)}
           >
             {
@@ -223,14 +223,14 @@ export default function DesignMenu({
           </div>
           <input
             type="range"
-            min="0"
-            max="10"
+            min="2"
+            max="12"
             step="0.01"
             value={height}
             onChange={(e) => setHeight(Number(e.target.value))}
             className="h-1 w-full cursor-pointer appearance-none rounded-lg bg-gray-200"
             style={{
-              background: `linear-gradient(to right, black ${Number(height.toFixed(2)) * 10}%, #e5e7eb ${Number(height.toFixed(2)) * 10}%)`,
+              background: `linear-gradient(to right, black ${((height - 2) / (12 - 2)) * 100}%, #e5e7eb ${((height - 2) / (12 - 2)) * 100}%)`,
             }}
           />
         </div>

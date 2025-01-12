@@ -3,7 +3,7 @@ import { useState, MouseEvent, JSX } from "react";
 import Sidebar from "./Sidebar";
 import TopMenue from "./isEdit";
 import { MdDragHandle } from "react-icons/md";
-import DesignMenu from "./desginMenu";
+import Toolbar from "./Toolbar";
 
 const HeaderContent = ({ selectedLayout }: { selectedLayout: string }) => {
   const layouts: { [key: string]: JSX.Element } = {
@@ -141,7 +141,7 @@ export default function Page() {
                     Edit Design
                   </button>
                   {isDesignMenuVisible && (
-                    <DesignMenu
+                    <Toolbar
                       onOptionChange={handleLayoutSelection}
                       initialHeight={headerHeight}
                       onHeightChange={handleHeightChange}

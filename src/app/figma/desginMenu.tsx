@@ -1,13 +1,51 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-export default function DesignMenu() {
+interface DesignMenuProps {
+  onOptionChange: (option: string) => void;
+  initialLayoutOption?: string;
+  initialLinkSpacing?: number;
+  initialElementSpacing?: number;
+  initialHeight?: number;
+  initialWidth?: string;
+  onHeightChange: (height: number) => void;
+}
+
+export default function DesignMenu({
+  onOptionChange,
+  initialLayoutOption = "Option 1",
+  initialLinkSpacing = 0,
+  initialElementSpacing = 0,
+  initialHeight = 0,
+  initialWidth = "full",
+  onHeightChange,
+}: DesignMenuProps) {
   const [activeMenu, setActiveMenu] = useState("design");
-  const [layoutOption, setLayoutOption] = useState("Option 1");
+  const [layoutOption, setLayoutOption] = useState(initialLayoutOption);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [linkSpacing, setLinkSpacing] = useState(0);
-  const [elementSpacing, setElementSpacing] = useState(0);
-  const [height, setHeight] = useState(0);
-  const [width, setWidth] = useState("full");
+  const [linkSpacing, setLinkSpacing] = useState(initialLinkSpacing);
+  const [elementSpacing, setElementSpacing] = useState(initialElementSpacing);
+  const [height, setHeight] = useState(initialHeight);
+  const [width, setWidth] = useState(initialWidth);
+
+  useEffect(() => {
+    setLayoutOption(initialLayoutOption);
+  }, [initialLayoutOption]);
+
+  useEffect(() => {
+    setLinkSpacing(initialLinkSpacing);
+  }, [initialLinkSpacing]);
+
+  useEffect(() => {
+    setElementSpacing(initialElementSpacing);
+  }, [initialElementSpacing]);
+
+  useEffect(() => {
+    setWidth(initialWidth);
+  }, [initialWidth]);
+
+  useEffect(() => {
+    onHeightChange(height);
+  }, [height]);
 
   const layoutOptions = [
     {
@@ -91,13 +129,13 @@ export default function DesignMenu() {
       <div className="absolute right-0 top-full mt-2 w-80 h-96 rounded-lg bg-white p-4 shadow-lg overflow-auto">
         <div className="mb-4 flex gap-4 border-b border-gray-300 pb-2 text-black">
           <button
-            className={`rounded px-4 py-2 ${activeMenu === "design" ? "bg-blue-500 text-white" : "bg-gray-100"}`}
+            className={` px-4 py-2  ${activeMenu === "design" ? "border-b-2 border-blue-400" : ""}`}
             onClick={() => setActiveMenu("design")}
           >
             Design
           </button>
           <button
-            className={`rounded px-4 py-2 ${activeMenu === "color" ? "bg-blue-500 text-white" : "bg-gray-100"}`}
+            className={` px-4 py-2 ${activeMenu === "color" ? "border-b-2 border-blue-400" : ""}`}
             onClick={() => setActiveMenu("color")}
           >
             Color
@@ -239,6 +277,7 @@ export default function DesignMenu() {
               onClick={() => {
                 setLayoutOption(option.name);
                 setShowDropdown(false);
+                onOptionChange(option.name); // Call the callback function
               }}
             >
               {option.layout}

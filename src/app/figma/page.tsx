@@ -1,26 +1,74 @@
 "use client";
-import { useState } from "react";
+import { useState, MouseEvent, JSX } from "react";
 import Sidebar from "./Sidebar";
 import TopMenue from "./isEdit";
 import { MdDragHandle } from "react-icons/md";
 import DesignMenu from "./desginMenu";
 
+const HeaderContent = ({ selectedLayout }: { selectedLayout: string }) => {
+  const layouts: { [key: string]: JSX.Element } = {
+    "Option 1": (
+      <>
+        <h1 className="text-2xl font-bold">YourWebsiteTitle</h1>
+        <div className="flex space-x-4">
+          <button className="rounded px-2 py-1 text-white">Menu</button>
+          <button className="rounded px-2 py-1 text-white">Reservation</button>
+        </div>
+      </>
+    ),
+    "Option 2": (
+      <>
+        <div className="flex space-x-4">
+          <h1 className="text-2xl font-bold">Menu</h1>
+          <button className="rounded px-2 py-1 text-white">YourWebsiteTitle</button>
+        </div>
+        <button className="rounded px-2 py-1 text-white">Reservation</button>
+      </>
+    ),
+    "Option 3": (
+      <>
+        <h1 className="text-2xl font-bold">YourWebsiteTitle</h1>
+        <button className="rounded px-2 py-1 text-white">Menu</button>
+        <button className="rounded px-2 py-1 text-white">Reservation</button>
+      </>
+    ),
+    "Option 4": (
+      <>
+        <button className="rounded px-2 py-1 text-white">Menu</button>
+        <h1 className="text-2xl font-bold">YourWebsiteTitle</h1>
+        <button className="rounded px-2 py-1 text-white">Reservation</button>
+      </>
+    ),
+  };
+
+  return layouts[selectedLayout] || null;
+};
+
 export default function Page() {
   const [isEditing, setIsEditing] = useState(true);
   const [isHeaderHovered, setIsHeaderHovered] = useState(false);
   const [isHeaderEditing, setIsHeaderEditing] = useState(false);
-  const [headerHeight, setHeaderHeight] = useState(100); // Initial height of the header
+  const [headerHeight, setHeaderHeight] = useState(3); // Initial height of the header
   const [isResizing, setIsResizing] = useState(false);
   const [isDesignMenuVisible, setIsDesignMenuVisible] = useState(false);
+  const [selectedLayout, setSelectedLayout] = useState("Option 1"); // Default to "Option 1"
 
-  const handleMouseMove = (e) => {
+  const handleMouseMove = (e: MouseEvent) => {
     if (isResizing) {
-      setHeaderHeight(e.clientY);
+      setHeaderHeight((prevHeight) => prevHeight + (e.movementY * 0.1)); // Adjust the scaling factor as needed
     }
   };
 
   const handleMouseUp = () => {
     setIsResizing(false);
+  };
+
+  const handleLayoutSelection = (layout : string) => {
+    setSelectedLayout(layout);
+  };
+
+  const handleHeightChange = (height:number) => {
+    setHeaderHeight(height + 2);
   };
 
   return (
@@ -38,12 +86,12 @@ export default function Page() {
           className={`flex grow flex-col bg-gray-500 transition-all duration-500`}
         >
           <header
-            className={`relative flex bg-red-400 p-4 text-white shadow-md hover:bg-opacity-70 ${isHeaderHovered ? "bg-gray-700" : ""}`}
-            style={{ height: `${headerHeight}px` }}
+            className={`relative flex justify-between items-center bg-red-400 p-4 text-white shadow-md hover:bg-opacity-70 ${isHeaderHovered ? "bg-gray-700" : ""}`}
+            style={{ height: `${headerHeight}vw` }}
             onMouseEnter={() => setIsHeaderHovered(true)}
             onMouseLeave={() => setIsHeaderHovered(false)}
           >
-            <h1 className="text-2xl font-bold">Header</h1>
+            <HeaderContent selectedLayout={selectedLayout} />
             {isHeaderHovered && !isHeaderEditing && (
               <button
                 className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 rounded bg-blue-500 px-2 py-1 text-white"
@@ -73,7 +121,13 @@ export default function Page() {
                   >
                     Edit Design
                   </button>
-                  {isDesignMenuVisible && <DesignMenu />}
+                  {isDesignMenuVisible && (
+                    <DesignMenu
+                      onOptionChange={handleLayoutSelection}
+                      initialHeight={headerHeight}
+                      onHeightChange={handleHeightChange}
+                    />
+                  )}
                 </div>
               </div>
             </div>

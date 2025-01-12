@@ -1,6 +1,10 @@
 import { FaMobileAlt, FaPaintBrush, FaDesktop, FaExpand } from "react-icons/fa";
 
-export default function TopMenue({ setIsEditing }) {
+interface TopMenueProps {
+  setIsEditing: (isEditing: boolean) => void;
+}
+
+export default function TopMenue({ setIsEditing }: TopMenueProps) {
   return (
     <div className="flex items-center justify-between bg-white p-2">
       <button className="text-black" onClick={() => setIsEditing(true)}>

@@ -62,7 +62,10 @@ const Toolbar: React.FC<ToolbarProps> = ({
         <div className="flex border-r border-black">
           <GrDrag className="m-2" />
           <div className="relative">
-            <BiCodeAlt className="m-2" onClick={() => toggleDropdown("format")} />
+            <BiCodeAlt
+              className="m-2"
+              onClick={() => toggleDropdown("format")}
+            />
             {showDropdown === "format" && (
               <FormatDropdown onFormatClick={onFormatClick} />
             )}

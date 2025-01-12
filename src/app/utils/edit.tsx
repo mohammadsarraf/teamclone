@@ -114,9 +114,7 @@ export default function Edit({
         <meta name="description" content={"No description available."} />
         <link rel="icon" href="/favicon.ico" />
       </div>
-      <main
-        className={`size-full px-10`}
-      >
+      <main className={`size-full px-10`}>
         <section className="flex size-full flex-col">
           <nav className="mb-5 flex justify-between py-10">
             <h1
@@ -162,72 +160,86 @@ export default function Edit({
             ))}
           </section>
           <section>
-          <div>
-            <h3 className={`text-3xl py-1 `}>Skills</h3>
-            <p className={`text-md py-2 leading-8`}>
-              {/* Since the beginning of my journey as a freelance designer and
+            <div>
+              <h3 className={`py-1 text-3xl `}>Skills</h3>
+              <p className={`text-md py-2 leading-8`}>
+                {/* Since the beginning of my journey as a freelance designer and
 							developer, I've done remote work for */}
-              I bring a diverse skill set to the table, encompassing 
-              <span className="text-teal-500"> brand design </span>, <span className="text-teal-500"> programming </span>, 
-              and <span className="text-teal-500"> education </span>. My expertise lies not only in creating visually appealing designs 
-              and efficient code but also in imparting this knowledge through teaching.
-            </p>
-            {/* <p className={`text-md py-2 leading-8 text-gray-800`}>
+                I bring a diverse skill set to the table, encompassing
+                <span className="text-teal-500"> brand design </span>,{" "}
+                <span className="text-teal-500"> programming </span>, and{" "}
+                <span className="text-teal-500"> education </span>. My expertise
+                lies not only in creating visually appealing designs and
+                efficient code but also in imparting this knowledge through
+                teaching.
+              </p>
+              {/* <p className={`text-md py-2 leading-8 text-gray-800`}>
               I offer from a wide range of services, including brand design,
               programming and teaching.
             </p> */}
-          </div>
-          <div className="flex gap-10 overflow-auto">
-            <div className={`text-center  shadow-lg p-10 rounded-xl my-10  bg-gray-700 flex-1`}>
-              <PiFrameCornersBold className={`w-16 h-16 text-teal-600 mx-auto`} />
-              <h3 className="text-lg font-medium pt-8 pb-2  ">
-                FrameWorks
-              </h3>
-              <p className="py-2">
-My technical proficiency is anchored in a variety of frameworks that enhance the development process
-              </p>
-              {/* <h4 className="text-teal-300 py-4">#####</h4> */}
-              <p className="text-inherit py-1">React</p>
-              <p className="text-inherit py-1">Next.js</p>
-              <p className="text-inherit py-1">Figma</p>
-              <p className="text-inherit py-1">Firebase</p>
-              <p className="text-inherit py-1">Material-UI, Tailwind, BootsTrap</p>
             </div>
-            <div className={`text-center  shadow-lg p-10 rounded-xl my-10   bg-gray-700 flex-1`}>
-              <IoLibraryOutline className={`w-16 h-16 text-teal-600 mx-auto`} />
-              <h3 className="text-lg font-medium pt-8 pb-2 ">
-                Libraries
-              </h3>
-              <p className="py-2">
-I leverage powerful libraries to process data, create machine learning models, and visualize results
-              </p>
-              {/* <h4 className="text-teal-300 py-4">#####</h4> */}
-              <p className="text-inherit py-1">Pandas</p>
-              <p className="text-inherit py-1">NumPy</p>
-              <p className="text-inherit py-1">TensorFlow</p>
-              <p className="text-inherit py-1">sci-kitlearn, matplotlib</p>
-              <p className="text-inherit py-1">matplotlib</p>
+            <div className="flex gap-10 overflow-auto">
+              <div
+                className={`my-10  flex-1 rounded-xl bg-gray-700 p-10  text-center shadow-lg`}
+              >
+                <PiFrameCornersBold
+                  className={`mx-auto size-16 text-teal-600`}
+                />
+                <h3 className="pb-2 pt-8 text-lg font-medium  ">FrameWorks</h3>
+                <p className="py-2">
+                  My technical proficiency is anchored in a variety of
+                  frameworks that enhance the development process
+                </p>
+                {/* <h4 className="text-teal-300 py-4">#####</h4> */}
+                <p className="py-1 text-inherit">React</p>
+                <p className="py-1 text-inherit">Next.js</p>
+                <p className="py-1 text-inherit">Figma</p>
+                <p className="py-1 text-inherit">Firebase</p>
+                <p className="py-1 text-inherit">
+                  Material-UI, Tailwind, BootsTrap
+                </p>
+              </div>
+              <div
+                className={`my-10  flex-1 rounded-xl bg-gray-700 p-10   text-center shadow-lg`}
+              >
+                <IoLibraryOutline className={`mx-auto size-16 text-teal-600`} />
+                <h3 className="pb-2 pt-8 text-lg font-medium ">Libraries</h3>
+                <p className="py-2">
+                  I leverage powerful libraries to process data, create machine
+                  learning models, and visualize results
+                </p>
+                {/* <h4 className="text-teal-300 py-4">#####</h4> */}
+                <p className="py-1 text-inherit">Pandas</p>
+                <p className="py-1 text-inherit">NumPy</p>
+                <p className="py-1 text-inherit">TensorFlow</p>
+                <p className="py-1 text-inherit">sci-kitlearn, matplotlib</p>
+                <p className="py-1 text-inherit">matplotlib</p>
+              </div>
+              <div
+                className={`my-10  flex-1 rounded-xl bg-gray-700 p-10   text-center shadow-lg`}
+              >
+                <FaCode className={`mx-auto size-16 text-teal-600`} />
+                <h3 className="pb-2 pt-8 text-lg font-medium ">
+                  Programming Languages
+                </h3>
+                <p className="py-2">
+                  Proficient in multiple programming languages, enabling
+                  versatility across various projects
+                </p>
+                {/* <h4 className="text-teal-300 py-4">##### </h4> */}
+                <p className="py-1 text-inherit">C/C++</p>
+                <p className="py-1 text-inherit">Python</p>
+                <p className="py-1 text-inherit">SQL</p>
+                <p className="py-1 text-inherit">Java</p>
+                <p className="py-1 text-inherit">HTML/CSS/JavaScript</p>
+              </div>
             </div>
-            <div className={`text-center  shadow-lg p-10 rounded-xl my-10   bg-gray-700 flex-1`}>
-              <FaCode className={`w-16 h-16 text-teal-600 mx-auto`} />
-              <h3 className="text-lg font-medium pt-8 pb-2 ">Programming Languages</h3>
-              <p className="py-2">
-Proficient in multiple programming languages, enabling versatility across various projects
-              </p>
-              {/* <h4 className="text-teal-300 py-4">##### </h4> */}
-              <p className="text-inherit py-1">C/C++</p>
-              <p className="text-inherit py-1">Python</p>
-              <p className="text-inherit py-1">SQL</p>
-              <p className="text-inherit py-1">Java</p>
-              <p className="text-inherit py-1">HTML/CSS/JavaScript</p>
-            </div>
-          </div>
-        </section>
-        <section className="py-10">
-          <div>
-            <h3 className={`text-3xl py-1`}>Portofolio</h3>
-            <p className={`text-md py-2 leading-8 text-gray-800`}>
-              {`As a dedicated Computer Science student at Wilfrid Laurier University and an 
+          </section>
+          <section className="py-10">
+            <div>
+              <h3 className={`py-1 text-3xl`}>Portofolio</h3>
+              <p className={`text-md py-2 leading-8 text-gray-800`}>
+                {`As a dedicated Computer Science student at Wilfrid Laurier University and an 
               experienced IT Systems and Automation Specialist at Caseware, I, Moe Sarraf, have 
               developed a unique blend of skills in Data Science, AI, and Full-Stack Development. 
               My portfolio showcases diverse projects, such as an NBA MVP prediction model where 
@@ -236,12 +248,9 @@ Proficient in multiple programming languages, enabling versatility across variou
               projects reflect not just my technical acumen but also my passion for blending creativity 
               with functionality, offering a glimpse into my journey 
               of continuous learning and innovation in the ever-evolving tech landscape.`}
-
-            </p>
-
-          </div>
-
-        </section>
+              </p>
+            </div>
+          </section>
         </section>
       </main>
     </div>

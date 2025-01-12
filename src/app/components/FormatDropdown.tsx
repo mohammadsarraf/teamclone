@@ -7,23 +7,23 @@ interface FormatDropdownProps {
 
 const FormatDropdown: React.FC<FormatDropdownProps> = ({ onFormatClick }) => {
   return (
-    <div className="absolute top-full left-0 mt-1 w-40 rounded bg-white shadow-lg text-sm">
+    <div className="absolute left-0 top-full mt-1 w-40 rounded bg-white text-sm shadow-lg">
       <div
-        className="cursor-pointer p-2 hover:bg-gray-200 flex items-center"
+        className="flex cursor-pointer items-center p-2 hover:bg-gray-200"
         onClick={() => onFormatClick("bold")}
       >
         <FaBold className="mr-2" />
         Bold
       </div>
       <div
-        className="cursor-pointer p-2 hover:bg-gray-200 flex items-center"
+        className="flex cursor-pointer items-center p-2 hover:bg-gray-200"
         onClick={() => onFormatClick("underline")}
       >
         <FaUnderline className="mr-2" />
         Underline
       </div>
       <div
-        className="cursor-pointer p-2 hover:bg-gray-200 flex items-center"
+        className="flex cursor-pointer items-center p-2 hover:bg-gray-200"
         onClick={() => onFormatClick("italic")}
       >
         <FaItalic className="mr-2" />

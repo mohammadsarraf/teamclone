@@ -38,7 +38,7 @@ export default function Page() {
           className={`flex grow flex-col bg-gray-500 transition-all duration-500`}
         >
           <header
-            className={`relative flex bg-red-400 p-4 text-white shadow-md hover:bg-gray-700 ${isHeaderHovered ? "bg-gray-700" : ""}`}
+            className={`relative flex bg-red-400 p-4 text-white shadow-md hover:bg-opacity-70 ${isHeaderHovered ? "bg-gray-700" : ""}`}
             style={{ height: `${headerHeight}px` }}
             onMouseEnter={() => setIsHeaderHovered(true)}
             onMouseLeave={() => setIsHeaderHovered(false)}

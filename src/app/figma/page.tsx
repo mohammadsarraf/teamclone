@@ -7,11 +7,10 @@ import Toolbar from "./Toolbar";
 import { FaGithub, FaInstagram, FaTwitter } from "react-icons/fa6";
 import { FaShoppingCart } from "react-icons/fa";
 import HeaderContent from "./headerContent";
-
-
+import FooterContent from "./footer";
 
 export default function Page() {
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(true);
   const [isHeaderHovered, setIsHeaderHovered] = useState(false);
   const [isHeaderEditing, setIsHeaderEditing] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(3); // Initial height of the header
@@ -185,9 +184,7 @@ export default function Page() {
           <section className="grow p-4">
             {/* Section content goes here */}
           </section>
-          <footer className="flex bg-blue-600 p-4 text-white shadow-md">
-            <p className="text-lg">Footer</p>
-          </footer>
+          <FooterContent />
         </div>
       </main>
     </div>

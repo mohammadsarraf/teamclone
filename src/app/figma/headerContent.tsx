@@ -15,7 +15,7 @@ export default function HeaderContent({
   isButton: boolean;
   isCart: boolean;
   isAccount: boolean;
-})  {
+}) {
   const layouts: { [key: string]: JSX.Element } = {
     "Option 1": (
       <>
@@ -124,4 +124,4 @@ export default function HeaderContent({
   };
 
   return layouts[selectedLayout] || null;
-};
+}

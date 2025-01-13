@@ -5,9 +5,11 @@ interface DraggableItemProps {
   gridSize: number; // Size of each grid cell
   showGrid: boolean; // Whether to show the grid or not
   setShowGrid: (show: boolean) => void; // Function to toggle the grid visibility
+  colGap?: number; // Gap between each column
+  rowGap?: number; // Gap between each row
 }
 
-const DraggableItem: React.FC<DraggableItemProps> = ({ text, gridSize, showGrid, setShowGrid }) => {
+const DraggableItem: React.FC<DraggableItemProps> = ({ text, gridSize, showGrid, setShowGrid, colGap = 10, rowGap = 5 }) => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [dragging, setDragging] = useState(false);
   const [resizing, setResizing] = useState(false);
@@ -74,10 +76,15 @@ const DraggableItem: React.FC<DraggableItemProps> = ({ text, gridSize, showGrid,
         setDragging(false);
         setShowGrid(false);
         // Snap to grid
-        setPosition((prev) => ({
-          x: Math.round(prev.x / gridSize) * gridSize,
-          y: Math.round(prev.y / gridSize) * gridSize,
-        }));
+        const container = containerRef.current;
+        if (container) {
+          const offsetX = (container.clientWidth - (Math.floor(container.clientWidth / (gridSize + colGap)) * (gridSize + colGap) - colGap)) / 2;
+          const offsetY = (container.clientHeight - (Math.floor(container.clientHeight / ((gridSize / 2) + rowGap)) * ((gridSize / 2) + rowGap) - rowGap)) / 2;
+          setPosition((prev) => ({
+            x: Math.round((prev.x - offsetX) / (gridSize + colGap)) * (gridSize + colGap) + offsetX,
+            y: Math.round((prev.y - offsetY) / ((gridSize / 2) + rowGap)) * ((gridSize / 2) + rowGap) + offsetY,
+          }));
+        }
       }
       if (resizing) {
         setResizing(false);
@@ -92,7 +99,7 @@ const DraggableItem: React.FC<DraggableItemProps> = ({ text, gridSize, showGrid,
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [dragging, resizing, offset, position, size, resizeDirection]);
+  }, [dragging, resizing, offset, position, size, resizeDirection, gridSize, colGap, rowGap]);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     setDragging(true);
@@ -108,6 +115,10 @@ const DraggableItem: React.FC<DraggableItemProps> = ({ text, gridSize, showGrid,
     setResizing(true);
     setResizeDirection(direction);
   };
+
+  const container = containerRef.current;
+  const offsetX = container ? (container.clientWidth - (Math.floor(container.clientWidth / (gridSize + colGap)) * (gridSize + colGap) - colGap)) / 2 : 0;
+  const offsetY = container ? (container.clientHeight - (Math.floor(container.clientHeight / ((gridSize / 2) + rowGap)) * ((gridSize / 2) + rowGap) - rowGap)) / 2 : 0;
 
   return (
     <div ref={containerRef} className="relative w-full h-full">
@@ -156,8 +167,8 @@ const DraggableItem: React.FC<DraggableItemProps> = ({ text, gridSize, showGrid,
         <div
           style={{
             position: 'absolute',
-            left: Math.round(position.x / gridSize) * gridSize,
-            top: Math.round(position.y / gridSize) * gridSize,
+            left: Math.round((position.x - offsetX) / (gridSize + colGap)) * (gridSize + colGap) + offsetX,
+            top: Math.round((position.y - offsetY) / ((gridSize / 2) + rowGap)) * ((gridSize / 2) + rowGap) + offsetY,
             width: size.width,
             height: size.height,
             border: '2px dashed red',

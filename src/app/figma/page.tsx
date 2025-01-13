@@ -7,10 +7,10 @@ import Toolbar from "./Toolbar";
 import { FaGithub, FaInstagram, FaTwitter } from "react-icons/fa6";
 import { FaShoppingCart } from "react-icons/fa";
 import HeaderContent from "./headerContent";
-import FooterContent from "./footer";
+import FooterContent from "./footerContent";
 
 export default function Page() {
-  const [isEditing, setIsEditing] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
   const [isHeaderHovered, setIsHeaderHovered] = useState(false);
   const [isHeaderEditing, setIsHeaderEditing] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(3); // Initial height of the header

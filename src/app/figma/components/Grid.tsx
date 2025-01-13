@@ -1,38 +1,33 @@
-import React from 'react';
+import React from "react";
 
 interface GridProps {
   gridSize: number; // Size of each grid cell
   showGrid: boolean; // Whether to show the grid or not
-  gap?: number; // Gap between each grid cell
+  colGap: number; // Gap between columns
+  rowGap: number; // Gap between rows
 }
 
-const Grid: React.FC<GridProps> = ({ gridSize, showGrid, gap = 10 }) => {
+const Grid: React.FC<GridProps> = ({ gridSize, showGrid, colGap, rowGap }) => {
   if (!showGrid) return null;
-
-  const containerWidth = window.innerWidth;
-  const containerHeight = window.innerHeight;
-  const numCols = Math.floor(containerWidth / (gridSize + gap));
-  const numRows = Math.floor(containerHeight / ((gridSize / 2) + gap));
-  const gridWidth = numCols * (gridSize + gap) - gap;
-  const gridHeight = numRows * ((gridSize / 2) + gap) - gap;
 
   return (
     <div
       className="absolute inset-0 grid"
       style={{
-        gridTemplateColumns: `repeat(${numCols}, ${gridSize}px)`,
-        gridTemplateRows: `repeat(${numRows}, ${gridSize / 2}px)`, // Rectangles with height half of the width
-        gap: `${gap}px`,
-        width: `${gridWidth}px`,
-        height: `${gridHeight}px`,
-        margin: 'auto',
-        top: 0,
-        bottom: 0,
-        left: 0,
-        right: 0,
+        gridTemplateColumns: `repeat(auto-fill, minmax(${gridSize}px, 1fr))`,
+        gridTemplateRows: `repeat(auto-fill, minmax(${gridSize / 2}px, 1fr))`,
+        gap: `${rowGap}px ${colGap}px`,
+        width: "100%",
+        height: "100%",
+        maxWidth: "100%",
+        maxHeight: "100%",
       }}
     >
-      {Array.from({ length: numCols * numRows }).map((_, index) => (
+      {Array.from({
+        length:
+          Math.floor(window.innerWidth / gridSize) *
+          Math.floor(window.innerHeight / (gridSize / 2)),
+      }).map((_, index) => (
         <div key={index} className="border border-gray-500"></div>
       ))}
     </div>

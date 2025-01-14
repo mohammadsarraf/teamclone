@@ -23,9 +23,9 @@ import { SlCalender, SlEnvolopeLetter } from "react-icons/sl";
 import { TbSocial } from "react-icons/tb";
 import { TfiLayoutAccordionSeparated } from "react-icons/tfi";
 
-export default function AddBlock({ handleClose, handleAddBlock }) {
+export default function AddBlock({ handleClose }: any) {
   return (
-    <div className="absolute -top-[30rem] left-[20rem] size-96 -translate-x-1/2 overflow-auto rounded-xl bg-white p-4 text-black ">
+    <div className="absolute -top-20 right-0 size-96 -translate-x-1/2 overflow-auto rounded-xl bg-white p-4 text-black ">
       {/* Close Button */}
       <button
         onClick={handleClose}
@@ -47,10 +47,7 @@ export default function AddBlock({ handleClose, handleAddBlock }) {
       {/* Options */}
       <h3 className="mb-2 border-b px-4 text-lg font-bold">Basic</h3>
       <div className="grid grid-cols-2 gap-4">
-        <button
-          onClick={() => handleAddBlock("Text Block")}
-          className="justify-left flex items-center rounded bg-white px-4 py-2 text-black transition-all hover:bg-blue-400"
-        >
+        <button className="justify-left flex items-center rounded bg-white px-4 py-2 text-black transition-all hover:bg-blue-400">
           <RiText className="mr-4 flex items-center text-blue-600" size={20} />
           <span className="text-black">Text</span>
         </button>

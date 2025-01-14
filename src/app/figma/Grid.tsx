@@ -40,13 +40,14 @@ export default function Grid({
   handleAlignClick,
 }: GridProps) {
   const [hoveredBlock, setHoveredBlock] = useState<string | null>(null);
+  const [windowWidth, setWindowWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 1200);
 
   return (
     <GridLayout
       className="grid size-full"
       cols={12}
       rowHeight={30}
-      width={window.innerWidth}
+      width={windowWidth}
       isDraggable
       isResizable
       useCSSTransforms
@@ -67,7 +68,9 @@ export default function Grid({
           onMouseLeave={() => setHoveredBlock(null)}
         >
           {(activeBlock === block.i || hoveredBlock === block.i) && (
-            <div className="no-drag absolute -top-12 left-0 z-20 w-full">
+            <div
+              className={`no-drag absolute -top-12 left-0 z-20 w-full ${activeBlock === block.i ? "" : "invisible"}`}
+            >
               <ActiveBlock
                 block={block}
                 index={index}
@@ -91,7 +94,8 @@ export default function Grid({
             html={block.text}
             disabled={!isEditing || activeBlock !== block.i}
             onChange={(event) => handleTextChange(index, event)}
-            className={`${block.fontSize} ${block.color} ${block.textAlign} size-full`}
+            onBlur={() => handleBlockClick("")} // Hide ActiveBlock on blur
+            className={`${block.fontSize} ${block.color} ${block.textAlign} size-full `}
           />
         </div>
       ))}

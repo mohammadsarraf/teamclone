@@ -76,10 +76,10 @@ const ActiveBlock: React.FC<ActiveBlockProps> = ({
 
   return (
     <div className="mb-3 flex w-fit flex-col gap-3">
-      <div className="relative flex h-10 items-center rounded-lg bg-gray-300 px-2 text-xl text-black">
+      <div className="relative flex h-10 items-center rounded-lg bg-gray-300 px-2 text-lg text-black">
         <div className="relative border-r px-2">
           <button
-            className="flex w-32 items-center justify-between hover:bg-blue-500"
+            className="block w-32 items-center justify-between rounded px-2 hover:bg-blue-500"
             onClick={toggleDropdown}
           >
             {fontSize}
@@ -235,7 +235,7 @@ const ActiveBlock: React.FC<ActiveBlockProps> = ({
           </div>
         </div>
         <div className="flex items-center px-2">
-          <button className="rounded p-1 hover:bg-blue-500">
+          <button className="rounded p-1 text-red-500 hover:bg-blue-500">
             <MdDelete />
           </button>
         </div>

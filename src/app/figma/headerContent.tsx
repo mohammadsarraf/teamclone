@@ -35,7 +35,6 @@ export default function HeaderContent({
   const [isCart, setIsCart] = useState(false);
   const [isAccount, setIsAccount] = useState(false);
 
-
   return (
     <>
       <header
@@ -80,17 +79,14 @@ export default function HeaderContent({
                 <div
                   className={`absolute left-0  mt-2 flex w-80 flex-col  rounded-lg bg-white p-4 shadow-lg`}
                 >
-                  <p className=" mb-4 border-b py-2 text-left">
-                    Add Elements
-                  </p>
+                  <p className=" mb-4 border-b py-2 text-left">Add Elements</p>
                   <div className="relative z-20">
-
-                  <ElementToolbar
-                    setIsButton={setIsButton}
-                    setIsSocial={setIsSocial}
-                    setIsCart={setIsCart}
-                    setIsAccount={setIsAccount}
-                  />
+                    <ElementToolbar
+                      setIsButton={setIsButton}
+                      setIsSocial={setIsSocial}
+                      setIsCart={setIsCart}
+                      setIsAccount={setIsAccount}
+                    />
                   </div>
                 </div>
               </div>

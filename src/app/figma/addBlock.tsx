@@ -25,7 +25,7 @@ import { TfiLayoutAccordionSeparated } from "react-icons/tfi";
 
 export default function AddBlock({ handleClose, handleAddBlock }) {
   return (
-    <div className="absolute -top-[30rem] left-[20rem] size-96 -translate-x-1/2 overflow-auto rounded-xl bg-white p-4 text-black ">
+    <div className="absolute -top-[30rem] left-80 size-96 -translate-x-1/2 overflow-auto rounded-xl bg-white p-4 text-black ">
       {/* Close Button */}
       <button
         onClick={handleClose}

@@ -40,7 +40,9 @@ export default function Grid({
   handleAlignClick,
 }: GridProps) {
   const [hoveredBlock, setHoveredBlock] = useState<string | null>(null);
-  const [windowWidth, setWindowWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  const [windowWidth, setWindowWidth] = useState<number>(
+    typeof window !== "undefined" ? window.innerWidth : 1200,
+  );
 
   return (
     <GridLayout

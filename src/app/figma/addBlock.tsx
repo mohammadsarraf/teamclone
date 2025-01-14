@@ -28,7 +28,10 @@ interface AddBlockProps {
   handleAddBlock: (blockType: string) => void;
 }
 
-export default function AddBlock({ handleClose, handleAddBlock }: AddBlockProps) {
+export default function AddBlock({
+  handleClose,
+  handleAddBlock,
+}: AddBlockProps) {
   return (
     <div className="absolute -top-[30rem] left-80 size-96 -translate-x-1/2 overflow-auto rounded-xl bg-white p-4 text-black ">
       {/* Close Button */}

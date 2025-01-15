@@ -10,13 +10,13 @@ export const handleTextChange = (
   texts: Texts,
   setTexts: React.Dispatch<React.SetStateAction<Texts>>,
   layout: Layout[],
-  setLayout: React.Dispatch<React.SetStateAction<Layout[]>>
+  setLayout: React.Dispatch<React.SetStateAction<Layout[]>>,
 ) => {
   setTexts({
     ...texts,
     [key]: event.target.value,
   });
-  event.target.style.height = 'auto';
+  event.target.style.height = "auto";
   event.target.style.height = `${event.target.scrollHeight}px`;
 
   const newLayout = layout.map((item) => {
@@ -36,17 +36,17 @@ export const handleKeyDown = (
   layout: Layout[],
   setLayout: React.Dispatch<React.SetStateAction<Layout[]>>,
   setNewRectKey: React.Dispatch<React.SetStateAction<string | null>>,
-  removeRectangle: (key: string) => void
+  removeRectangle: (key: string) => void,
 ) => {
-  if (event.key === 'Enter' && !event.shiftKey) {
+  if (event.key === "Enter" && !event.shiftKey) {
     event.preventDefault();
     const newKey = `rect${Object.keys(texts).length + 1}`;
-    const index = layout.findIndex(item => item.i === key);
+    const index = layout.findIndex((item) => item.i === key);
 
     const newLayout = [
       ...layout.slice(0, index + 1),
       { i: newKey, x: 0, y: layout[index].y + 1, w: 12, h: 1 },
-      ...layout.slice(index + 1).map(item => ({ ...item, y: item.y + 1 }))
+      ...layout.slice(index + 1).map((item) => ({ ...item, y: item.y + 1 })),
     ];
 
     setTexts({
@@ -55,7 +55,7 @@ export const handleKeyDown = (
     });
     setLayout(newLayout);
     setNewRectKey(newKey);
-  } else if (event.key === 'Backspace' && texts[key] === "") {
+  } else if (event.key === "Backspace" && texts[key] === "") {
     event.preventDefault();
     removeRectangle(key);
   }
@@ -66,7 +66,7 @@ export const addRectangle = (
   setTexts: React.Dispatch<React.SetStateAction<Texts>>,
   layout: Layout[],
   setLayout: React.Dispatch<React.SetStateAction<Layout[]>>,
-  setNewRectKey: React.Dispatch<React.SetStateAction<string | null>>
+  setNewRectKey: React.Dispatch<React.SetStateAction<string | null>>,
 ) => {
   const newKey = `rect${Object.keys(texts).length + 1}`;
   setTexts({
@@ -85,15 +85,15 @@ export const removeRectangle = (
   setLayout: React.Dispatch<React.SetStateAction<Layout[]>>,
   setNewRectKey: React.Dispatch<React.SetStateAction<string | null>>,
   defaultTexts: Texts,
-  defaultLayout: Layout[]
+  defaultLayout: Layout[],
 ) => {
   const newTexts = { ...texts };
   delete newTexts[key];
 
   const newLayout = layout
-    .filter(item => item.i !== key)
-    .map(item => {
-      if (item.y > layout.find(l => l.i === key)!.y) {
+    .filter((item) => item.i !== key)
+    .map((item) => {
+      if (item.y > layout.find((l) => l.i === key)!.y) {
         return { ...item, y: item.y - 1 };
       }
       return item;
@@ -107,7 +107,7 @@ export const removeRectangle = (
     setLayout(defaultLayout);
     setNewRectKey("rect1");
   } else {
-    const index = layout.findIndex(item => item.i === key);
+    const index = layout.findIndex((item) => item.i === key);
     if (index > 0) {
       setNewRectKey(layout[index - 1].i);
     } else if (newLayout.length > 0) {

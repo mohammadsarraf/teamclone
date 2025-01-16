@@ -1,0 +1,13 @@
+.layout {
+  width: 100% !important;
+}
+
+.layout > div {
+  width: 100% !important;
+}
+
+/* Ensure textarea takes full width */
+textarea {
+  width: 100% !important;
+  box-sizing: border-box;
+}

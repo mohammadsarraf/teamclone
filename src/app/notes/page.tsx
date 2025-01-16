@@ -153,7 +153,7 @@ export default function Note() {
   return (
     <div className="flex h-screen w-screen flex-col bg-gray-600">
       <NoteHeader addRectangle={addRectangle} isClicked={isClicked} />
-      <div className="flex-1 overflow-auto p-4">
+      <div className="w-full flex-1 overflow-auto p-4">
         <NoteGrid
           layout={layout}
           texts={texts}

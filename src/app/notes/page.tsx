@@ -6,6 +6,7 @@ import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import { FaJediOrder } from "react-icons/fa6";
 import NoteGrid from "./NoteGrid";
+import NoteHeader from "./NoteHeader";
 
 interface Texts {
   [key: string]: string;
@@ -19,20 +20,6 @@ interface Layout {
   h: number;
 }
 
-const NoteHeader = ({
-  addRectangle,
-  isClicked,
-}: {
-  addRectangle: () => void;
-  isClicked: boolean;
-}) => (
-  <header className="flex items-center justify-between bg-gray-800 p-4 text-white">
-    <h1 className="text-xl">Note App</h1>
-    <button onClick={addRectangle} className="bg-white p-2 text-black">
-      Add Rectangle
-    </button>
-  </header>
-);
 
 export default function Note() {
   const defaultLayout = [{ i: "rect1", x: 0, y: 0, w: 12, h: 1 }];
@@ -74,7 +61,10 @@ export default function Note() {
           newRectRef.current.focus();
         }
       }, 0);
-    } else if (event.key === "Backspace" && event.currentTarget.textContent === "") {
+    } else if (
+      event.key === "Backspace" &&
+      event.currentTarget.textContent === ""
+    ) {
       event.preventDefault();
       removeRectangle(key);
     }
@@ -120,7 +110,7 @@ export default function Note() {
 
   return (
     <div className="flex h-screen w-screen flex-col bg-gray-600">
-      <NoteHeader addRectangle={addRectangle} isClicked={isClicked} />
+      <NoteHeader />
       <div className="w-full flex-1 overflow-auto pl-4 pt-4">
         <NoteGrid
           layout={layout}

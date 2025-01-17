@@ -26,7 +26,10 @@ const NoteGrid = ({
   setLayout, // Receive the setLayout function
 }: {
   layout: Layout[];
-  handleKeyDown: (key: string, event: React.KeyboardEvent<HTMLDivElement>) => void;
+  handleKeyDown: (
+    key: string,
+    event: React.KeyboardEvent<HTMLDivElement>,
+  ) => void;
   newRectKey: string | null;
   newRectRef: React.RefObject<HTMLDivElement | null>;
   rectMenuStates: { [key: string]: boolean };
@@ -64,8 +67,8 @@ const NoteGrid = ({
     if (contentElement) {
       const newHeight = contentElement.scrollHeight / rowHeight;
       setLayout((prevLayout) =>
-        prevLayout.map((item) =>
-          item.i === key ? { ...item, h: newHeight } : item, // Update the height based on the measured height
+        prevLayout.map(
+          (item) => (item.i === key ? { ...item, h: newHeight } : item), // Update the height based on the measured height
         ),
       );
     }
@@ -83,7 +86,11 @@ const NoteGrid = ({
       isResizable={false}
     >
       {layout.map((item) => (
-        <div key={item.i} className="flex items-center" style={{ height: item.h * rowHeight }}>
+        <div
+          key={item.i}
+          className="flex items-center"
+          style={{ height: item.h * rowHeight }}
+        >
           <MdOutlineReorder className="drag-handle mr-4 cursor-move" />
           <FaJediOrder
             className="mr-4 cursor-pointer"

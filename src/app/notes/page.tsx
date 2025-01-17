@@ -35,10 +35,8 @@ const NoteHeader = ({
 );
 
 export default function Note() {
-  const defaultTexts = { rect1: "" };
   const defaultLayout = [{ i: "rect1", x: 0, y: 0, w: 12, h: 1 }];
 
-  const [texts, setTexts] = useState<Texts>(defaultTexts);
   const [layout, setLayout] = useState<Layout[]>(defaultLayout);
 
   const newRectRef = useRef<HTMLDivElement | null>(null);
@@ -54,50 +52,35 @@ export default function Note() {
     }
   }, [newRectKey]);
 
-  const handleTextChange = (key: string, text: string) => {
-    setTexts({
-      ...texts,
-      [key]: text,
-    });
-  };
-
   const handleKeyDown = (
     key: string,
     event: React.KeyboardEvent<HTMLDivElement>,
   ) => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
-      const newKey = `rect${Object.keys(texts).length + 1}`;
+      const newKey = `rect${layout.length + 1}`;
       const index = layout.findIndex((item) => item.i === key);
 
-      setTexts((prevTexts) => {
-        const updatedTexts = {
-          ...prevTexts,
-          [key]: (event.target as HTMLDivElement).innerText,
-          [newKey]: ``,
-        };
+      const newLayout = [
+        ...layout.slice(0, index + 1),
+        { i: newKey, x: 0, y: layout[index].y + 1, w: 12, h: 1 },
+        ...layout.slice(index + 1).map((item) => ({ ...item, y: item.y + 1 })),
+      ];
 
-        const newLayout = [
-          ...layout.slice(0, index + 1),
-          { i: newKey, x: 0, y: layout[index].y + 1, w: 12, h: 1 },
-          ...layout.slice(index + 1).map((item) => ({ ...item, y: item.y + 1 })),
-        ];
-
-        setLayout(newLayout);
-        setNewRectKey(newKey);
-
-        return updatedTexts;
-      });
-    } else if (event.key === "Backspace" && texts[key] === "") {
+      setLayout(newLayout);
+      setNewRectKey(newKey);
+      setTimeout(() => {
+        if (newRectRef.current) {
+          newRectRef.current.focus();
+        }
+      }, 0);
+    } else if (event.key === "Backspace" && event.currentTarget.textContent === "") {
       event.preventDefault();
       removeRectangle(key);
     }
   };
 
   const removeRectangle = (key: string) => {
-    const newTexts = { ...texts };
-    delete newTexts[key];
-
     const newLayout = layout
       .filter((item) => item.i !== key)
       .map((item) => {
@@ -107,11 +90,9 @@ export default function Note() {
         return item;
       });
 
-    setTexts(newTexts);
     setLayout(newLayout);
 
     if (newLayout.length === 0) {
-      setTexts(defaultTexts);
       setLayout(defaultLayout);
       setNewRectKey("rect1");
     } else {
@@ -125,11 +106,7 @@ export default function Note() {
   };
 
   const addRectangle = () => {
-    const newKey = `rect${Object.keys(texts).length + 1}`;
-    setTexts({
-      ...texts,
-      [newKey]: ``,
-    });
+    const newKey = `rect${layout.length + 1}`;
     setLayout([...layout, { i: newKey, x: 0, y: layout.length, w: 12, h: 1 }]);
     setNewRectKey(newKey);
   };
@@ -144,16 +121,15 @@ export default function Note() {
   return (
     <div className="flex h-screen w-screen flex-col bg-gray-600">
       <NoteHeader addRectangle={addRectangle} isClicked={isClicked} />
-      <div className="w-full flex-1 overflow-auto p-4">
+      <div className="w-full flex-1 overflow-auto pl-4 pt-4">
         <NoteGrid
           layout={layout}
-          texts={texts}
-          handleTextChange={handleTextChange}
           handleKeyDown={handleKeyDown}
           newRectKey={newRectKey}
           newRectRef={newRectRef}
           rectMenuStates={rectMenuStates}
           toggleRectMenu={toggleRectMenu}
+          setLayout={setLayout} // Pass the setLayout function
         />
       </div>
     </div>

@@ -3,6 +3,7 @@ import GridLayout from "react-grid-layout";
 import { MdOutlineReorder } from "react-icons/md";
 import { FaJediOrder } from "react-icons/fa6";
 import ContentEditable from "react-contenteditable";
+import Menu from "./menu";
 
 interface Texts {
   [key: string]: string;
@@ -21,8 +22,6 @@ const NoteGrid = ({
   handleKeyDown,
   newRectKey,
   newRectRef,
-  rectMenuStates,
-  toggleRectMenu,
   setLayout, // Receive the setLayout function
 }: {
   layout: Layout[];
@@ -32,11 +31,11 @@ const NoteGrid = ({
   ) => void;
   newRectKey: string | null;
   newRectRef: React.RefObject<HTMLDivElement | null>;
-  rectMenuStates: { [key: string]: boolean };
   toggleRectMenu: (key: string) => void;
   setLayout: React.Dispatch<React.SetStateAction<Layout[]>>; // Define the type for setLayout
 }) => {
   const [texts, setTexts] = useState<Texts>({ rect1: "" });
+  const [menuVisibility, setMenuVisibility] = useState<{ [key: string]: boolean }>({});
   const menuRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const contentRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
@@ -53,6 +52,26 @@ const NoteGrid = ({
       contentRefs.current[newRectKey].focus();
     }
   }, [newRectKey]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!isAnyMenuVisible) return;
+
+      const target = event.target as Node;
+      if (
+        !Object.values(menuRefs.current).some(
+          (menuRef) => menuRef && menuRef.contains(target),
+        )
+      ) {
+        setMenuVisibility({});
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [menuVisibility]);
 
   const handleTextChange = (key: string, text: string) => {
     setTexts({
@@ -74,6 +93,30 @@ const NoteGrid = ({
     }
   };
 
+  const adjustMenuPosition = (rect: HTMLDivElement) => {
+    const rectBounds = rect.getBoundingClientRect();
+    const menuHeight = 200; // Assume a fixed height for the menu
+    const windowHeight = window.innerHeight;
+
+    if (rectBounds.top + menuHeight > windowHeight) {
+      return { top: rectBounds.top - menuHeight, left: rectBounds.left };
+    } else {
+      return { top: rectBounds.bottom, left: rectBounds.left };
+    }
+  };
+
+  const isAnyMenuVisible = Object.values(menuVisibility).some((visible) => visible);
+
+  const toggleRectMenu = (key: string) => {
+    setMenuVisibility((prev) => {
+      const newVisibility = { ...prev, [key]: !prev[key] };
+      Object.keys(newVisibility).forEach((k) => {
+        if (k !== key) newVisibility[k] = false;
+      });
+      return newVisibility;
+    });
+  };
+
   return (
     <GridLayout
       className="layout"
@@ -88,14 +131,23 @@ const NoteGrid = ({
       {layout.map((item) => (
         <div
           key={item.i}
-          className="flex items-center"
-          style={{ height: item.h * rowHeight }}
+          className={`flex items-center b bg-slate-400 `}
+          style={{
+            height: item.h * rowHeight,
+            zIndex: menuVisibility[item.i] ? 10 : 1, // Conditionally apply zIndex to the rectangle
+          }}
+          ref={(el) => (menuRefs.current[item.i] = el)} // Store the ref to adjust menu position
         >
-          <MdOutlineReorder className="drag-handle mr-4 cursor-move" />
+          <MdOutlineReorder className="drag-handle mr-4 cursor-move " />
           <FaJediOrder
             className="mr-4 cursor-pointer"
             onClick={() => toggleRectMenu(item.i)}
           />
+          {menuVisibility[item.i] && (
+            <div className="absolute top-auto left-14 z-20"> {/* Ensure the menu has a high z-index */}
+              <Menu />
+            </div>
+          )}
           <ContentEditable
             className="w-full outline-none"
             html={texts[item.i]} // Use the html prop to set the content

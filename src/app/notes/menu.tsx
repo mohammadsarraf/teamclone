@@ -28,7 +28,7 @@ export default function Menu({
   };
 
   return (
-    <div className="">
+    <div  className="bg-gray-900 w-fit">
       <div className="border-b">
         <button
           ref={firstButtonRef}

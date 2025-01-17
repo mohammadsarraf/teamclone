@@ -41,7 +41,7 @@ export default function Note() {
   const [texts, setTexts] = useState<Texts>(defaultTexts);
   const [layout, setLayout] = useState<Layout[]>(defaultLayout);
 
-  const newRectRef = useRef<HTMLTextAreaElement | null>(null);
+  const newRectRef = useRef<HTMLDivElement | null>(null);
   const [newRectKey, setNewRectKey] = useState<string | null>(null);
   const [isClicked, setIsClicked] = useState(false);
   const [rectMenuStates, setRectMenuStates] = useState<{
@@ -51,52 +51,43 @@ export default function Note() {
   useEffect(() => {
     if (newRectRef.current) {
       newRectRef.current.focus();
-      newRectRef.current.selectionStart = newRectRef.current.value.length;
-      newRectRef.current.selectionEnd = newRectRef.current.value.length;
     }
   }, [newRectKey]);
 
-  const handleTextChange = (
-    key: string,
-    event: React.ChangeEvent<HTMLTextAreaElement>,
-  ) => {
+  const handleTextChange = (key: string, text: string) => {
     setTexts({
       ...texts,
-      [key]: event.target.value,
+      [key]: text,
     });
-    event.target.style.height = "auto";
-    event.target.style.height = `${event.target.scrollHeight}px`;
-
-    const newLayout = layout.map((item) => {
-      if (item.i === key) {
-        return { ...item, h: Math.ceil(event.target.scrollHeight / 30) };
-      }
-      return item;
-    });
-    setLayout(newLayout);
   };
 
   const handleKeyDown = (
     key: string,
-    event: React.KeyboardEvent<HTMLTextAreaElement>,
+    event: React.KeyboardEvent<HTMLDivElement>,
   ) => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
       const newKey = `rect${Object.keys(texts).length + 1}`;
       const index = layout.findIndex((item) => item.i === key);
 
-      const newLayout = [
-        ...layout.slice(0, index + 1),
-        { i: newKey, x: 0, y: layout[index].y + 1, w: 12, h: 1 },
-        ...layout.slice(index + 1).map((item) => ({ ...item, y: item.y + 1 })),
-      ];
+      setTexts((prevTexts) => {
+        const updatedTexts = {
+          ...prevTexts,
+          [key]: (event.target as HTMLDivElement).innerText,
+          [newKey]: ``,
+        };
 
-      setTexts({
-        ...texts,
-        [newKey]: ``,
+        const newLayout = [
+          ...layout.slice(0, index + 1),
+          { i: newKey, x: 0, y: layout[index].y + 1, w: 12, h: 1 },
+          ...layout.slice(index + 1).map((item) => ({ ...item, y: item.y + 1 })),
+        ];
+
+        setLayout(newLayout);
+        setNewRectKey(newKey);
+
+        return updatedTexts;
       });
-      setLayout(newLayout);
-      setNewRectKey(newKey);
     } else if (event.key === "Backspace" && texts[key] === "") {
       event.preventDefault();
       removeRectangle(key);

@@ -8,6 +8,8 @@ import Paragraph from "./components/Paragraph";
 import Heading1 from "./components/Heading1"; // Import Heading1 component
 import Heading2 from "./components/Heading2"; // Import Heading2 component
 import Heading3 from "./components/Heading3"; // Import Heading3 component
+import BulletPoint from "./components/BulletPoint"; // Import BulletPoint component
+import NumberedList from "./components/NumberedList"; // Ensure correct import
 
 interface Texts {
   [key: string]: string;
@@ -222,6 +224,26 @@ const NoteGrid = ({
               />
             ) : item.type === "Heading 3" ? (
               <Heading3
+                text={texts[item.i]}
+                handleTextChange={(text) => handleTextChangeWithHeight(item.i, text)}
+                handleKeyDown={(e) => handleKeyDown(item.i, e)}
+                textareaRef={(el) => {
+                  contentRefs.current[item.i] = el;
+                  el?.addEventListener('focus', () => handleFocus(item.i)); // Log the style on focus
+                }}
+              />
+            ) : item.type === "Bullet point" ? (
+              <BulletPoint
+                text={texts[item.i]}
+                handleTextChange={(text) => handleTextChangeWithHeight(item.i, text)}
+                handleKeyDown={(e) => handleKeyDown(item.i, e)}
+                textareaRef={(el) => {
+                  contentRefs.current[item.i] = el;
+                  el?.addEventListener('focus', () => handleFocus(item.i)); // Log the style on focus
+                }}
+              />
+            ) : item.type === "Numbered List" ? (
+              <NumberedList
                 text={texts[item.i]}
                 handleTextChange={(text) => handleTextChangeWithHeight(item.i, text)}
                 handleKeyDown={(e) => handleKeyDown(item.i, e)}

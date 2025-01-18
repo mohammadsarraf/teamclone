@@ -48,7 +48,7 @@ export default function Note() {
 
       const newLayout = [
         ...layout.slice(0, index + 1),
-        { i: newKey, x: 0, y: layout[index].y + 1, w: 12, h: 1, type: currentType === "Task" ? "Task" : "Paragraph" }, // Set type based on current type
+        { i: newKey, x: 0, y: layout[index].y + 1, w: 12, h: 1, type: currentType === "Task" || currentType === "Bullet point" || currentType === "Numbered List" ? currentType : "Paragraph" }, // Set type based on current type
         ...layout.slice(index + 1).map((item) => ({ ...item, y: item.y + 1 })),
       ];
 

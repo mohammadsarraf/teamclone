@@ -8,7 +8,7 @@ const Heading2 = ({ text, handleTextChange, handleKeyDown, textareaRef }) => {
         html={text}
         onChange={(e: ContentEditableEvent) => handleTextChange(e.target.value)}
         onKeyDown={handleKeyDown}
-        className="w-full resize-none bg-transparent text-2xl outline-none"
+        className="w-full resize-none bg-transparent text-4xl outline-none"
         innerRef={textareaRef}
       />
     </div>

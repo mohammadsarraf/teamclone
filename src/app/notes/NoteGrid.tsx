@@ -44,6 +44,15 @@ const calculateDistance = (
   }
 };
 
+const logCurrentRectStyle = (key: string, layout: Layout[]) => {
+  const currentRect = layout.find(item => item.i === key);
+  if (currentRect) {
+    console.log(`Current rectangle style: ${currentRect.type}`);
+  } else {
+    console.log("Rectangle not found");
+  }
+};
+
 const NoteGrid = ({
   layout,
   handleKeyDown,
@@ -130,6 +139,10 @@ const NoteGrid = ({
     });
   };
 
+  const handleFocus = (key: string) => {
+    logCurrentRectStyle(key, layout);
+  };
+
   return (
     <div ref={containerRef}>
       <GridLayout
@@ -153,6 +166,7 @@ const NoteGrid = ({
               height: item.h * rowHeight,
               zIndex: menuVisibility[item.i] ? 10 : 1,
             }}
+            onClick={() => handleFocus(item.i)} // Log the style on click
           >
             <MdOutlineReorder className="drag-handle mr-4 cursor-move opacity-0 group-hover:opacity-100" />
             <div
@@ -181,35 +195,50 @@ const NoteGrid = ({
                 text={texts[item.i]}
                 handleTextChange={(text) => handleTextChangeWithHeight(item.i, text)}
                 handleKeyDown={(e) => handleKeyDown(item.i, e)}
-                textareaRef={(el) => (contentRefs.current[item.i] = el)}
+                textareaRef={(el) => {
+                  contentRefs.current[item.i] = el;
+                  el?.addEventListener('focus', () => handleFocus(item.i)); // Log the style on focus
+                }}
               />
             ) : item.type === "Heading 1" ? (
               <Heading1
                 text={texts[item.i]}
                 handleTextChange={(text) => handleTextChangeWithHeight(item.i, text)}
                 handleKeyDown={(e) => handleKeyDown(item.i, e)}
-                textareaRef={(el) => (contentRefs.current[item.i] = el)}
+                textareaRef={(el) => {
+                  contentRefs.current[item.i] = el;
+                  el?.addEventListener('focus', () => handleFocus(item.i)); // Log the style on focus
+                }}
               />
             ) : item.type === "Heading 2" ? (
               <Heading2
                 text={texts[item.i]}
                 handleTextChange={(text) => handleTextChangeWithHeight(item.i, text)}
                 handleKeyDown={(e) => handleKeyDown(item.i, e)}
-                textareaRef={(el) => (contentRefs.current[item.i] = el)}
+                textareaRef={(el) => {
+                  contentRefs.current[item.i] = el;
+                  el?.addEventListener('focus', () => handleFocus(item.i)); // Log the style on focus
+                }}
               />
             ) : item.type === "Heading 3" ? (
               <Heading3
                 text={texts[item.i]}
                 handleTextChange={(text) => handleTextChangeWithHeight(item.i, text)}
                 handleKeyDown={(e) => handleKeyDown(item.i, e)}
-                textareaRef={(el) => (contentRefs.current[item.i] = el)}
+                textareaRef={(el) => {
+                  contentRefs.current[item.i] = el;
+                  el?.addEventListener('focus', () => handleFocus(item.i)); // Log the style on focus
+                }}
               />
             ) : (
               <Paragraph
                 text={texts[item.i]}
                 handleTextChange={(text) => handleTextChangeWithHeight(item.i, text)}
                 handleKeyDown={(e) => handleKeyDown(item.i, e)}
-                textareaRef={(el) => (contentRefs.current[item.i] = el)}
+                textareaRef={(el) => {
+                  contentRefs.current[item.i] = el;
+                  el?.addEventListener('focus', () => handleFocus(item.i)); // Log the style on focus
+                }}
               />
             )}
           </div>

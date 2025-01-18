@@ -18,11 +18,11 @@ interface Layout {
   y: number;
   w: number;
   h: number;
+  type?: string; // Add type property to Layout interface
 }
 
-
 export default function Note() {
-  const defaultLayout = [{ i: "rect1", x: 0, y: 0, w: 12, h: 1 }];
+  const defaultLayout = [{ i: "rect1", x: 0, y: 0, w: 12, h: 1, type: "Paragraph" }]; // Set default type to Paragraph
 
   const [layout, setLayout] = useState<Layout[]>(defaultLayout);
 
@@ -44,10 +44,11 @@ export default function Note() {
       event.preventDefault();
       const newKey = `rect${layout.length + 1}`;
       const index = layout.findIndex((item) => item.i === key);
+      const currentType = layout[index].type;
 
       const newLayout = [
         ...layout.slice(0, index + 1),
-        { i: newKey, x: 0, y: layout[index].y + 1, w: 12, h: 1 },
+        { i: newKey, x: 0, y: layout[index].y + 1, w: 12, h: 1, type: currentType === "Task" ? "Task" : "Paragraph" }, // Set type based on current type
         ...layout.slice(index + 1).map((item) => ({ ...item, y: item.y + 1 })),
       ];
 

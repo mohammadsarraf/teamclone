@@ -5,11 +5,11 @@ import { FaParagraph } from "react-icons/fa6";
 import Menu from "./menu";
 import Task from "./components/Task";
 import Paragraph from "./components/Paragraph";
-import Heading1 from "./components/Heading1"; // Import Heading1 component
-import Heading2 from "./components/Heading2"; // Import Heading2 component
-import Heading3 from "./components/Heading3"; // Import Heading3 component
 import BulletPoint from "./components/BulletPoint"; // Import BulletPoint component
 import NumberedList from "./components/NumberedList"; // Ensure correct import
+import Heading1 from "./components/Heading1";
+import Heading2 from "./components/Heading2";
+import Heading3 from "./components/Heading3";
 
 interface Texts {
   [key: string]: string;
@@ -46,24 +46,21 @@ const calculateDistance = (
   }
 };
 
-const logCurrentRectStyle = (key: string, layout: Layout[]) => {
-  const currentRect = layout.find(item => item.i === key);
-  if (currentRect) {
-    console.log(`Current rectangle style: ${currentRect.type}`);
-  } else {
-    console.log("Rectangle not found");
-  }
-};
 
 const NoteGrid = ({
   layout,
   handleKeyDown,
+  handleArrowNavigation,
   newRectKey,
   newRectRef,
   setLayout,
 }: {
   layout: Layout[];
   handleKeyDown: (
+    key: string,
+    event: React.KeyboardEvent<HTMLDivElement>,
+  ) => void;
+  handleArrowNavigation: (
     key: string,
     event: React.KeyboardEvent<HTMLDivElement>,
   ) => void;
@@ -97,6 +94,19 @@ const NoteGrid = ({
     setGridWidth(window.innerWidth);
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setMenuVisibility({});
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [containerRef]);
+
   const handleTextChange = (key: string, text: string) => {
     setTexts({
       ...texts,
@@ -129,8 +139,6 @@ const NoteGrid = ({
     );
   };
 
-  const isAnyMenuVisible = Object.values(menuVisibility).some((visible) => visible);
-
   const toggleRectMenu = (key: string) => {
     setMenuVisibility((prev) => {
       const newVisibility = { ...prev, [key]: !prev[key] };
@@ -139,10 +147,6 @@ const NoteGrid = ({
       });
       return newVisibility;
     });
-  };
-
-  const handleFocus = (key: string) => {
-    logCurrentRectStyle(key, layout);
   };
 
   return (
@@ -168,7 +172,6 @@ const NoteGrid = ({
               height: item.h * rowHeight,
               zIndex: menuVisibility[item.i] ? 10 : 1,
             }}
-            onClick={() => handleFocus(item.i)} // Log the style on click
           >
             <MdOutlineReorder className="drag-handle mr-4 cursor-move opacity-0 group-hover:opacity-100" />
             <div
@@ -196,70 +199,91 @@ const NoteGrid = ({
               <Task
                 text={texts[item.i]}
                 handleTextChange={(text) => handleTextChangeWithHeight(item.i, text)}
-                handleKeyDown={(e) => handleKeyDown(item.i, e)}
+                handleKeyDown={(e) => {
+                  handleKeyDown(item.i, e);
+                  handleArrowNavigation(item.i, e);
+                }}
                 textareaRef={(el) => {
                   contentRefs.current[item.i] = el;
-                  el?.addEventListener('focus', () => handleFocus(item.i)); // Log the style on focus
+                  if (el) el.setAttribute("data-grid-id", item.i);
                 }}
               />
             ) : item.type === "Heading 1" ? (
               <Heading1
                 text={texts[item.i]}
                 handleTextChange={(text) => handleTextChangeWithHeight(item.i, text)}
-                handleKeyDown={(e) => handleKeyDown(item.i, e)}
+                handleKeyDown={(e) => {
+                  handleKeyDown(item.i, e);
+                  handleArrowNavigation(item.i, e);
+                }}
                 textareaRef={(el) => {
                   contentRefs.current[item.i] = el;
-                  el?.addEventListener('focus', () => handleFocus(item.i)); // Log the style on focus
+                  if (el) el.setAttribute("data-grid-id", item.i);
                 }}
               />
             ) : item.type === "Heading 2" ? (
               <Heading2
                 text={texts[item.i]}
                 handleTextChange={(text) => handleTextChangeWithHeight(item.i, text)}
-                handleKeyDown={(e) => handleKeyDown(item.i, e)}
+                handleKeyDown={(e) => {
+                  handleKeyDown(item.i, e);
+                  handleArrowNavigation(item.i, e);
+                }}
                 textareaRef={(el) => {
                   contentRefs.current[item.i] = el;
-                  el?.addEventListener('focus', () => handleFocus(item.i)); // Log the style on focus
+                  if (el) el.setAttribute("data-grid-id", item.i);
                 }}
               />
             ) : item.type === "Heading 3" ? (
               <Heading3
                 text={texts[item.i]}
                 handleTextChange={(text) => handleTextChangeWithHeight(item.i, text)}
-                handleKeyDown={(e) => handleKeyDown(item.i, e)}
+                handleKeyDown={(e) => {
+                  handleKeyDown(item.i, e);
+                  handleArrowNavigation(item.i, e);
+                }}
                 textareaRef={(el) => {
                   contentRefs.current[item.i] = el;
-                  el?.addEventListener('focus', () => handleFocus(item.i)); // Log the style on focus
+                  if (el) el.setAttribute("data-grid-id", item.i);
                 }}
               />
             ) : item.type === "Bullet point" ? (
               <BulletPoint
                 text={texts[item.i]}
                 handleTextChange={(text) => handleTextChangeWithHeight(item.i, text)}
-                handleKeyDown={(e) => handleKeyDown(item.i, e)}
+                handleKeyDown={(e) => {
+                  handleKeyDown(item.i, e);
+                  handleArrowNavigation(item.i, e);
+                }}
                 textareaRef={(el) => {
                   contentRefs.current[item.i] = el;
-                  el?.addEventListener('focus', () => handleFocus(item.i)); // Log the style on focus
+                  if (el) el.setAttribute("data-grid-id", item.i);
                 }}
               />
             ) : item.type === "Numbered List" ? (
               <NumberedList
                 text={texts[item.i]}
                 handleTextChange={(text) => handleTextChangeWithHeight(item.i, text)}
-                handleKeyDown={(e) => handleKeyDown(item.i, e)}
+                handleKeyDown={(e) => {
+                  handleKeyDown(item.i, e);
+                  handleArrowNavigation(item.i, e);
+                }}
                 textareaRef={(el) => {
                   contentRefs.current[item.i] = el;
-                  el?.addEventListener('focus', () => handleFocus(item.i)); // Log the style on focus
+                  if (el) el.setAttribute("data-grid-id", item.i);
                 }}
               />
             ) : (
               <Paragraph
                 text={texts[item.i]}
                 handleTextChange={(text) => handleTextChangeWithHeight(item.i, text)}
-                handleKeyDown={(e) => handleKeyDown(item.i, e)}
+                handleKeyDown={(e) => {
+                  handleKeyDown(item.i, e);
+                  handleArrowNavigation(item.i, e);
+                }}
                 textareaRef={(el) => {
                   contentRefs.current[item.i] = el;
-                  el?.addEventListener('focus', () => handleFocus(item.i)); // Log the style on focus
+                  if (el) el.setAttribute("data-grid-id", item.i);
                 }}
               />
             )}

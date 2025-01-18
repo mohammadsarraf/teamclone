@@ -68,6 +68,44 @@ export default function Note() {
     }
   };
 
+  const handleArrowNavigation = (
+    key: string,
+    event: React.KeyboardEvent<HTMLDivElement>
+  ) => {
+    const index = layout.findIndex((item) => item.i === key);
+    if (event.key === "ArrowUp" && index > 0) {
+      event.preventDefault();
+      const prevKey = layout[index - 1].i;
+      setNewRectKey(prevKey);
+      setTimeout(() => {
+        const prevElement = document.querySelector(`[data-grid-id="${prevKey}"]`);
+        if (prevElement) {
+          const range = document.createRange();
+          const sel = window.getSelection();
+          range.selectNodeContents(prevElement);
+          range.collapse(false);
+          sel?.removeAllRanges();
+          sel?.addRange(range);
+        }
+      }, 0);
+    } else if (event.key === "ArrowDown" && index < layout.length - 1) {
+      event.preventDefault();
+      const nextKey = layout[index + 1].i;
+      setNewRectKey(nextKey);
+      setTimeout(() => {
+        const nextElement = document.querySelector(`[data-grid-id="${nextKey}"]`);
+        if (nextElement) {
+          const range = document.createRange();
+          const sel = window.getSelection();
+          range.selectNodeContents(nextElement);
+          range.collapse(false);
+          sel?.removeAllRanges();
+          sel?.addRange(range);
+        }
+      }, 0);
+    }
+  };
+
   const removeRectangle = (key: string) => {
     const newLayout = layout
       .filter((item) => item.i !== key)
@@ -86,7 +124,19 @@ export default function Note() {
     } else {
       const index = layout.findIndex((item) => item.i === key);
       if (index > 0) {
-        setNewRectKey(layout[index - 1].i);
+        const prevKey = layout[index - 1].i;
+        setNewRectKey(prevKey);
+        setTimeout(() => {
+          const prevElement = document.querySelector(`[data-grid-id="${prevKey}"]`);
+          if (prevElement) {
+            const range = document.createRange();
+            const sel = window.getSelection();
+            range.selectNodeContents(prevElement);
+            range.collapse(false);
+            sel?.removeAllRanges();
+            sel?.addRange(range);
+          }
+        }, 0);
       } else if (newLayout.length > 0) {
         setNewRectKey(newLayout[0].i);
       }
@@ -100,6 +150,7 @@ export default function Note() {
         <NoteGrid
           layout={layout}
           handleKeyDown={handleKeyDown}
+          handleArrowNavigation={handleArrowNavigation} // Pass the handleArrowNavigation function
           newRectKey={newRectKey}
           newRectRef={newRectRef}
           setLayout={setLayout} // Pass the setLayout function

@@ -29,9 +29,6 @@ export default function Note() {
   const newRectRef = useRef<HTMLDivElement | null>(null);
   const [newRectKey, setNewRectKey] = useState<string | null>(null);
   const [isClicked, setIsClicked] = useState(false);
-  const [rectMenuStates, setRectMenuStates] = useState<{
-    [key: string]: boolean;
-  }>({});
 
   useEffect(() => {
     if (newRectRef.current) {
@@ -95,19 +92,6 @@ export default function Note() {
     }
   };
 
-  const addRectangle = () => {
-    const newKey = `rect${layout.length + 1}`;
-    setLayout([...layout, { i: newKey, x: 0, y: layout.length, w: 12, h: 1 }]);
-    setNewRectKey(newKey);
-  };
-
-  const toggleRectMenu = (key: string) => {
-    setRectMenuStates((prev) => ({
-      ...prev,
-      [key]: !prev[key],
-    }));
-  };
-
   return (
     <div className="flex h-screen w-screen flex-col bg-gray-600">
       <NoteHeader />
@@ -117,8 +101,6 @@ export default function Note() {
           handleKeyDown={handleKeyDown}
           newRectKey={newRectKey}
           newRectRef={newRectRef}
-          rectMenuStates={rectMenuStates}
-          toggleRectMenu={toggleRectMenu}
           setLayout={setLayout} // Pass the setLayout function
         />
       </div>

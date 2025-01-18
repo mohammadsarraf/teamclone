@@ -1,9 +1,13 @@
 import React, { useRef, useEffect, useState } from "react";
 import GridLayout from "react-grid-layout";
 import { MdOutlineReorder } from "react-icons/md";
-import { FaJediOrder, FaParagraph } from "react-icons/fa6";
-import ContentEditable, { ContentEditableEvent } from "react-contenteditable";
+import { FaParagraph } from "react-icons/fa6";
 import Menu from "./menu";
+import Task from "./components/Task";
+import Paragraph from "./components/Paragraph";
+import Heading1 from "./components/Heading1"; // Import Heading1 component
+import Heading2 from "./components/Heading2"; // Import Heading2 component
+import Heading3 from "./components/Heading3"; // Import Heading3 component
 
 interface Texts {
   [key: string]: string;
@@ -15,9 +19,10 @@ interface Layout {
   y: number;
   w: number;
   h: number;
+  type?: string;
 }
 
-const calculateDistance = ( // TODO: barely works
+const calculateDistance = (
   iconRef: HTMLDivElement | null,
   containerRef: HTMLDivElement | null,
   setMenuPositionClass: React.Dispatch<React.SetStateAction<string>>,
@@ -28,15 +33,13 @@ const calculateDistance = ( // TODO: barely works
     const iconCenterY = iconRect.top + iconRect.height / 2;
     const distanceTop = iconCenterY - containerRect.top;
     const distanceBottom = containerRect.bottom - iconCenterY;
-    console.log(`Distance from top of container to center of Jedi icon: ${distanceTop}px`);
-
-    const menuHeight = 100; // Assume the menu height is 100px
+    const menuHeight = 100;
     if (distanceTop < (menuHeight / 2) + 300) {
       setMenuPositionClass("top-0");
     } else if (distanceBottom < (menuHeight / 2) + 120) {
       setMenuPositionClass("bottom-0");
     } else {
-      setMenuPositionClass(""); // No change in position
+      setMenuPositionClass("");
     }
   }
 };
@@ -46,7 +49,7 @@ const NoteGrid = ({
   handleKeyDown,
   newRectKey,
   newRectRef,
-  setLayout, // Receive the setLayout function
+  setLayout,
 }: {
   layout: Layout[];
   handleKeyDown: (
@@ -55,18 +58,17 @@ const NoteGrid = ({
   ) => void;
   newRectKey: string | null;
   newRectRef: React.RefObject<HTMLDivElement | null>;
-  toggleRectMenu: (key: string) => void;
-  setLayout: React.Dispatch<React.SetStateAction<Layout[]>>; // Define the type for setLayout
+  setLayout: React.Dispatch<React.SetStateAction<Layout[]>>;
 }) => {
   const [texts, setTexts] = useState<Texts>({ rect1: "" });
   const [menuVisibility, setMenuVisibility] = useState<{ [key: string]: boolean }>({});
   const [menuPositionClass, setMenuPositionClass] = useState<string>("");
-  const [gridWidth, setGridWidth] = useState<number>(0); // Add state for grid width
+  const [gridWidth, setGridWidth] = useState<number>(0);
   const menuRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const contentRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  const rowHeight = 20; // Decrease the row height to reduce the distance between rectangles
+  const rowHeight = 20;
 
   useEffect(() => {
     if (newRectRef.current) {
@@ -81,27 +83,7 @@ const NoteGrid = ({
   }, [newRectKey]);
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (!isAnyMenuVisible) return;
-
-      const target = event.target as Node;
-      if (
-        !Object.values(menuRefs.current).some(
-          (menuRef) => menuRef && menuRef.contains(target),
-        )
-      ) {
-        setMenuVisibility({});
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [menuVisibility]);
-
-  useEffect(() => {
-    setGridWidth(window.innerWidth); // Set grid width on mount
+    setGridWidth(window.innerWidth);
   }, []);
 
   const handleTextChange = (key: string, text: string) => {
@@ -118,10 +100,22 @@ const NoteGrid = ({
       const newHeight = contentElement.scrollHeight / rowHeight;
       setLayout((prevLayout) =>
         prevLayout.map(
-          (item) => (item.i === key ? { ...item, h: newHeight } : item), // Update the height based on the measured height
+          (item) => (item.i === key ? { ...item, h: newHeight } : item),
         ),
       );
     }
+  };
+
+  const handleMenuSelect = (key: string, option: string) => {
+    setTexts((prevTexts) => ({
+      ...prevTexts,
+      [key]: prevTexts[key],
+    }));
+    setLayout((prevLayout) =>
+      prevLayout.map((item) =>
+        item.i === key ? { ...item, type: option } : item
+      )
+    );
   };
 
   const isAnyMenuVisible = Object.values(menuVisibility).some((visible) => visible);
@@ -142,8 +136,8 @@ const NoteGrid = ({
         className="layout"
         layout={layout}
         cols={12}
-        rowHeight={rowHeight} // Use the updated row height
-        width={gridWidth} // Use the state variable for grid width
+        rowHeight={rowHeight}
+        width={gridWidth}
         draggableHandle=".drag-handle"
         useCSSTransforms={true}
         isResizable={false}
@@ -154,41 +148,70 @@ const NoteGrid = ({
         {layout.map((item) => (
           <div
             key={item.i}
-            className={`flex items-center group`} // Add group class for hover effect
+            className="flex items-center group"
             style={{
               height: item.h * rowHeight,
-              zIndex: menuVisibility[item.i] ? 10 : 1, // Conditionally apply zIndex to the rectangle
+              zIndex: menuVisibility[item.i] ? 10 : 1,
             }}
           >
-            <MdOutlineReorder className="drag-handle mr-4 cursor-move opacity-0 group-hover:opacity-100" /> {/* Add hover effect */}
+            <MdOutlineReorder className="drag-handle mr-4 cursor-move opacity-0 group-hover:opacity-100" />
             <div
-              className="mr-4 cursor-pointer opacity-0 group-hover:opacity-100" // Add hover effect
+              className="mr-4 cursor-pointer opacity-0 group-hover:opacity-100"
               onClick={() => {
                 toggleRectMenu(item.i);
                 calculateDistance(menuRefs.current[item.i], containerRef.current, setMenuPositionClass);
               }}
               ref={(el: HTMLDivElement | null) => {
                 menuRefs.current[item.i] = el;
-              }} // Ensure ref assignment returns void
+              }}
             >
               <FaParagraph />
             </div>
             {menuVisibility[item.i] && (
-              <div className={`absolute left-14 z-20 ${menuPositionClass}`}> {/* Apply the dynamic position class */}
+              <div className={`absolute left-14 z-20 ${menuPositionClass}`}>
                 <Menu
                   closeMenu={() => setMenuVisibility({ ...menuVisibility, [item.i]: false })}
-                  onSelect={(option: string) => console.log(option)}
+                  onSelect={(option: string) => handleMenuSelect(item.i, option)}
                   adjustTextareaHeight={() => handleTextChangeWithHeight(item.i, texts[item.i])}
                 />
               </div>
             )}
-            <ContentEditable
-              className="w-full outline-none"
-              html={texts[item.i]} // Use the html prop to set the content
-              onChange={(e: ContentEditableEvent) => handleTextChangeWithHeight(item.i, e.target.value)} // Use onChange with ContentEditableEvent
-              onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => handleKeyDown(item.i, e)}
-              innerRef={(el: HTMLDivElement | null) => (contentRefs.current[item.i] = el)} // Store the ref to measure height
-            />
+            {item.type === "Task" ? (
+              <Task
+                text={texts[item.i]}
+                handleTextChange={(text) => handleTextChangeWithHeight(item.i, text)}
+                handleKeyDown={(e) => handleKeyDown(item.i, e)}
+                textareaRef={(el) => (contentRefs.current[item.i] = el)}
+              />
+            ) : item.type === "Heading 1" ? (
+              <Heading1
+                text={texts[item.i]}
+                handleTextChange={(text) => handleTextChangeWithHeight(item.i, text)}
+                handleKeyDown={(e) => handleKeyDown(item.i, e)}
+                textareaRef={(el) => (contentRefs.current[item.i] = el)}
+              />
+            ) : item.type === "Heading 2" ? (
+              <Heading2
+                text={texts[item.i]}
+                handleTextChange={(text) => handleTextChangeWithHeight(item.i, text)}
+                handleKeyDown={(e) => handleKeyDown(item.i, e)}
+                textareaRef={(el) => (contentRefs.current[item.i] = el)}
+              />
+            ) : item.type === "Heading 3" ? (
+              <Heading3
+                text={texts[item.i]}
+                handleTextChange={(text) => handleTextChangeWithHeight(item.i, text)}
+                handleKeyDown={(e) => handleKeyDown(item.i, e)}
+                textareaRef={(el) => (contentRefs.current[item.i] = el)}
+              />
+            ) : (
+              <Paragraph
+                text={texts[item.i]}
+                handleTextChange={(text) => handleTextChangeWithHeight(item.i, text)}
+                handleKeyDown={(e) => handleKeyDown(item.i, e)}
+                textareaRef={(el) => (contentRefs.current[item.i] = el)}
+              />
+            )}
           </div>
         ))}
       </GridLayout>

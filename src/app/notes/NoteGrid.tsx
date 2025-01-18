@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from "react";
 import GridLayout from "react-grid-layout";
 import { MdOutlineReorder } from "react-icons/md";
 import { FaJediOrder, FaParagraph } from "react-icons/fa6";
-import ContentEditable from "react-contenteditable";
+import ContentEditable, { ContentEditableEvent } from "react-contenteditable";
 import Menu from "./menu";
 
 interface Texts {
@@ -61,6 +61,7 @@ const NoteGrid = ({
   const [texts, setTexts] = useState<Texts>({ rect1: "" });
   const [menuVisibility, setMenuVisibility] = useState<{ [key: string]: boolean }>({});
   const [menuPositionClass, setMenuPositionClass] = useState<string>("");
+  const [gridWidth, setGridWidth] = useState<number>(0); // Add state for grid width
   const menuRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const contentRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -98,6 +99,10 @@ const NoteGrid = ({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [menuVisibility]);
+
+  useEffect(() => {
+    setGridWidth(window.innerWidth); // Set grid width on mount
+  }, []);
 
   const handleTextChange = (key: string, text: string) => {
     setTexts({
@@ -138,7 +143,7 @@ const NoteGrid = ({
         layout={layout}
         cols={12}
         rowHeight={rowHeight} // Use the updated row height
-        width={window.innerWidth}
+        width={gridWidth} // Use the state variable for grid width
         draggableHandle=".drag-handle"
         useCSSTransforms={true}
         isResizable={false}
@@ -156,25 +161,33 @@ const NoteGrid = ({
             }}
           >
             <MdOutlineReorder className="drag-handle mr-4 cursor-move opacity-0 group-hover:opacity-100" /> {/* Add hover effect */}
-            <FaParagraph
+            <div
               className="mr-4 cursor-pointer opacity-0 group-hover:opacity-100" // Add hover effect
               onClick={() => {
                 toggleRectMenu(item.i);
                 calculateDistance(menuRefs.current[item.i], containerRef.current, setMenuPositionClass);
               }}
-              ref={(el) => (menuRefs.current[item.i] = el)}
-            />
+              ref={(el: HTMLDivElement | null) => {
+                menuRefs.current[item.i] = el;
+              }} // Ensure ref assignment returns void
+            >
+              <FaParagraph />
+            </div>
             {menuVisibility[item.i] && (
               <div className={`absolute left-14 z-20 ${menuPositionClass}`}> {/* Apply the dynamic position class */}
-                <Menu />
+                <Menu
+                  closeMenu={() => setMenuVisibility({ ...menuVisibility, [item.i]: false })}
+                  onSelect={(option: string) => console.log(option)}
+                  adjustTextareaHeight={() => handleTextChangeWithHeight(item.i, texts[item.i])}
+                />
               </div>
             )}
             <ContentEditable
               className="w-full outline-none"
               html={texts[item.i]} // Use the html prop to set the content
-              onChange={(e) => handleTextChangeWithHeight(item.i, e.target.value)} // Use onChange instead of onInput
-              onKeyDown={(e) => handleKeyDown(item.i, e)}
-              innerRef={(el) => (contentRefs.current[item.i] = el)} // Store the ref to measure height
+              onChange={(e: ContentEditableEvent) => handleTextChangeWithHeight(item.i, e.target.value)} // Use onChange with ContentEditableEvent
+              onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => handleKeyDown(item.i, e)}
+              innerRef={(el: HTMLDivElement | null) => (contentRefs.current[item.i] = el)} // Store the ref to measure height
             />
           </div>
         ))}

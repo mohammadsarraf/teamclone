@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import GridLayout from "react-grid-layout";
 import { MdOutlineReorder } from "react-icons/md";
-import { FaJediOrder } from "react-icons/fa6";
+import { FaJediOrder, FaParagraph } from "react-icons/fa6";
 import ContentEditable from "react-contenteditable";
 import Menu from "./menu";
 
@@ -16,6 +16,30 @@ interface Layout {
   w: number;
   h: number;
 }
+
+const calculateDistance = ( // TODO: barely works
+  iconRef: HTMLDivElement | null,
+  containerRef: HTMLDivElement | null,
+  setMenuPositionClass: React.Dispatch<React.SetStateAction<string>>,
+) => {
+  if (iconRef && containerRef) {
+    const iconRect = iconRef.getBoundingClientRect();
+    const containerRect = containerRef.getBoundingClientRect();
+    const iconCenterY = iconRect.top + iconRect.height / 2;
+    const distanceTop = iconCenterY - containerRect.top;
+    const distanceBottom = containerRect.bottom - iconCenterY;
+    console.log(`Distance from top of container to center of Jedi icon: ${distanceTop}px`);
+
+    const menuHeight = 100; // Assume the menu height is 100px
+    if (distanceTop < (menuHeight / 2) + 300) {
+      setMenuPositionClass("top-0");
+    } else if (distanceBottom < (menuHeight / 2) + 120) {
+      setMenuPositionClass("bottom-0");
+    } else {
+      setMenuPositionClass(""); // No change in position
+    }
+  }
+};
 
 const NoteGrid = ({
   layout,
@@ -36,8 +60,10 @@ const NoteGrid = ({
 }) => {
   const [texts, setTexts] = useState<Texts>({ rect1: "" });
   const [menuVisibility, setMenuVisibility] = useState<{ [key: string]: boolean }>({});
+  const [menuPositionClass, setMenuPositionClass] = useState<string>("");
   const menuRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const contentRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   const rowHeight = 20; // Decrease the row height to reduce the distance between rectangles
 
@@ -93,18 +119,6 @@ const NoteGrid = ({
     }
   };
 
-  const adjustMenuPosition = (rect: HTMLDivElement) => {
-    const rectBounds = rect.getBoundingClientRect();
-    const menuHeight = 200; // Assume a fixed height for the menu
-    const windowHeight = window.innerHeight;
-
-    if (rectBounds.top + menuHeight > windowHeight) {
-      return { top: rectBounds.top - menuHeight, left: rectBounds.left };
-    } else {
-      return { top: rectBounds.bottom, left: rectBounds.left };
-    }
-  };
-
   const isAnyMenuVisible = Object.values(menuVisibility).some((visible) => visible);
 
   const toggleRectMenu = (key: string) => {
@@ -118,46 +132,54 @@ const NoteGrid = ({
   };
 
   return (
-    <GridLayout
-      className="layout"
-      layout={layout}
-      cols={12}
-      rowHeight={rowHeight} // Use the updated row height
-      width={window.innerWidth}
-      draggableHandle=".drag-handle"
-      useCSSTransforms={true}
-      isResizable={false}
-    >
-      {layout.map((item) => (
-        <div
-          key={item.i}
-          className={`flex items-center b bg-slate-400 `}
-          style={{
-            height: item.h * rowHeight,
-            zIndex: menuVisibility[item.i] ? 10 : 1, // Conditionally apply zIndex to the rectangle
-          }}
-          ref={(el) => (menuRefs.current[item.i] = el)} // Store the ref to adjust menu position
-        >
-          <MdOutlineReorder className="drag-handle mr-4 cursor-move " />
-          <FaJediOrder
-            className="mr-4 cursor-pointer"
-            onClick={() => toggleRectMenu(item.i)}
-          />
-          {menuVisibility[item.i] && (
-            <div className="absolute top-auto left-14 z-20"> {/* Ensure the menu has a high z-index */}
-              <Menu />
-            </div>
-          )}
-          <ContentEditable
-            className="w-full outline-none"
-            html={texts[item.i]} // Use the html prop to set the content
-            onChange={(e) => handleTextChangeWithHeight(item.i, e.target.value)} // Use onChange instead of onInput
-            onKeyDown={(e) => handleKeyDown(item.i, e)}
-            innerRef={(el) => (contentRefs.current[item.i] = el)} // Store the ref to measure height
-          />
-        </div>
-      ))}
-    </GridLayout>
+    <div ref={containerRef}>
+      <GridLayout
+        className="layout"
+        layout={layout}
+        cols={12}
+        rowHeight={rowHeight} // Use the updated row height
+        width={window.innerWidth}
+        draggableHandle=".drag-handle"
+        useCSSTransforms={true}
+        isResizable={false}
+        onDrag={(layout, oldItem, newItem, placeholder, e, element) => {
+          calculateDistance(menuRefs.current[newItem.i], containerRef.current, setMenuPositionClass);
+        }}
+      >
+        {layout.map((item) => (
+          <div
+            key={item.i}
+            className={`flex items-center group`} // Add group class for hover effect
+            style={{
+              height: item.h * rowHeight,
+              zIndex: menuVisibility[item.i] ? 10 : 1, // Conditionally apply zIndex to the rectangle
+            }}
+          >
+            <MdOutlineReorder className="drag-handle mr-4 cursor-move opacity-0 group-hover:opacity-100" /> {/* Add hover effect */}
+            <FaParagraph
+              className="mr-4 cursor-pointer opacity-0 group-hover:opacity-100" // Add hover effect
+              onClick={() => {
+                toggleRectMenu(item.i);
+                calculateDistance(menuRefs.current[item.i], containerRef.current, setMenuPositionClass);
+              }}
+              ref={(el) => (menuRefs.current[item.i] = el)}
+            />
+            {menuVisibility[item.i] && (
+              <div className={`absolute left-14 z-20 ${menuPositionClass}`}> {/* Apply the dynamic position class */}
+                <Menu />
+              </div>
+            )}
+            <ContentEditable
+              className="w-full outline-none"
+              html={texts[item.i]} // Use the html prop to set the content
+              onChange={(e) => handleTextChangeWithHeight(item.i, e.target.value)} // Use onChange instead of onInput
+              onKeyDown={(e) => handleKeyDown(item.i, e)}
+              innerRef={(el) => (contentRefs.current[item.i] = el)} // Store the ref to measure height
+            />
+          </div>
+        ))}
+      </GridLayout>
+    </div>
   );
 };
 

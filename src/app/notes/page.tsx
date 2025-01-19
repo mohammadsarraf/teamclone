@@ -42,6 +42,15 @@ export default function Note() {
     return savedTexts ? JSON.parse(savedTexts) : {};
   });
 
+  const [iconTypes, setIconTypes] = useState<{ [key: string]: string }>(() => {
+    const savedIconTypes = localStorage.getItem("iconTypes");
+    return savedIconTypes ? JSON.parse(savedIconTypes) : {};
+  });
+
+  useEffect(() => {
+    localStorage.setItem("iconTypes", JSON.stringify(iconTypes));
+  }, [iconTypes]);
+
   useEffect(() => {
     localStorage.setItem("title", title);
   }, [title]);
@@ -88,6 +97,12 @@ export default function Note() {
       ];
 
       setLayout(newLayout);
+      setIconTypes((prevIconTypes) => ({
+        ...prevIconTypes,
+        [newKey]: currentType === "Bullet point" || currentType === "Task"
+          ? currentType
+          : "Paragraph",
+      }));
       setNewRectKey(newKey);
       setTimeout(() => {
         if (newRectRef.current) {
@@ -217,6 +232,22 @@ export default function Note() {
     setTexts({}); // Reset the texts state
   };
 
+  const handleMenuSelect = (key: string, option: string) => {
+    setTexts((prevTexts) => ({
+      ...prevTexts,
+      [key]: prevTexts[key],
+    }));
+    setLayout((prevLayout) =>
+      prevLayout.map((item) =>
+        item.i === key ? { ...item, type: option } : item,
+      ),
+    );
+    setIconTypes((prevIconTypes) => ({
+      ...prevIconTypes,
+      [key]: option,
+    }));
+  };
+
   return (
     <div
       className="flex h-screen w-screen flex-col overflow-x-hidden bg-black font-serif sm:h-screen sm:w-screen"
@@ -247,6 +278,8 @@ export default function Note() {
           setLayout={setLayout} // Pass the setLayout function
           texts={texts} // Pass the texts state
           setTexts={setTexts} // Pass the setTexts function
+          iconTypes={iconTypes} // Pass the iconTypes state
+          handleMenuSelect={handleMenuSelect} // Pass the handleMenuSelect function
         />
       </div>
     </div>

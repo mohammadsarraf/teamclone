@@ -12,6 +12,12 @@ import Heading1 from "./components/Heading1";
 import Heading2 from "./components/Heading2";
 import Heading3 from "./components/Heading3";
 import Title from "./components/Title"; // Import Title component
+import { HiH1, HiH2, HiH3 } from "react-icons/hi2";
+import { FaTasks } from "react-icons/fa";
+import { PiListBulletsBold } from "react-icons/pi";
+import { LiaLine } from "react-icons/lia";
+import { TbQuoteOff } from "react-icons/tb";
+import { BsClipboard, BsFillFileEarmarkImageFill } from "react-icons/bs";
 
 interface Texts {
   [key: string]: string;
@@ -58,6 +64,8 @@ const NoteGrid = ({
   setLayout,
   texts,
   setTexts,
+  iconTypes,
+  handleMenuSelect,
 }: {
   layout: Layout[];
   handleKeyDown: (
@@ -73,6 +81,8 @@ const NoteGrid = ({
   setLayout: React.Dispatch<React.SetStateAction<Layout[]>>;
   texts: Texts;
   setTexts: React.Dispatch<React.SetStateAction<Texts>>;
+  iconTypes: { [key: string]: string };
+  handleMenuSelect: (key: string, option: string) => void;
 }) => {
   const initialTexts = layout.reduce((acc, item) => {
     if (item.type === "Title") {
@@ -182,18 +192,6 @@ const NoteGrid = ({
     }
   };
 
-  const handleMenuSelect = (key: string, option: string) => {
-    setTexts((prevTexts) => ({
-      ...prevTexts,
-      [key]: prevTexts[key],
-    }));
-    setLayout((prevLayout) =>
-      prevLayout.map((item) =>
-        item.i === key ? { ...item, type: option } : item,
-      ),
-    );
-  };
-
   const toggleRectMenu = (key: string) => {
     setMenuVisibility((prev) => {
       const newVisibility = { ...prev, [key]: !prev[key] };
@@ -202,6 +200,33 @@ const NoteGrid = ({
       });
       return newVisibility;
     });
+  };
+
+  const getIcon = (type: string) => {
+    switch (type) {
+      case "Task":
+        return <FaTasks />;
+      case "Paragraph":
+        return <FaParagraph />;
+      case "Heading 1":
+        return <HiH1 />;
+      case "Heading 2":
+        return <HiH2 />;
+      case "Heading 3":
+        return <HiH3 />;
+      case "Bullet point":
+        return <PiListBulletsBold />;
+      case "Divider":
+        return <LiaLine />;
+      case "Blockquote":
+        return <TbQuoteOff />;
+      case "Image":
+        return <BsFillFileEarmarkImageFill />;
+      case "Attachment":
+        return <BsClipboard />;
+      default:
+        return <FaParagraph />;
+    }
   };
 
   return (
@@ -245,7 +270,7 @@ const NoteGrid = ({
                     menuRefs.current[item.i] = el;
                   }}
                 >
-                  <FaParagraph />
+                  {getIcon(iconTypes[item.i] || "Paragraph")}
                 </div>
               </>
             )}

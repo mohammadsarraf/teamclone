@@ -39,9 +39,9 @@ const calculateDistance = (
     const distanceTop = iconCenterY - containerRect.top;
     const distanceBottom = containerRect.bottom - iconCenterY;
     const menuHeight = 100;
-    if (distanceTop < (menuHeight / 2) + 300) {
+    if (distanceTop < menuHeight / 2 + 300) {
       setMenuPositionClass("top-0");
-    } else if (distanceBottom < (menuHeight / 2) + 120) {
+    } else if (distanceBottom < menuHeight / 2 + 120) {
       setMenuPositionClass("bottom-0");
     } else {
       setMenuPositionClass("");
@@ -76,7 +76,9 @@ const NoteGrid = ({
   }, {} as Texts);
 
   const [texts, setTexts] = useState<Texts>(initialTexts);
-  const [menuVisibility, setMenuVisibility] = useState<{ [key: string]: boolean }>({});
+  const [menuVisibility, setMenuVisibility] = useState<{
+    [key: string]: boolean;
+  }>({});
   const [menuPositionClass, setMenuPositionClass] = useState<string>("");
   const [gridWidth, setGridWidth] = useState<number>(0);
   const menuRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
@@ -103,7 +105,10 @@ const NoteGrid = ({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
         setMenuVisibility({});
       }
     };
@@ -128,7 +133,9 @@ const NoteGrid = ({
       const newHeight = contentElement.scrollHeight / rowHeight;
       setLayout((prevLayout) =>
         prevLayout.map((item) =>
-          item.i === key && newHeight > item.h ? { ...item, h: newHeight } : item
+          item.i === key && newHeight > item.h
+            ? { ...item, h: newHeight }
+            : item,
         ),
       );
     }
@@ -141,8 +148,8 @@ const NoteGrid = ({
     }));
     setLayout((prevLayout) =>
       prevLayout.map((item) =>
-        item.i === key ? { ...item, type: option } : item
-      )
+        item.i === key ? { ...item, type: option } : item,
+      ),
     );
   };
 
@@ -168,19 +175,22 @@ const NoteGrid = ({
         useCSSTransforms={true}
         isResizable={false}
         onDrag={(layout, oldItem, newItem, placeholder, e, element) => {
-          calculateDistance(menuRefs.current[newItem.i], containerRef.current, setMenuPositionClass);
+          calculateDistance(
+            menuRefs.current[newItem.i],
+            containerRef.current,
+            setMenuPositionClass,
+          );
         }}
       >
-
-{layout.slice(0).map((item) => (
-  <div
-    key={item.i}
-    className="flex items-center group"
-    style={{
-      height: item.h * rowHeight,
-      zIndex: menuVisibility[item.i] ? 10 : 1,
-    }}
-  >
+        {layout.slice(0).map((item) => (
+          <div
+            key={item.i}
+            className="group flex items-center"
+            style={{
+              height: item.h * rowHeight,
+              zIndex: menuVisibility[item.i] ? 10 : 1,
+            }}
+          >
             {item.showIcons && (
               <>
                 <MdOutlineReorder className="drag-handle mr-4 cursor-move opacity-0 group-hover:opacity-100" />
@@ -188,7 +198,11 @@ const NoteGrid = ({
                   className="mr-4 cursor-pointer opacity-0 group-hover:opacity-100"
                   onClick={() => {
                     toggleRectMenu(item.i);
-                    calculateDistance(menuRefs.current[item.i], containerRef.current, setMenuPositionClass);
+                    calculateDistance(
+                      menuRefs.current[item.i],
+                      containerRef.current,
+                      setMenuPositionClass,
+                    );
                   }}
                   ref={(el: HTMLDivElement | null) => {
                     menuRefs.current[item.i] = el;
@@ -201,87 +215,111 @@ const NoteGrid = ({
             {menuVisibility[item.i] && (
               <div className={`absolute left-14 z-20 ${menuPositionClass}`}>
                 <Menu
-                  closeMenu={() => setMenuVisibility({ ...menuVisibility, [item.i]: false })}
-                  onSelect={(option: string) => handleMenuSelect(item.i, option)}
-                  adjustTextareaHeight={() => handleTextChangeWithHeight(item.i, texts[item.i])}
+                  closeMenu={() =>
+                    setMenuVisibility({ ...menuVisibility, [item.i]: false })
+                  }
+                  onSelect={(option: string) =>
+                    handleMenuSelect(item.i, option)
+                  }
+                  adjustTextareaHeight={() =>
+                    handleTextChangeWithHeight(item.i, texts[item.i])
+                  }
                 />
               </div>
             )}
-            { item.type === "Task" ? (
+            {item.type === "Task" ? (
               <Task
                 text={texts[item.i]}
-                handleTextChange={(text) => handleTextChangeWithHeight(item.i, text)}
+                handleTextChange={(text) =>
+                  handleTextChangeWithHeight(item.i, text)
+                }
                 handleKeyDown={(e) => {
                   handleKeyDown(item.i, e);
                   handleArrowNavigation(item.i, e);
                 }}
                 textareaRef={(el) => {
-                  contentRefs.current[item.i] = el as React.RefObject<HTMLElement>;
+                  contentRefs.current[item.i] =
+                    el as React.RefObject<HTMLElement>;
                   if (el) el.setAttribute("data-grid-id", item.i);
                 }}
               />
             ) : item.type === "Heading 1" ? (
               <Heading1
                 text={texts[item.i]}
-                handleTextChange={(text) => handleTextChangeWithHeight(item.i, text)}
+                handleTextChange={(text) =>
+                  handleTextChangeWithHeight(item.i, text)
+                }
                 handleKeyDown={(e) => {
                   handleKeyDown(item.i, e);
                   handleArrowNavigation(item.i, e);
                 }}
                 textareaRef={(el) => {
-                  contentRefs.current[item.i] = el as React.RefObject<HTMLElement>;
+                  contentRefs.current[item.i] =
+                    el as React.RefObject<HTMLElement>;
                   if (el) el.setAttribute("data-grid-id", item.i);
                 }}
               />
             ) : item.type === "Heading 2" ? (
               <Heading2
                 text={texts[item.i]}
-                handleTextChange={(text) => handleTextChangeWithHeight(item.i, text)}
+                handleTextChange={(text) =>
+                  handleTextChangeWithHeight(item.i, text)
+                }
                 handleKeyDown={(e) => {
                   handleKeyDown(item.i, e);
                   handleArrowNavigation(item.i, e);
                 }}
                 textareaRef={(el) => {
-                  contentRefs.current[item.i] = el as React.RefObject<HTMLElement>;
+                  contentRefs.current[item.i] =
+                    el as React.RefObject<HTMLElement>;
                   if (el) el.setAttribute("data-grid-id", item.i);
                 }}
               />
             ) : item.type === "Heading 3" ? (
               <Heading3
                 text={texts[item.i]}
-                handleTextChange={(text) => handleTextChangeWithHeight(item.i, text)}
+                handleTextChange={(text) =>
+                  handleTextChangeWithHeight(item.i, text)
+                }
                 handleKeyDown={(e) => {
                   handleKeyDown(item.i, e);
                   handleArrowNavigation(item.i, e);
                 }}
                 textareaRef={(el) => {
-                  contentRefs.current[item.i] = el as React.RefObject<HTMLElement>;
+                  contentRefs.current[item.i] =
+                    el as React.RefObject<HTMLElement>;
                   if (el) el.setAttribute("data-grid-id", item.i);
                 }}
               />
             ) : item.type === "Bullet point" ? (
               <BulletPoint
                 text={texts[item.i]}
-                handleTextChange={(text) => handleTextChangeWithHeight(item.i, text)}
+                handleTextChange={(text) =>
+                  handleTextChangeWithHeight(item.i, text)
+                }
                 handleKeyDown={(e) => {
                   handleKeyDown(item.i, e);
                   handleArrowNavigation(item.i, e);
                 }}
                 textareaRef={(el) => {
-                  contentRefs.current[item.i] = el as React.RefObject<HTMLElement>;
+                  contentRefs.current[item.i] =
+                    el as React.RefObject<HTMLElement>;
                   if (el) el.setAttribute("data-grid-id", item.i);
                 }}
               />
             ) : (
               <Paragraph
                 text={texts[item.i]}
-                handleTextChange={(text) => handleTextChangeWithHeight(item.i, text)}
+                handleTextChange={(text) =>
+                  handleTextChangeWithHeight(item.i, text)
+                }
                 handleKeyDown={(e) => {
                   handleKeyDown(item.i, e);
                   handleArrowNavigation(item.i, e);
                 }}
                 textareaRef={(el) => {
-                  contentRefs.current[item.i] = el as React.RefObject<HTMLElement>;
+                  contentRefs.current[item.i] =
+                    el as React.RefObject<HTMLElement>;
                   if (el) el.setAttribute("data-grid-id", item.i);
                 }}
               />

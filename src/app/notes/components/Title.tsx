@@ -3,7 +3,7 @@ import ContentEditable, { ContentEditableEvent } from "react-contenteditable";
 
 const Title = ({
   text,
-  placeholder 
+  placeholder,
 }: {
   text: string;
   placeholder?: string;
@@ -20,7 +20,7 @@ const Title = ({
   };
 
   return (
-    <div className="flex w-full items-center relative">
+    <div className="relative flex w-full items-center">
       <ContentEditable
         html={currentText}
         onChange={handleTextChange}

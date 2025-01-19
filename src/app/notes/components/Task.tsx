@@ -8,7 +8,12 @@ interface TaskProps {
   textareaRef: React.RefObject<HTMLElement>;
 }
 
-const Task = ({ text, handleTextChange, handleKeyDown, textareaRef }: TaskProps) => {
+const Task = ({
+  text,
+  handleTextChange,
+  handleKeyDown,
+  textareaRef,
+}: TaskProps) => {
   const [isChecked, setIsChecked] = useState(false);
 
   const handleCheckboxChange = () => {
@@ -18,15 +23,17 @@ const Task = ({ text, handleTextChange, handleKeyDown, textareaRef }: TaskProps)
   return (
     <div className="flex items-center">
       <div
-        className={`w-6 h-6 mr-2 flex items-center justify-center border-2 rounded ${
-          isChecked ? "bg-red-500 border-red-500" : "bg-transparent border-gray-300"
+        className={`mr-2 flex size-6 items-center justify-center rounded border-2 ${
+          isChecked
+            ? "border-red-500 bg-red-500"
+            : "border-gray-300 bg-transparent"
         }`}
         onClick={handleCheckboxChange}
         style={{ minWidth: "1.5rem", minHeight: "1.5rem" }}
       >
         {isChecked && (
           <svg
-            className="w-4 h-4 text-white"
+            className="size-4 text-white"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -46,7 +53,7 @@ const Task = ({ text, handleTextChange, handleKeyDown, textareaRef }: TaskProps)
         onChange={(e: ContentEditableEvent) => handleTextChange(e.target.value)}
         onKeyDown={handleKeyDown}
         className={`w-full resize-none bg-transparent text-2xl outline-none ${
-          isChecked ? "line-through decoration-red-500 text-gray-500" : ""
+          isChecked ? "text-gray-500 line-through decoration-red-500" : ""
         }`}
         innerRef={textareaRef}
       />

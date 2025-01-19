@@ -57,7 +57,10 @@ export default function Note() {
           y: layout[index].y + 1,
           w: 12,
           h: 1,
-          type: currentType === "Bullet point" || currentType === "Task" ? currentType : "Paragraph",
+          type:
+            currentType === "Bullet point" || currentType === "Task"
+              ? currentType
+              : "Paragraph",
           showIcons: true,
         },
         ...layout.slice(index + 1).map((item) => ({ ...item, y: item.y + 1 })),

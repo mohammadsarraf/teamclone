@@ -26,20 +26,22 @@ const Title = ({
   };
 
   return (
-    <div className="relative flex w-full items-center">
+    <div className="relative flex w-3/5 items-center">
       <ContentEditable
         html={currentText}
         onChange={handleTextChange}
         onKeyDown={handleKeyDown}
-        className={`w-full resize-none bg-transparent text-5xl outline-none`}
+        className={`w-full resize-none bg-transparent outline-none`}
         //@ts-ignore
         innerRef={textareaRef}
+        style={{ fontSize: "2rem" }} // Title font size
       />
       {(!currentText || currentText === "<br>") && (
         <div
-          className="absolute top-0 left-0 w-full h-full pointer-events-none text-5xl text-gray-500"
+          className="pointer-events-none absolute left-0 top-0 size-full text-gray-500"
+          style={{ fontSize: "2rem" }} // Title font size
         >
-          {placeholder || "testing"}
+          {placeholder}
         </div>
       )}
     </div>

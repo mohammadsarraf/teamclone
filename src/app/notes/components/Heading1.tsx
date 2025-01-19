@@ -8,20 +8,21 @@ interface Heading1Props {
   textareaRef: React.RefObject<HTMLElement>;
 }
 
-const Heading1 = ({
+const Heading1: React.FC<Heading1Props> = ({
   text,
   handleTextChange,
   handleKeyDown,
   textareaRef,
 }: Heading1Props) => {
   return (
-    <div className="flex items-center">
+    <div className="w-3/5">
       <ContentEditable
         html={text}
         onChange={(e: ContentEditableEvent) => handleTextChange(e.target.value)}
         onKeyDown={handleKeyDown}
-        className="w-full resize-none bg-transparent text-5xl outline-none"
+        className="w-full resize-none bg-transparent outline-none"
         innerRef={textareaRef}
+        style={{ fontSize: "1.5rem" }} // Heading 1 font size
       />
     </div>
   );

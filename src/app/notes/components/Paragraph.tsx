@@ -19,17 +19,19 @@ const Paragraph: React.FC<ParagraphProps> = ({
   placeholder,
 }: ParagraphProps) => {
   return (
-    <div className="relative flex items-center w-full">
+    <div className="relative flex w-3/5 items-center">
       <ContentEditable
         html={text}
         onChange={(e: ContentEditableEvent) => handleTextChange(e.target.value)}
         onKeyDown={handleKeyDown}
         className="w-full resize-none bg-transparent text-2xl outline-none"
         innerRef={textareaRef}
+        style={{ fontSize: "1rem" }} // Paragraph font size
       />
-      {(index === 0) && (!text || text === "<br>") && (
+      {index === 0 && (!text || text === "<br>") && (
         <div
-          className="absolute top-0 left-0 w-full h-full pointer-events-none text-2xl text-gray-500"
+          className="pointer-events-none absolute left-0 top-0 size-full text-2xl text-gray-500"
+          style={{ fontSize: "1rem" }} // Placeholder font size
         >
           {placeholder || "testing"}
         </div>

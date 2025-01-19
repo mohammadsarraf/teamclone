@@ -219,21 +219,21 @@ export default function Note() {
 
   return (
     <div
-      className="flex h-screen w-screen flex-col bg-black font-serif sm:h-screen sm:w-screen"
+      className="flex h-screen w-screen flex-col overflow-x-hidden bg-black font-serif sm:h-screen sm:w-screen"
       style={{ fontFamily: "'Playfair Display', serif" }}
     >
       <NoteHeader />
       <button
         onClick={restartCache}
-        className="m-4 p-2 bg-red-500 text-white rounded"
+        className="m-4 rounded bg-red-500 p-2 text-white"
       >
         Restart Cache
       </button>
-      <div className="w-full flex-1 overflow-auto pl-4 pt-4">
+      <div className="mx-72 w-3/5 flex-1 pl-4 pt-4">
         <div className="mb-10">
           <Title
             text={title}
-            placeholder="Title"
+            placeholder="Add a title"
             setTitle={setTitle}
             handleKeyDown={handleTitleKeyDown}
           />

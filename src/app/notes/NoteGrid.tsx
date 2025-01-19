@@ -83,18 +83,23 @@ const NoteGrid = ({
     return acc;
   }, {} as Texts);
 
-  const initialCheckedState = layout.reduce((acc, item) => {
-    if (item.type === "Task") {
-      acc[item.i] = false;
-    }
-    return acc;
-  }, {} as { [key: string]: boolean });
+  const initialCheckedState = layout.reduce(
+    (acc, item) => {
+      if (item.type === "Task") {
+        acc[item.i] = false;
+      }
+      return acc;
+    },
+    {} as { [key: string]: boolean },
+  );
 
   const [checkedState, setCheckedState] = useState<{ [key: string]: boolean }>(
     () => {
       const savedCheckedState = localStorage.getItem("checkedState");
-      return savedCheckedState ? JSON.parse(savedCheckedState) : initialCheckedState;
-    }
+      return savedCheckedState
+        ? JSON.parse(savedCheckedState)
+        : initialCheckedState;
+    },
   );
 
   useEffect(() => {
@@ -200,7 +205,7 @@ const NoteGrid = ({
   };
 
   return (
-    <div ref={containerRef}>
+    <div ref={containerRef} className="w-3/5">
       <GridLayout
         className="layout"
         layout={layout}
@@ -219,14 +224,10 @@ const NoteGrid = ({
         }}
       >
         {layout.slice(0).map((item, index) => (
-          <div
-            key={item.i}
-            className="group flex items-center"
-            style={{
-              height: item.h * rowHeight,
-              zIndex: menuVisibility[item.i] ? 10 : 1,
-            }}
-          >
+          <div key={item.i} className="group flex items-center"
+              style={{
+                zIndex: menuVisibility[item.i] ? 10 : 1,
+              }}>
             {item.showIcons && (
               <>
                 <MdOutlineReorder className="drag-handle mr-4 cursor-move opacity-0 group-hover:opacity-100" />
@@ -361,7 +362,7 @@ const NoteGrid = ({
                   if (el) el.setAttribute("data-grid-id", item.i);
                 }}
                 index={index}
-                placeholder="Enter text..."
+                placeholder="Start typing, or type '/' to choose a different content type"
               />
             )}
           </div>

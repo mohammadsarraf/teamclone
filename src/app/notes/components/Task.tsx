@@ -19,7 +19,7 @@ const Task = ({
   handleCheckboxChange,
 }: TaskProps) => {
   return (
-    <div className="flex items-center">
+    <div className="flex w-3/5 items-center">
       <div
         className={`mr-2 flex size-6 items-center justify-center rounded border-2 ${
           isChecked
@@ -54,6 +54,7 @@ const Task = ({
           isChecked ? "text-gray-500 line-through decoration-red-500" : ""
         }`}
         innerRef={textareaRef}
+        style={{ fontSize: "1.5rem" }} // Task font size
       />
     </div>
   );

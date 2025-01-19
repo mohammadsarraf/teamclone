@@ -8,7 +8,7 @@ interface BulletPointProps {
   textareaRef: React.RefObject<HTMLElement>;
 }
 
-const BulletPoint = ({
+const BulletPoint: React.FC<BulletPointProps> = ({
   text,
   handleTextChange,
   handleKeyDown,
@@ -16,19 +16,15 @@ const BulletPoint = ({
 }: BulletPointProps) => {
   return (
     <div className="flex items-center">
-      <ul className="list-disc pl-4">
-        <li>
-          <ContentEditable
-            html={text}
-            onChange={(e: ContentEditableEvent) =>
-              handleTextChange(e.target.value)
-            }
-            onKeyDown={handleKeyDown}
-            className="w-full resize-none bg-transparent text-2xl outline-none "
-            innerRef={textareaRef}
-          />
-        </li>
-      </ul>
+      <div className="mr-2">•</div>
+      <ContentEditable
+        html={text}
+        onChange={(e: ContentEditableEvent) => handleTextChange(e.target.value)}
+        onKeyDown={handleKeyDown}
+        className="w-full resize-none bg-transparent outline-none"
+        innerRef={textareaRef}
+        style={{ fontSize: "1rem" }} // Bullet point font size
+      />
     </div>
   );
 };

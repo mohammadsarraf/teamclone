@@ -10,15 +10,15 @@ import { TbQuoteOff } from "react-icons/tb";
 export default function Menu({
   closeMenu,
   adjustTextareaHeight,
-  onSelect, // Add onSelect prop
+  onSelect,
 }: {
   closeMenu: () => void;
   adjustTextareaHeight: () => void;
-  onSelect: (option: string) => void; // Define the type for onSelect
+  onSelect: (option: string) => void;
 }) {
   const handleOptionClick = (option: string) => {
     adjustTextareaHeight();
-    onSelect(option); // Call onSelect with the selected option
+    onSelect(option);
     closeMenu();
   };
 

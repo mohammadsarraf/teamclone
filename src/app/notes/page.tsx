@@ -27,7 +27,49 @@ export default function Note() {
     { i: "rect1", x: 0, y: 1, w: 12, h: 1, type: "Paragraph", showIcons: true },
   ]; // Ensure Title is at the top
 
-  const [layout, setLayout] = useState<Layout[]>(defaultLayout);
+  const [layout, setLayout] = useState<Layout[]>(() => {
+    if (typeof window !== "undefined") {
+      const savedLayout = localStorage.getItem("layout");
+      return savedLayout ? JSON.parse(savedLayout) : defaultLayout;
+    }
+    return defaultLayout;
+  });
+
+  const [title, setTitle] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      const savedTitle = localStorage.getItem("title");
+      return savedTitle ? savedTitle : "";
+    }
+    return "";
+  });
+
+  const [texts, setTexts] = useState<Texts>(() => {
+    if (typeof window !== "undefined") {
+      const savedTexts = localStorage.getItem("texts");
+      return savedTexts ? JSON.parse(savedTexts) : {};
+    }
+    return {};
+  });
+
+  const [iconTypes, setIconTypes] = useState<{ [key: string]: string }>(() => {
+    if (typeof window !== "undefined") {
+      const savedIconTypes = localStorage.getItem("iconTypes");
+      return savedIconTypes ? JSON.parse(savedIconTypes) : {};
+    }
+    return {};
+  });
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("iconTypes", JSON.stringify(iconTypes));
+    }
+  }, [iconTypes]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("title", title);
+    }
+  }, [title]);
 
   const newRectRef = useRef<HTMLDivElement | null>(null);
   const [newRectKey, setNewRectKey] = useState<string | null>(null);
@@ -38,6 +80,12 @@ export default function Note() {
       newRectRef.current.focus();
     }
   }, [newRectKey]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("layout", JSON.stringify(layout));
+    }
+  }, [layout]);
 
   const handleKeyDown = (
     key: string,
@@ -67,6 +115,13 @@ export default function Note() {
       ];
 
       setLayout(newLayout);
+      setIconTypes((prevIconTypes) => ({
+        ...prevIconTypes,
+        [newKey]:
+          currentType === "Bullet point" || currentType === "Task"
+            ? currentType
+            : "Paragraph",
+      }));
       setNewRectKey(newKey);
       setTimeout(() => {
         if (newRectRef.current) {
@@ -163,15 +218,75 @@ export default function Note() {
     }
   };
 
+  const handleTitleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      if (layout.length > 0) {
+        const firstKey = layout[0].i;
+        setNewRectKey(firstKey);
+        setTimeout(() => {
+          const firstElement = document.querySelector(
+            `[data-grid-id="${firstKey}"]`,
+          );
+          if (firstElement) {
+            const range = document.createRange();
+            const sel = window.getSelection();
+            range.selectNodeContents(firstElement);
+            range.collapse(false);
+            sel?.removeAllRanges();
+            sel?.addRange(range);
+          }
+        }, 0);
+      }
+    }
+  };
+
+  const restartCache = () => {
+    localStorage.removeItem("layout");
+    localStorage.removeItem("title");
+    localStorage.removeItem("texts");
+    localStorage.removeItem("checkedState");
+    setLayout(defaultLayout);
+    setTitle("");
+    setTexts({}); // Reset the texts state
+  };
+
+  const handleMenuSelect = (key: string, option: string) => {
+    setTexts((prevTexts) => ({
+      ...prevTexts,
+      [key]: prevTexts[key],
+    }));
+    setLayout((prevLayout) =>
+      prevLayout.map((item) =>
+        item.i === key ? { ...item, type: option } : item,
+      ),
+    );
+    setIconTypes((prevIconTypes) => ({
+      ...prevIconTypes,
+      [key]: option,
+    }));
+  };
+
   return (
     <div
-      className="flex h-screen w-screen flex-col bg-gray-600 font-serif sm:h-screen sm:w-screen"
+      className="flex h-screen w-screen flex-col overflow-x-hidden bg-black font-serif sm:h-screen sm:w-screen"
       style={{ fontFamily: "'Playfair Display', serif" }}
     >
       <NoteHeader />
-      <div className="w-full flex-1 overflow-auto pl-4 pt-4">
+      <button
+        onClick={restartCache}
+        className="m-4 rounded bg-red-500 p-2 text-white"
+      >
+        Restart Cache
+      </button>
+      <div className="mx-72 w-3/5 flex-1 pl-4 pt-4">
         <div className="mb-10">
-          <Title text="" placeholder="Title" />
+          <Title
+            text={title}
+            placeholder="Add a title"
+            setTitle={setTitle}
+            handleKeyDown={handleTitleKeyDown}
+          />
         </div>
         <NoteGrid
           layout={layout}
@@ -180,6 +295,10 @@ export default function Note() {
           newRectKey={newRectKey}
           newRectRef={newRectRef}
           setLayout={setLayout} // Pass the setLayout function
+          texts={texts} // Pass the texts state
+          setTexts={setTexts} // Pass the setTexts function
+          iconTypes={iconTypes} // Pass the iconTypes state
+          handleMenuSelect={handleMenuSelect} // Pass the handleMenuSelect function
         />
       </div>
     </div>

@@ -12,6 +12,12 @@ import Heading1 from "./components/Heading1";
 import Heading2 from "./components/Heading2";
 import Heading3 from "./components/Heading3";
 import Title from "./components/Title"; // Import Title component
+import { HiH1, HiH2, HiH3 } from "react-icons/hi2";
+import { FaTasks } from "react-icons/fa";
+import { PiListBulletsBold } from "react-icons/pi";
+import { LiaLine } from "react-icons/lia";
+import { TbQuoteOff } from "react-icons/tb";
+import { BsClipboard, BsFillFileEarmarkImageFill } from "react-icons/bs";
 
 interface Texts {
   [key: string]: string;
@@ -56,6 +62,10 @@ const NoteGrid = ({
   newRectKey,
   newRectRef,
   setLayout,
+  texts,
+  setTexts,
+  iconTypes,
+  handleMenuSelect,
 }: {
   layout: Layout[];
   handleKeyDown: (
@@ -69,13 +79,55 @@ const NoteGrid = ({
   newRectKey: string | null;
   newRectRef: React.RefObject<HTMLDivElement | null>;
   setLayout: React.Dispatch<React.SetStateAction<Layout[]>>;
+  texts: Texts;
+  setTexts: React.Dispatch<React.SetStateAction<Texts>>;
+  iconTypes: { [key: string]: string };
+  handleMenuSelect: (key: string, option: string) => void;
 }) => {
   const initialTexts = layout.reduce((acc, item) => {
-    acc[item.i] = "";
+    if (item.type === "Title") {
+      acc[item.i] = "Title";
+    } else {
+      acc[item.i] = "";
+    }
     return acc;
   }, {} as Texts);
 
-  const [texts, setTexts] = useState<Texts>(initialTexts);
+  const initialCheckedState = layout.reduce(
+    (acc, item) => {
+      if (item.type === "Task") {
+        acc[item.i] = false;
+      }
+      return acc;
+    },
+    {} as { [key: string]: boolean },
+  );
+
+  const [checkedState, setCheckedState] = useState<{ [key: string]: boolean }>(
+    () => {
+      if (typeof window !== "undefined") {
+        const savedCheckedState = localStorage.getItem("checkedState");
+        return savedCheckedState
+          ? JSON.parse(savedCheckedState)
+          : initialCheckedState;
+      }
+      return initialCheckedState;
+    },
+  );
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("checkedState", JSON.stringify(checkedState));
+    }
+  }, [checkedState]);
+
+  const handleCheckboxChange = (key: string) => {
+    setCheckedState((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+
   const [menuVisibility, setMenuVisibility] = useState<{
     [key: string]: boolean;
   }>({});
@@ -119,6 +171,12 @@ const NoteGrid = ({
     };
   }, [containerRef]);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("texts", JSON.stringify(texts));
+    }
+  }, [texts]);
+
   const handleTextChange = (key: string, text: string) => {
     setTexts({
       ...texts,
@@ -141,18 +199,6 @@ const NoteGrid = ({
     }
   };
 
-  const handleMenuSelect = (key: string, option: string) => {
-    setTexts((prevTexts) => ({
-      ...prevTexts,
-      [key]: prevTexts[key],
-    }));
-    setLayout((prevLayout) =>
-      prevLayout.map((item) =>
-        item.i === key ? { ...item, type: option } : item,
-      ),
-    );
-  };
-
   const toggleRectMenu = (key: string) => {
     setMenuVisibility((prev) => {
       const newVisibility = { ...prev, [key]: !prev[key] };
@@ -163,8 +209,35 @@ const NoteGrid = ({
     });
   };
 
+  const getIcon = (type: string) => {
+    switch (type) {
+      case "Task":
+        return <FaTasks />;
+      case "Paragraph":
+        return <FaParagraph />;
+      case "Heading 1":
+        return <HiH1 />;
+      case "Heading 2":
+        return <HiH2 />;
+      case "Heading 3":
+        return <HiH3 />;
+      case "Bullet point":
+        return <PiListBulletsBold />;
+      case "Divider":
+        return <LiaLine />;
+      case "Blockquote":
+        return <TbQuoteOff />;
+      case "Image":
+        return <BsFillFileEarmarkImageFill />;
+      case "Attachment":
+        return <BsClipboard />;
+      default:
+        return <FaParagraph />;
+    }
+  };
+
   return (
-    <div ref={containerRef}>
+    <div ref={containerRef} className="w-3/5">
       <GridLayout
         className="layout"
         layout={layout}
@@ -182,12 +255,11 @@ const NoteGrid = ({
           );
         }}
       >
-        {layout.slice(0).map((item) => (
+        {layout.slice(0).map((item, index) => (
           <div
             key={item.i}
             className="group flex items-center"
             style={{
-              height: item.h * rowHeight,
               zIndex: menuVisibility[item.i] ? 10 : 1,
             }}
           >
@@ -208,7 +280,7 @@ const NoteGrid = ({
                     menuRefs.current[item.i] = el;
                   }}
                 >
-                  <FaParagraph />
+                  {getIcon(iconTypes[item.i] || "Paragraph")}
                 </div>
               </>
             )}
@@ -242,6 +314,8 @@ const NoteGrid = ({
                     el as React.RefObject<HTMLElement>;
                   if (el) el.setAttribute("data-grid-id", item.i);
                 }}
+                isChecked={checkedState[item.i]}
+                handleCheckboxChange={() => handleCheckboxChange(item.i)}
               />
             ) : item.type === "Heading 1" ? (
               <Heading1
@@ -322,6 +396,8 @@ const NoteGrid = ({
                     el as React.RefObject<HTMLElement>;
                   if (el) el.setAttribute("data-grid-id", item.i);
                 }}
+                index={index}
+                placeholder="Start typing, or type '/' to choose a different content type"
               />
             )}
           </div>

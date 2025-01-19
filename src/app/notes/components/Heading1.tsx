@@ -15,14 +15,14 @@ const Heading1: React.FC<Heading1Props> = ({
   textareaRef,
 }: Heading1Props) => {
   return (
-    <div className="w-3/5">
+    <div className="w-3/5 font-bold">
       <ContentEditable
         html={text}
         onChange={(e: ContentEditableEvent) => handleTextChange(e.target.value)}
         onKeyDown={handleKeyDown}
         className="w-full resize-none bg-transparent outline-none"
         innerRef={textareaRef}
-        style={{ fontSize: "1.5rem" }} // Heading 1 font size
+        style={{ fontSize: "2rem" }} // Heading 1 font size
       />
     </div>
   );

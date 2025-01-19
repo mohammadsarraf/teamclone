@@ -1,12 +1,12 @@
 "use client";
 import React, { useState, useRef, useEffect, RefObject } from "react";
-import GridLayout from "react-grid-layout";
-import { MdOutlineReorder } from "react-icons/md";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
-import { FaJediOrder } from "react-icons/fa6";
 import NoteGrid from "./NoteGrid";
 import NoteHeader from "./NoteHeader";
+import "@fontsource/playfair-display"; // Defaults to weight 400
+import "@fontsource/playfair-display/700.css"; // For weight 700
+import Title from "./components/Title";
 
 interface Texts {
   [key: string]: string;
@@ -18,20 +18,20 @@ interface Layout {
   y: number;
   w: number;
   h: number;
+  type?: string; // Add type property to Layout interface
+  showIcons: boolean; // Add showIcons property to Layout interface
 }
 
-
 export default function Note() {
-  const defaultLayout = [{ i: "rect1", x: 0, y: 0, w: 12, h: 1 }];
+  const defaultLayout = [
+    { i: "rect1", x: 0, y: 1, w: 12, h: 1, type: "Paragraph", showIcons: true },
+  ]; // Ensure Title is at the top
 
   const [layout, setLayout] = useState<Layout[]>(defaultLayout);
 
   const newRectRef = useRef<HTMLDivElement | null>(null);
   const [newRectKey, setNewRectKey] = useState<string | null>(null);
   const [isClicked, setIsClicked] = useState(false);
-  const [rectMenuStates, setRectMenuStates] = useState<{
-    [key: string]: boolean;
-  }>({});
 
   useEffect(() => {
     if (newRectRef.current) {
@@ -47,10 +47,22 @@ export default function Note() {
       event.preventDefault();
       const newKey = `rect${layout.length + 1}`;
       const index = layout.findIndex((item) => item.i === key);
+      const currentType = layout[index].type;
 
       const newLayout = [
         ...layout.slice(0, index + 1),
-        { i: newKey, x: 0, y: layout[index].y + 1, w: 12, h: 1 },
+        {
+          i: newKey,
+          x: 0,
+          y: layout[index].y + 1,
+          w: 12,
+          h: 1,
+          type:
+            currentType === "Bullet point" || currentType === "Task"
+              ? currentType
+              : "Paragraph",
+          showIcons: true,
+        },
         ...layout.slice(index + 1).map((item) => ({ ...item, y: item.y + 1 })),
       ];
 
@@ -67,6 +79,48 @@ export default function Note() {
     ) {
       event.preventDefault();
       removeRectangle(key);
+    }
+  };
+
+  const handleArrowNavigation = (
+    key: string,
+    event: React.KeyboardEvent<HTMLDivElement>,
+  ) => {
+    const index = layout.findIndex((item) => item.i === key);
+    if (event.key === "ArrowUp" && index > 0) {
+      event.preventDefault();
+      const prevKey = layout[index - 1].i;
+      setNewRectKey(prevKey);
+      setTimeout(() => {
+        const prevElement = document.querySelector(
+          `[data-grid-id="${prevKey}"]`,
+        );
+        if (prevElement) {
+          const range = document.createRange();
+          const sel = window.getSelection();
+          range.selectNodeContents(prevElement);
+          range.collapse(false);
+          sel?.removeAllRanges();
+          sel?.addRange(range);
+        }
+      }, 0);
+    } else if (event.key === "ArrowDown" && index < layout.length - 1) {
+      event.preventDefault();
+      const nextKey = layout[index + 1].i;
+      setNewRectKey(nextKey);
+      setTimeout(() => {
+        const nextElement = document.querySelector(
+          `[data-grid-id="${nextKey}"]`,
+        );
+        if (nextElement) {
+          const range = document.createRange();
+          const sel = window.getSelection();
+          range.selectNodeContents(nextElement);
+          range.collapse(false);
+          sel?.removeAllRanges();
+          sel?.addRange(range);
+        }
+      }, 0);
     }
   };
 
@@ -88,37 +142,43 @@ export default function Note() {
     } else {
       const index = layout.findIndex((item) => item.i === key);
       if (index > 0) {
-        setNewRectKey(layout[index - 1].i);
+        const prevKey = layout[index - 1].i;
+        setNewRectKey(prevKey);
+        setTimeout(() => {
+          const prevElement = document.querySelector(
+            `[data-grid-id="${prevKey}"]`,
+          );
+          if (prevElement) {
+            const range = document.createRange();
+            const sel = window.getSelection();
+            range.selectNodeContents(prevElement);
+            range.collapse(false);
+            sel?.removeAllRanges();
+            sel?.addRange(range);
+          }
+        }, 0);
       } else if (newLayout.length > 0) {
         setNewRectKey(newLayout[0].i);
       }
     }
   };
 
-  const addRectangle = () => {
-    const newKey = `rect${layout.length + 1}`;
-    setLayout([...layout, { i: newKey, x: 0, y: layout.length, w: 12, h: 1 }]);
-    setNewRectKey(newKey);
-  };
-
-  const toggleRectMenu = (key: string) => {
-    setRectMenuStates((prev) => ({
-      ...prev,
-      [key]: !prev[key],
-    }));
-  };
-
   return (
-    <div className="flex h-screen w-screen flex-col bg-gray-600">
+    <div
+      className="flex h-screen w-screen flex-col bg-gray-600 font-serif sm:h-screen sm:w-screen"
+      style={{ fontFamily: "'Playfair Display', serif" }}
+    >
       <NoteHeader />
       <div className="w-full flex-1 overflow-auto pl-4 pt-4">
+        <div className="mb-10">
+          <Title text="" placeholder="Title" />
+        </div>
         <NoteGrid
           layout={layout}
           handleKeyDown={handleKeyDown}
+          handleArrowNavigation={handleArrowNavigation} // Pass the handleArrowNavigation function
           newRectKey={newRectKey}
           newRectRef={newRectRef}
-          rectMenuStates={rectMenuStates}
-          toggleRectMenu={toggleRectMenu}
           setLayout={setLayout} // Pass the setLayout function
         />
       </div>

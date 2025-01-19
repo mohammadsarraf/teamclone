@@ -1,0 +1,8 @@
+.placeholder::before {
+    content: attr(data-placeholder);
+    color: gray;
+    pointer-events: none;
+    font-size: inherit;
+    line-height: inherit;
+  }
+  

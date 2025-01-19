@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import ContentEditable, { ContentEditableEvent } from "react-contenteditable";
 
 interface TaskProps {
@@ -6,6 +6,8 @@ interface TaskProps {
   handleTextChange: (value: string) => void;
   handleKeyDown: (event: React.KeyboardEvent) => void;
   textareaRef: React.RefObject<HTMLElement>;
+  isChecked: boolean;
+  handleCheckboxChange: () => void;
 }
 
 const Task = ({
@@ -13,13 +15,9 @@ const Task = ({
   handleTextChange,
   handleKeyDown,
   textareaRef,
+  isChecked,
+  handleCheckboxChange,
 }: TaskProps) => {
-  const [isChecked, setIsChecked] = useState(false);
-
-  const handleCheckboxChange = () => {
-    setIsChecked(!isChecked);
-  };
-
   return (
     <div className="flex items-center">
       <div

@@ -6,6 +6,8 @@ interface ParagraphProps {
   handleTextChange: (value: string) => void;
   handleKeyDown: (event: React.KeyboardEvent) => void;
   textareaRef: React.RefObject<HTMLElement>;
+  index: number;
+  placeholder?: string;
 }
 
 const Paragraph: React.FC<ParagraphProps> = ({
@@ -13,9 +15,11 @@ const Paragraph: React.FC<ParagraphProps> = ({
   handleTextChange,
   handleKeyDown,
   textareaRef,
+  index,
+  placeholder,
 }: ParagraphProps) => {
   return (
-    <div className="flex items-center">
+    <div className="relative flex items-center w-full">
       <ContentEditable
         html={text}
         onChange={(e: ContentEditableEvent) => handleTextChange(e.target.value)}
@@ -23,6 +27,13 @@ const Paragraph: React.FC<ParagraphProps> = ({
         className="w-full resize-none bg-transparent text-2xl outline-none"
         innerRef={textareaRef}
       />
+      {(index === 0) && (!text || text === "<br>") && (
+        <div
+          className="absolute top-0 left-0 w-full h-full pointer-events-none text-2xl text-gray-500"
+        >
+          {placeholder || "testing"}
+        </div>
+      )}
     </div>
   );
 };

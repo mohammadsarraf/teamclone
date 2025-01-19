@@ -71,11 +71,44 @@ const NoteGrid = ({
   setLayout: React.Dispatch<React.SetStateAction<Layout[]>>;
 }) => {
   const initialTexts = layout.reduce((acc, item) => {
-    acc[item.i] = "";
+    if (item.type === "Title") {
+      acc[item.i] = "Title";
+    } else {
+      acc[item.i] = "";
+    }
     return acc;
   }, {} as Texts);
 
-  const [texts, setTexts] = useState<Texts>(initialTexts);
+  const [texts, setTexts] = useState<Texts>(() => {
+    const savedTexts = localStorage.getItem("texts");
+    return savedTexts ? JSON.parse(savedTexts) : initialTexts;
+  });
+
+  const initialCheckedState = layout.reduce((acc, item) => {
+    if (item.type === "Task") {
+      acc[item.i] = false;
+    }
+    return acc;
+  }, {} as { [key: string]: boolean });
+
+  const [checkedState, setCheckedState] = useState<{ [key: string]: boolean }>(
+    () => {
+      const savedCheckedState = localStorage.getItem("checkedState");
+      return savedCheckedState ? JSON.parse(savedCheckedState) : initialCheckedState;
+    }
+  );
+
+  useEffect(() => {
+    localStorage.setItem("checkedState", JSON.stringify(checkedState));
+  }, [checkedState]);
+
+  const handleCheckboxChange = (key: string) => {
+    setCheckedState((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+
   const [menuVisibility, setMenuVisibility] = useState<{
     [key: string]: boolean;
   }>({});
@@ -118,6 +151,10 @@ const NoteGrid = ({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [containerRef]);
+
+  useEffect(() => {
+    localStorage.setItem("texts", JSON.stringify(texts));
+  }, [texts]);
 
   const handleTextChange = (key: string, text: string) => {
     setTexts({
@@ -182,7 +219,7 @@ const NoteGrid = ({
           );
         }}
       >
-        {layout.slice(0).map((item) => (
+        {layout.slice(0).map((item, index) => (
           <div
             key={item.i}
             className="group flex items-center"
@@ -242,6 +279,8 @@ const NoteGrid = ({
                     el as React.RefObject<HTMLElement>;
                   if (el) el.setAttribute("data-grid-id", item.i);
                 }}
+                isChecked={checkedState[item.i]}
+                handleCheckboxChange={() => handleCheckboxChange(item.i)}
               />
             ) : item.type === "Heading 1" ? (
               <Heading1
@@ -322,6 +361,8 @@ const NoteGrid = ({
                     el as React.RefObject<HTMLElement>;
                   if (el) el.setAttribute("data-grid-id", item.i);
                 }}
+                index={index}
+                placeholder="Enter text..."
               />
             )}
           </div>

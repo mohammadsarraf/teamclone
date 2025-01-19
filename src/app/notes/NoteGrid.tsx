@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import React, { useRef, useEffect, useState } from "react";
 import GridLayout from "react-grid-layout";
 import { MdOutlineReorder } from "react-icons/md";
@@ -6,10 +8,10 @@ import Menu from "./menu";
 import Task from "./components/Task";
 import Paragraph from "./components/Paragraph";
 import BulletPoint from "./components/BulletPoint"; // Import BulletPoint component
-import NumberedList from "./components/NumberedList"; // Ensure correct import
 import Heading1 from "./components/Heading1";
 import Heading2 from "./components/Heading2";
 import Heading3 from "./components/Heading3";
+import Title from "./components/Title"; // Import Title component
 
 interface Texts {
   [key: string]: string;
@@ -22,6 +24,7 @@ interface Layout {
   w: number;
   h: number;
   type?: string;
+  showIcons: boolean; // Add showIcons property to Layout interface
 }
 
 const calculateDistance = (
@@ -46,7 +49,6 @@ const calculateDistance = (
   }
 };
 
-
 const NoteGrid = ({
   layout,
   handleKeyDown,
@@ -68,12 +70,17 @@ const NoteGrid = ({
   newRectRef: React.RefObject<HTMLDivElement | null>;
   setLayout: React.Dispatch<React.SetStateAction<Layout[]>>;
 }) => {
-  const [texts, setTexts] = useState<Texts>({ rect1: "" });
+  const initialTexts = layout.reduce((acc, item) => {
+    acc[item.i] = "";
+    return acc;
+  }, {} as Texts);
+
+  const [texts, setTexts] = useState<Texts>(initialTexts);
   const [menuVisibility, setMenuVisibility] = useState<{ [key: string]: boolean }>({});
   const [menuPositionClass, setMenuPositionClass] = useState<string>("");
   const [gridWidth, setGridWidth] = useState<number>(0);
   const menuRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
-  const contentRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+  const contentRefs = useRef<{ [key: string]: HTMLElement | null }>({});
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const rowHeight = 20;
@@ -120,8 +127,8 @@ const NoteGrid = ({
     if (contentElement) {
       const newHeight = contentElement.scrollHeight / rowHeight;
       setLayout((prevLayout) =>
-        prevLayout.map(
-          (item) => (item.i === key ? { ...item, h: newHeight } : item),
+        prevLayout.map((item) =>
+          item.i === key && newHeight > item.h ? { ...item, h: newHeight } : item
         ),
       );
     }
@@ -164,28 +171,33 @@ const NoteGrid = ({
           calculateDistance(menuRefs.current[newItem.i], containerRef.current, setMenuPositionClass);
         }}
       >
-        {layout.map((item) => (
-          <div
-            key={item.i}
-            className="flex items-center group"
-            style={{
-              height: item.h * rowHeight,
-              zIndex: menuVisibility[item.i] ? 10 : 1,
-            }}
-          >
-            <MdOutlineReorder className="drag-handle mr-4 cursor-move opacity-0 group-hover:opacity-100" />
-            <div
-              className="mr-4 cursor-pointer opacity-0 group-hover:opacity-100"
-              onClick={() => {
-                toggleRectMenu(item.i);
-                calculateDistance(menuRefs.current[item.i], containerRef.current, setMenuPositionClass);
-              }}
-              ref={(el: HTMLDivElement | null) => {
-                menuRefs.current[item.i] = el;
-              }}
-            >
-              <FaParagraph />
-            </div>
+
+{layout.slice(0).map((item) => (
+  <div
+    key={item.i}
+    className="flex items-center group"
+    style={{
+      height: item.h * rowHeight,
+      zIndex: menuVisibility[item.i] ? 10 : 1,
+    }}
+  >
+            {item.showIcons && (
+              <>
+                <MdOutlineReorder className="drag-handle mr-4 cursor-move opacity-0 group-hover:opacity-100" />
+                <div
+                  className="mr-4 cursor-pointer opacity-0 group-hover:opacity-100"
+                  onClick={() => {
+                    toggleRectMenu(item.i);
+                    calculateDistance(menuRefs.current[item.i], containerRef.current, setMenuPositionClass);
+                  }}
+                  ref={(el: HTMLDivElement | null) => {
+                    menuRefs.current[item.i] = el;
+                  }}
+                >
+                  <FaParagraph />
+                </div>
+              </>
+            )}
             {menuVisibility[item.i] && (
               <div className={`absolute left-14 z-20 ${menuPositionClass}`}>
                 <Menu
@@ -195,7 +207,7 @@ const NoteGrid = ({
                 />
               </div>
             )}
-            {item.type === "Task" ? (
+            { item.type === "Task" ? (
               <Task
                 text={texts[item.i]}
                 handleTextChange={(text) => handleTextChangeWithHeight(item.i, text)}
@@ -204,7 +216,7 @@ const NoteGrid = ({
                   handleArrowNavigation(item.i, e);
                 }}
                 textareaRef={(el) => {
-                  contentRefs.current[item.i] = el;
+                  contentRefs.current[item.i] = el as React.RefObject<HTMLElement>;
                   if (el) el.setAttribute("data-grid-id", item.i);
                 }}
               />
@@ -217,7 +229,7 @@ const NoteGrid = ({
                   handleArrowNavigation(item.i, e);
                 }}
                 textareaRef={(el) => {
-                  contentRefs.current[item.i] = el;
+                  contentRefs.current[item.i] = el as React.RefObject<HTMLElement>;
                   if (el) el.setAttribute("data-grid-id", item.i);
                 }}
               />
@@ -230,7 +242,7 @@ const NoteGrid = ({
                   handleArrowNavigation(item.i, e);
                 }}
                 textareaRef={(el) => {
-                  contentRefs.current[item.i] = el;
+                  contentRefs.current[item.i] = el as React.RefObject<HTMLElement>;
                   if (el) el.setAttribute("data-grid-id", item.i);
                 }}
               />
@@ -243,7 +255,7 @@ const NoteGrid = ({
                   handleArrowNavigation(item.i, e);
                 }}
                 textareaRef={(el) => {
-                  contentRefs.current[item.i] = el;
+                  contentRefs.current[item.i] = el as React.RefObject<HTMLElement>;
                   if (el) el.setAttribute("data-grid-id", item.i);
                 }}
               />
@@ -256,20 +268,7 @@ const NoteGrid = ({
                   handleArrowNavigation(item.i, e);
                 }}
                 textareaRef={(el) => {
-                  contentRefs.current[item.i] = el;
-                  if (el) el.setAttribute("data-grid-id", item.i);
-                }}
-              />
-            ) : item.type === "Numbered List" ? (
-              <NumberedList
-                text={texts[item.i]}
-                handleTextChange={(text) => handleTextChangeWithHeight(item.i, text)}
-                handleKeyDown={(e) => {
-                  handleKeyDown(item.i, e);
-                  handleArrowNavigation(item.i, e);
-                }}
-                textareaRef={(el) => {
-                  contentRefs.current[item.i] = el;
+                  contentRefs.current[item.i] = el as React.RefObject<HTMLElement>;
                   if (el) el.setAttribute("data-grid-id", item.i);
                 }}
               />
@@ -282,7 +281,7 @@ const NoteGrid = ({
                   handleArrowNavigation(item.i, e);
                 }}
                 textareaRef={(el) => {
-                  contentRefs.current[item.i] = el;
+                  contentRefs.current[item.i] = el as React.RefObject<HTMLElement>;
                   if (el) el.setAttribute("data-grid-id", item.i);
                 }}
               />

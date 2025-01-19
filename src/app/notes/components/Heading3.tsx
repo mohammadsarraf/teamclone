@@ -1,7 +1,19 @@
 import React from "react";
 import ContentEditable, { ContentEditableEvent } from "react-contenteditable";
 
-const Heading3 = ({ text, handleTextChange, handleKeyDown, textareaRef }) => {
+interface Heading3Props {
+  text: string;
+  handleTextChange: (value: string) => void;
+  handleKeyDown: (event: React.KeyboardEvent) => void;
+  textareaRef: React.RefObject<HTMLElement>;
+}
+
+const Heading3 = ({
+  text,
+  handleTextChange,
+  handleKeyDown,
+  textareaRef,
+}: Heading3Props) => {
   return (
     <div className="flex items-center">
       <ContentEditable

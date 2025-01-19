@@ -78,13 +78,13 @@ export default function Menu({
           <PiListBulletsBold />
           Bullet point
         </button>
-        <button
+        {/* <button
           className="flex w-full items-center gap-2 px-2 py-1 text-left hover:bg-gray-500 focus:bg-gray-500"
           onClick={() => handleOptionClick("Numbered List")}
         >
           <HiNumberedList />
           Numbered List
-        </button>
+        </button> */}
         <button
           className="flex w-full items-center gap-2 px-2 py-1 text-left hover:bg-gray-500 focus:bg-gray-500"
           onClick={() => handleOptionClick("Blockquote")}

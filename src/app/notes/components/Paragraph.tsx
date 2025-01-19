@@ -1,7 +1,19 @@
 import React from "react";
 import ContentEditable, { ContentEditableEvent } from "react-contenteditable";
 
-const Paragraph = ({ text, handleTextChange, handleKeyDown, textareaRef }) => {
+interface ParagraphProps {
+  text: string;
+  handleTextChange: (value: string) => void;
+  handleKeyDown: (event: React.KeyboardEvent) => void;
+  textareaRef: React.RefObject<HTMLElement>;
+}
+
+const Paragraph: React.FC<ParagraphProps> = ({
+  text,
+  handleTextChange,
+  handleKeyDown,
+  textareaRef,
+}: ParagraphProps) => {
   return (
     <div className="flex items-center">
       <ContentEditable

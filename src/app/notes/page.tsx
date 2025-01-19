@@ -1,12 +1,12 @@
 "use client";
 import React, { useState, useRef, useEffect, RefObject } from "react";
-import GridLayout from "react-grid-layout";
-import { MdOutlineReorder } from "react-icons/md";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
-import { FaJediOrder } from "react-icons/fa6";
 import NoteGrid from "./NoteGrid";
 import NoteHeader from "./NoteHeader";
+import "@fontsource/playfair-display"; // Defaults to weight 400
+import "@fontsource/playfair-display/700.css"; // For weight 700
+import Title from "./components/Title";
 
 interface Texts {
   [key: string]: string;
@@ -19,10 +19,13 @@ interface Layout {
   w: number;
   h: number;
   type?: string; // Add type property to Layout interface
+  showIcons: boolean; // Add showIcons property to Layout interface
 }
 
 export default function Note() {
-  const defaultLayout = [{ i: "rect1", x: 0, y: 0, w: 12, h: 1, type: "Paragraph" }]; // Set default type to Paragraph
+  const defaultLayout = [
+    { i: "rect1", x: 0, y: 1, w: 12, h: 1, type: "Paragraph", showIcons: true },
+  ]; // Ensure Title is at the top
 
   const [layout, setLayout] = useState<Layout[]>(defaultLayout);
 
@@ -48,7 +51,15 @@ export default function Note() {
 
       const newLayout = [
         ...layout.slice(0, index + 1),
-        { i: newKey, x: 0, y: layout[index].y + 1, w: 12, h: 1, type: currentType === "Task" || currentType === "Bullet point" || currentType === "Numbered List" ? currentType : "Paragraph" }, // Set type based on current type
+        {
+          i: newKey,
+          x: 0,
+          y: layout[index].y + 1,
+          w: 12,
+          h: 1,
+          type: currentType === "Bullet point" || currentType === "Task" ? currentType : "Paragraph",
+          showIcons: true,
+        },
         ...layout.slice(index + 1).map((item) => ({ ...item, y: item.y + 1 })),
       ];
 
@@ -70,7 +81,7 @@ export default function Note() {
 
   const handleArrowNavigation = (
     key: string,
-    event: React.KeyboardEvent<HTMLDivElement>
+    event: React.KeyboardEvent<HTMLDivElement>,
   ) => {
     const index = layout.findIndex((item) => item.i === key);
     if (event.key === "ArrowUp" && index > 0) {
@@ -78,7 +89,9 @@ export default function Note() {
       const prevKey = layout[index - 1].i;
       setNewRectKey(prevKey);
       setTimeout(() => {
-        const prevElement = document.querySelector(`[data-grid-id="${prevKey}"]`);
+        const prevElement = document.querySelector(
+          `[data-grid-id="${prevKey}"]`,
+        );
         if (prevElement) {
           const range = document.createRange();
           const sel = window.getSelection();
@@ -93,7 +106,9 @@ export default function Note() {
       const nextKey = layout[index + 1].i;
       setNewRectKey(nextKey);
       setTimeout(() => {
-        const nextElement = document.querySelector(`[data-grid-id="${nextKey}"]`);
+        const nextElement = document.querySelector(
+          `[data-grid-id="${nextKey}"]`,
+        );
         if (nextElement) {
           const range = document.createRange();
           const sel = window.getSelection();
@@ -127,7 +142,9 @@ export default function Note() {
         const prevKey = layout[index - 1].i;
         setNewRectKey(prevKey);
         setTimeout(() => {
-          const prevElement = document.querySelector(`[data-grid-id="${prevKey}"]`);
+          const prevElement = document.querySelector(
+            `[data-grid-id="${prevKey}"]`,
+          );
           if (prevElement) {
             const range = document.createRange();
             const sel = window.getSelection();
@@ -144,9 +161,15 @@ export default function Note() {
   };
 
   return (
-    <div className="flex h-screen w-screen flex-col bg-gray-600">
+    <div
+      className="flex h-screen w-screen flex-col bg-gray-600 font-serif sm:h-screen sm:w-screen"
+      style={{ fontFamily: "'Playfair Display', serif" }}
+    >
       <NoteHeader />
       <div className="w-full flex-1 overflow-auto pl-4 pt-4">
+        <div className="mb-10">
+          <Title text="" placeholder="Title" />
+        </div>
         <NoteGrid
           layout={layout}
           handleKeyDown={handleKeyDown}

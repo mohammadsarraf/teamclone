@@ -11,7 +11,7 @@ interface ParagraphProps {
 }
 
 const Paragraph: React.FC<ParagraphProps> = ({
-  text,
+  text = "", // Set default value to an empty string
   handleTextChange,
   handleKeyDown,
   textareaRef,

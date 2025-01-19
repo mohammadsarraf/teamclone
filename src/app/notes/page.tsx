@@ -37,6 +37,11 @@ export default function Note() {
     return savedTitle ? savedTitle : "";
   });
 
+  const [texts, setTexts] = useState<Texts>(() => {
+    const savedTexts = localStorage.getItem("texts");
+    return savedTexts ? JSON.parse(savedTexts) : {};
+  });
+
   useEffect(() => {
     localStorage.setItem("title", title);
   }, [title]);
@@ -209,6 +214,7 @@ export default function Note() {
     localStorage.removeItem("checkedState");
     setLayout(defaultLayout);
     setTitle("");
+    setTexts({}); // Reset the texts state
   };
 
   return (
@@ -239,6 +245,8 @@ export default function Note() {
           newRectKey={newRectKey}
           newRectRef={newRectRef}
           setLayout={setLayout} // Pass the setLayout function
+          texts={texts} // Pass the texts state
+          setTexts={setTexts} // Pass the setTexts function
         />
       </div>
     </div>

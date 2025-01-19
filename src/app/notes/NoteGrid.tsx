@@ -56,6 +56,8 @@ const NoteGrid = ({
   newRectKey,
   newRectRef,
   setLayout,
+  texts,
+  setTexts,
 }: {
   layout: Layout[];
   handleKeyDown: (
@@ -69,6 +71,8 @@ const NoteGrid = ({
   newRectKey: string | null;
   newRectRef: React.RefObject<HTMLDivElement | null>;
   setLayout: React.Dispatch<React.SetStateAction<Layout[]>>;
+  texts: Texts;
+  setTexts: React.Dispatch<React.SetStateAction<Texts>>;
 }) => {
   const initialTexts = layout.reduce((acc, item) => {
     if (item.type === "Title") {
@@ -78,11 +82,6 @@ const NoteGrid = ({
     }
     return acc;
   }, {} as Texts);
-
-  const [texts, setTexts] = useState<Texts>(() => {
-    const savedTexts = localStorage.getItem("texts");
-    return savedTexts ? JSON.parse(savedTexts) : initialTexts;
-  });
 
   const initialCheckedState = layout.reduce((acc, item) => {
     if (item.type === "Task") {

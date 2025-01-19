@@ -28,31 +28,47 @@ export default function Note() {
   ]; // Ensure Title is at the top
 
   const [layout, setLayout] = useState<Layout[]>(() => {
-    const savedLayout = localStorage.getItem("layout");
-    return savedLayout ? JSON.parse(savedLayout) : defaultLayout;
+    if (typeof window !== "undefined") {
+      const savedLayout = localStorage.getItem("layout");
+      return savedLayout ? JSON.parse(savedLayout) : defaultLayout;
+    }
+    return defaultLayout;
   });
 
   const [title, setTitle] = useState<string>(() => {
-    const savedTitle = localStorage.getItem("title");
-    return savedTitle ? savedTitle : "";
+    if (typeof window !== "undefined") {
+      const savedTitle = localStorage.getItem("title");
+      return savedTitle ? savedTitle : "";
+    }
+    return "";
   });
 
   const [texts, setTexts] = useState<Texts>(() => {
-    const savedTexts = localStorage.getItem("texts");
-    return savedTexts ? JSON.parse(savedTexts) : {};
+    if (typeof window !== "undefined") {
+      const savedTexts = localStorage.getItem("texts");
+      return savedTexts ? JSON.parse(savedTexts) : {};
+    }
+    return {};
   });
 
   const [iconTypes, setIconTypes] = useState<{ [key: string]: string }>(() => {
-    const savedIconTypes = localStorage.getItem("iconTypes");
-    return savedIconTypes ? JSON.parse(savedIconTypes) : {};
+    if (typeof window !== "undefined") {
+      const savedIconTypes = localStorage.getItem("iconTypes");
+      return savedIconTypes ? JSON.parse(savedIconTypes) : {};
+    }
+    return {};
   });
 
   useEffect(() => {
-    localStorage.setItem("iconTypes", JSON.stringify(iconTypes));
+    if (typeof window !== "undefined") {
+      localStorage.setItem("iconTypes", JSON.stringify(iconTypes));
+    }
   }, [iconTypes]);
 
   useEffect(() => {
-    localStorage.setItem("title", title);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("title", title);
+    }
   }, [title]);
 
   const newRectRef = useRef<HTMLDivElement | null>(null);
@@ -66,7 +82,9 @@ export default function Note() {
   }, [newRectKey]);
 
   useEffect(() => {
-    localStorage.setItem("layout", JSON.stringify(layout));
+    if (typeof window !== "undefined") {
+      localStorage.setItem("layout", JSON.stringify(layout));
+    }
   }, [layout]);
 
   const handleKeyDown = (
@@ -99,9 +117,10 @@ export default function Note() {
       setLayout(newLayout);
       setIconTypes((prevIconTypes) => ({
         ...prevIconTypes,
-        [newKey]: currentType === "Bullet point" || currentType === "Task"
-          ? currentType
-          : "Paragraph",
+        [newKey]:
+          currentType === "Bullet point" || currentType === "Task"
+            ? currentType
+            : "Paragraph",
       }));
       setNewRectKey(newKey);
       setTimeout(() => {

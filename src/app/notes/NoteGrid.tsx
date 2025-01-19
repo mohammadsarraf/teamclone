@@ -105,15 +105,20 @@ const NoteGrid = ({
 
   const [checkedState, setCheckedState] = useState<{ [key: string]: boolean }>(
     () => {
-      const savedCheckedState = localStorage.getItem("checkedState");
-      return savedCheckedState
-        ? JSON.parse(savedCheckedState)
-        : initialCheckedState;
+      if (typeof window !== "undefined") {
+        const savedCheckedState = localStorage.getItem("checkedState");
+        return savedCheckedState
+          ? JSON.parse(savedCheckedState)
+          : initialCheckedState;
+      }
+      return initialCheckedState;
     },
   );
 
   useEffect(() => {
-    localStorage.setItem("checkedState", JSON.stringify(checkedState));
+    if (typeof window !== "undefined") {
+      localStorage.setItem("checkedState", JSON.stringify(checkedState));
+    }
   }, [checkedState]);
 
   const handleCheckboxChange = (key: string) => {
@@ -167,7 +172,9 @@ const NoteGrid = ({
   }, [containerRef]);
 
   useEffect(() => {
-    localStorage.setItem("texts", JSON.stringify(texts));
+    if (typeof window !== "undefined") {
+      localStorage.setItem("texts", JSON.stringify(texts));
+    }
   }, [texts]);
 
   const handleTextChange = (key: string, text: string) => {
@@ -249,10 +256,13 @@ const NoteGrid = ({
         }}
       >
         {layout.slice(0).map((item, index) => (
-          <div key={item.i} className="group flex items-center"
-              style={{
-                zIndex: menuVisibility[item.i] ? 10 : 1,
-              }}>
+          <div
+            key={item.i}
+            className="group flex items-center"
+            style={{
+              zIndex: menuVisibility[item.i] ? 10 : 1,
+            }}
+          >
             {item.showIcons && (
               <>
                 <MdOutlineReorder className="drag-handle mr-4 cursor-move opacity-0 group-hover:opacity-100" />

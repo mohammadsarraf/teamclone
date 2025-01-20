@@ -1,28 +1,29 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import ContentEditable, { ContentEditableEvent } from "react-contenteditable";
 
-const Title = ({
-  text,
-  placeholder,
-  setTitle,
-  handleKeyDown,
-}: {
+interface TitleProps {
   text: string;
   placeholder?: string;
   setTitle: (text: string) => void;
   handleKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) => void;
+}
+
+const Title: React.FC<TitleProps> = ({
+  text,
+  placeholder,
+  setTitle,
+  handleKeyDown,
 }) => {
-  const [currentText, setCurrentText] = useState(text);
-  const textareaRef = useRef<HTMLElement>(null);
+  const [currentText, setCurrentText] = useState("");
 
   useEffect(() => {
-    setCurrentText(text);
+    setCurrentText(text || "");
   }, [text]);
 
   const handleTextChange = (e: ContentEditableEvent) => {
-    const newText = e.target.value;
-    setCurrentText(newText);
-    setTitle(newText);
+    const newText = e.target.value.replace(/<br\/?>/g, "");
+    setCurrentText(newText || "");
+    setTitle(newText || "");
   };
 
   return (
@@ -31,18 +32,20 @@ const Title = ({
         html={currentText}
         onChange={handleTextChange}
         onKeyDown={handleKeyDown}
-        className={`w-full resize-none bg-transparent outline-none`}
-        //@ts-ignore
-        innerRef={textareaRef}
-        style={{ fontSize: "3rem" }} // Title font size
+        className={`w-full resize-none bg-transparent outline-none ${!currentText ? "empty-content" : ""}`}
+        innerRef={(el: HTMLElement | null) => {
+          if (el) el.setAttribute("contentEditable", "true");
+        }}
+        style={{ fontSize: "3rem" }}
       />
-      {(!currentText || currentText === "<br>") && (
-        <div
+      {!currentText && (
+        <span
           className="pointer-events-none absolute left-0 top-0 size-full text-gray-500"
-          style={{ fontSize: "3rem" }} // Title font size
+          style={{ fontSize: "3rem" }}
+          aria-hidden="true"
         >
           {placeholder}
-        </div>
+        </span>
       )}
     </div>
   );

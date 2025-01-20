@@ -7,6 +7,7 @@ import NoteHeader from "./NoteHeader";
 import "@fontsource/playfair-display"; // Defaults to weight 400
 import "@fontsource/playfair-display/700.css"; // For weight 700
 import Title from "./components/Title";
+import Skeleton from "./components/Skeleton";
 
 interface Texts {
   [key: string]: string;
@@ -27,37 +28,24 @@ export default function Note() {
     { i: "rect1", x: 0, y: 1, w: 12, h: 1, type: "Paragraph", showIcons: true },
   ]; // Ensure Title is at the top
 
-  const [layout, setLayout] = useState<Layout[]>(() => {
-    if (typeof window !== "undefined") {
-      const savedLayout = localStorage.getItem("layout");
-      return savedLayout ? JSON.parse(savedLayout) : defaultLayout;
-    }
-    return defaultLayout;
-  });
+  const [isClient, setIsClient] = useState(false);
+  const [layout, setLayout] = useState<Layout[]>(defaultLayout);
+  const [title, setTitle] = useState<string>("");
+  const [texts, setTexts] = useState<Texts>({});
+  const [iconTypes, setIconTypes] = useState<{ [key: string]: string }>({});
 
-  const [title, setTitle] = useState<string>(() => {
-    if (typeof window !== "undefined") {
-      const savedTitle = localStorage.getItem("title");
-      return savedTitle ? savedTitle : "";
-    }
-    return "";
-  });
+  useEffect(() => {
+    setIsClient(true);
+    const savedLayout = localStorage.getItem("layout");
+    const savedTitle = localStorage.getItem("title");
+    const savedTexts = localStorage.getItem("texts");
+    const savedIconTypes = localStorage.getItem("iconTypes");
 
-  const [texts, setTexts] = useState<Texts>(() => {
-    if (typeof window !== "undefined") {
-      const savedTexts = localStorage.getItem("texts");
-      return savedTexts ? JSON.parse(savedTexts) : {};
-    }
-    return {};
-  });
-
-  const [iconTypes, setIconTypes] = useState<{ [key: string]: string }>(() => {
-    if (typeof window !== "undefined") {
-      const savedIconTypes = localStorage.getItem("iconTypes");
-      return savedIconTypes ? JSON.parse(savedIconTypes) : {};
-    }
-    return {};
-  });
+    if (savedLayout) setLayout(JSON.parse(savedLayout));
+    if (savedTitle) setTitle(savedTitle);
+    if (savedTexts) setTexts(JSON.parse(savedTexts));
+    if (savedIconTypes) setIconTypes(JSON.parse(savedIconTypes));
+  }, []);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -266,6 +254,10 @@ export default function Note() {
       [key]: option,
     }));
   };
+
+  if (!isClient) {
+    return <Skeleton />;
+  }
 
   return (
     <div

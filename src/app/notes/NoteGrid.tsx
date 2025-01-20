@@ -269,7 +269,7 @@ const NoteGrid = ({
   }
 
   return (
-    <div ref={containerRef} className="w-3/5">
+    <div className="w-full">
       <GridLayout
         className="layout"
         layout={layout}
@@ -279,6 +279,7 @@ const NoteGrid = ({
         draggableHandle=".drag-handle"
         useCSSTransforms={true}
         isResizable={false}
+        margin={[0, 16]} // Add vertical spacing between items
         onDrag={(layout, oldItem, newItem, placeholder, e, element) => {
           calculateDistance(
             menuRefs.current[newItem.i],

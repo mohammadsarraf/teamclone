@@ -37,18 +37,13 @@ const Paragraph: React.FC<ParagraphProps> = ({
         html={currentText}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
-        className="w-full resize-none bg-transparent text-2xl outline-none"
+        className={`w-full resize-none bg-transparent text-2xl outline-none ${
+          !currentText && index === 0 ? "before:content-[attr(data-placeholder)] before:text-zinc-600" : ""
+        }`}
         innerRef={textareaRef} // Now compatible with ContentEditable's innerRef prop
         style={{ fontSize: "1.25rem" }} // Paragraph font size
+        data-placeholder={index === 0 ? placeholder : ""}
       />
-      {index === 0 && !currentText && (
-        <div
-          className="pointer-events-none absolute left-0 top-0 size-full text-2xl text-gray-500"
-          style={{ fontSize: "1.25rem" }} // Placeholder font size
-        >
-          {placeholder || "testing"}
-        </div>
-      )}
     </div>
   );
 };

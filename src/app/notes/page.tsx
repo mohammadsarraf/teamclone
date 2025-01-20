@@ -9,6 +9,7 @@ import "@fontsource/playfair-display/700.css"; // For weight 700
 import Title from "./components/Title";
 import Skeleton from "./components/Skeleton";
 import SideMenu from './components/SideMenu';
+import { v4 as uuidv4 } from 'uuid';
 
 interface Texts {
   [key: string]: string;
@@ -42,11 +43,21 @@ export default function Note() {
     iconTypes: { [key: string]: string };
   }>>([]);
   const [activeNoteId, setActiveNoteId] = useState<string>('');
+  const [folders, setFolders] = useState<Array<{
+    id: string;
+    name: string;
+    isExpanded?: boolean;
+  }>>([]);
 
   useEffect(() => {
     setIsClient(true);
     const savedNotes = localStorage.getItem("notes");
     const savedActiveNoteId = localStorage.getItem("activeNoteId");
+    const savedFolders = localStorage.getItem("folders");
+
+    if (savedFolders) {
+      setFolders(JSON.parse(savedFolders));
+    }
 
     if (savedNotes) {
       const parsedNotes = JSON.parse(savedNotes);
@@ -83,11 +94,12 @@ export default function Note() {
     const autoSave = setTimeout(() => {
       if (activeNoteId && notes.length > 0) {
         saveCurrentNote();
+        localStorage.setItem("folders", JSON.stringify(folders));
       }
     }, 1000); // Debounce save for 1 second
 
     return () => clearTimeout(autoSave);
-  }, [title, layout, texts, iconTypes]);
+  }, [title, layout, texts, iconTypes, folders]);
 
   const newRectRef = useRef<HTMLDivElement | null>(null);
   const [newRectKey, setNewRectKey] = useState<string | null>(null);
@@ -305,7 +317,7 @@ export default function Note() {
     }
   };
 
-  const createNewNote = () => {
+  const createNewNote = (folderId?: string) => {
     saveCurrentNote(); // Save current note before creating new one
     const newNoteId = `note${Date.now()}`; // Use timestamp for unique IDs
     const newNote = {
@@ -313,7 +325,8 @@ export default function Note() {
       title: '',
       layout: defaultLayout,
       texts: {},
-      iconTypes: {}
+      iconTypes: {},
+      folderId
     };
     const updatedNotes = [...notes, newNote];
     setNotes(updatedNotes);
@@ -324,6 +337,15 @@ export default function Note() {
     setTitle('');
     setTexts({});
     setIconTypes({});
+  };
+
+  const createNewFolder = () => {
+    const newFolder = {
+      id: uuidv4(),
+      name: 'New Folder',
+      isExpanded: true
+    };
+    setFolders(prev => [...prev, newFolder]);
   };
 
   const saveCurrentNote = () => {
@@ -337,50 +359,87 @@ export default function Note() {
     localStorage.setItem("activeNoteId", activeNoteId);
   };
 
+  const handleUpdateFolder = (folderId: string, newName: string) => {
+    setFolders(prev => prev.map(folder =>
+      folder.id === folderId ? { ...folder, name: newName } : folder
+    ));
+  };
+
+  const handleMoveNote = (noteId: string, folderId: string | null) => {
+    setNotes(prev => prev.map(note =>
+      note.id === noteId ? { ...note, folderId } : note
+    ));
+  };
+
+  const handleDeleteFolder = (folderId: string) => {
+    // Move all notes from this folder to root
+    setNotes(prev => prev.map(note =>
+      note.folderId === folderId ? { ...note, folderId: null } : note
+    ));
+    
+    // Remove the folder
+    setFolders(prev => prev.filter(folder => folder.id !== folderId));
+  };
+
+  // Add new handler function
+  const handleDeleteNote = (noteId: string) => {
+    // If deleting active note, switch to another note
+    if (noteId === activeNoteId) {
+      const remainingNotes = notes.filter(note => note.id !== noteId);
+      if (remainingNotes.length > 0) {
+        handleNoteSelect(remainingNotes[0].id);
+      } else {
+        // If no notes left, create a new one
+        createNewNote();
+      }
+    }
+    
+    // Remove the note from the list
+    setNotes(prev => prev.filter(note => note.id !== noteId));
+  };
+
   if (!isClient) {
     return <Skeleton />;
   }
 
   return (
-    <div className="flex h-screen w-screen overflow-x-hidden bg-black font-serif">
+    <div className="flex h-screen w-screen overflow-hidden bg-zinc-950">
       <SideMenu
         notes={notes}
+        folders={folders}
         activeNoteId={activeNoteId}
         onNoteSelect={handleNoteSelect}
         onNewNote={createNewNote}
+        onNewFolder={createNewFolder}
+        onUpdateFolder={handleUpdateFolder}
+        onMoveNote={handleMoveNote}
+        onDeleteFolder={handleDeleteFolder}
+        onDeleteNote={handleDeleteNote} // Add this line
       />
-      <div className="flex-1">
-        <div>
-          <NoteHeader />
-          <button
-            onClick={restartCache}
-            className="m-4 rounded bg-red-500 p-2 text-white"
-          >
-            Restart Cache
-          </button>
-          <div className="mx-72 w-3/5 flex-1 pl-4 pt-4">
-            <div className="mb-10">
-              <Title
-                text={title}
-                placeholder="Add a title"
-                setTitle={setTitle}
-                handleKeyDown={handleTitleKeyDown}
-              />
-            </div>
-            <NoteGrid
-              layout={layout}
-              handleKeyDown={handleKeyDown}
-              handleArrowNavigation={handleArrowNavigation} // Pass the handleArrowNavigation function
-              newRectKey={newRectKey}
-              newRectRef={newRectRef}
-              setLayout={setLayout} // Pass the setLayout function
-              texts={texts} // Pass the texts state
-              setTexts={setTexts} // Pass the setTexts function
-              iconTypes={iconTypes} // Pass the iconTypes state
-              handleMenuSelect={handleMenuSelect} // Pass the handleMenuSelect function
+      <div className="flex h-full w-full flex-col overflow-y-auto">
+        <NoteHeader />
+        <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col px-4 py-8">
+          <div className="mb-8">
+            <Title
+              text={title}
+              placeholder="Add a title"
+              setTitle={setTitle}
+              handleKeyDown={handleTitleKeyDown}
             />
           </div>
-        </div>
+          <NoteGrid
+            layout={layout}
+            handleKeyDown={handleKeyDown}
+            handleArrowNavigation={handleArrowNavigation}
+            newRectKey={newRectKey}
+            newRectRef={newRectRef}
+            setLayout={setLayout}
+            texts={texts}
+            setTexts={setTexts}
+            iconTypes={iconTypes}
+            handleMenuSelect={handleMenuSelect}
+          />
+        </main>
       </div>
     </div>
   );

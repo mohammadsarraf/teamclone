@@ -32,9 +32,9 @@ const Title: React.FC<TitleProps> = ({
         html={currentText}
         onChange={handleTextChange}
         onKeyDown={handleKeyDown}
-        className={`w-full resize-none bg-transparent outline-none ${!currentText ? 'empty-content' : ''}`}
+        className={`w-full resize-none bg-transparent outline-none ${!currentText ? "empty-content" : ""}`}
         innerRef={(el: HTMLElement | null) => {
-          if (el) el.setAttribute('contentEditable', 'true');
+          if (el) el.setAttribute("contentEditable", "true");
         }}
         style={{ fontSize: "3rem" }}
       />

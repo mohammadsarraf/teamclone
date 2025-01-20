@@ -8,6 +8,7 @@ import "@fontsource/playfair-display"; // Defaults to weight 400
 import "@fontsource/playfair-display/700.css"; // For weight 700
 import Title from "./components/Title";
 import Skeleton from "./components/Skeleton";
+import SideMenu from './components/SideMenu';
 
 interface Texts {
   [key: string]: string;
@@ -33,31 +34,60 @@ export default function Note() {
   const [title, setTitle] = useState<string>("");
   const [texts, setTexts] = useState<Texts>({});
   const [iconTypes, setIconTypes] = useState<{ [key: string]: string }>({});
+  const [notes, setNotes] = useState<Array<{
+    id: string;
+    title: string;
+    layout: Layout[];
+    texts: Texts;
+    iconTypes: { [key: string]: string };
+  }>>([]);
+  const [activeNoteId, setActiveNoteId] = useState<string>('');
 
   useEffect(() => {
     setIsClient(true);
-    const savedLayout = localStorage.getItem("layout");
-    const savedTitle = localStorage.getItem("title");
-    const savedTexts = localStorage.getItem("texts");
-    const savedIconTypes = localStorage.getItem("iconTypes");
+    const savedNotes = localStorage.getItem("notes");
+    const savedActiveNoteId = localStorage.getItem("activeNoteId");
 
-    if (savedLayout) setLayout(JSON.parse(savedLayout));
-    if (savedTitle) setTitle(savedTitle);
-    if (savedTexts) setTexts(JSON.parse(savedTexts));
-    if (savedIconTypes) setIconTypes(JSON.parse(savedIconTypes));
+    if (savedNotes) {
+      const parsedNotes = JSON.parse(savedNotes);
+      setNotes(parsedNotes);
+      
+      // Set active note
+      const noteId = savedActiveNoteId || parsedNotes[0]?.id;
+      if (noteId) {
+        const activeNote = parsedNotes.find((n: any) => n.id === noteId);
+        if (activeNote) {
+          setActiveNoteId(noteId);
+          setLayout(activeNote.layout || defaultLayout);
+          setTitle(activeNote.title || '');
+          setTexts(activeNote.texts || {});
+          setIconTypes(activeNote.iconTypes || {});
+        }
+      }
+    } else {
+      // Initialize with a default note
+      const initialNote = {
+        id: 'note1',
+        title: '',
+        layout: defaultLayout,
+        texts: {},
+        iconTypes: {}
+      };
+      setNotes([initialNote]);
+      setActiveNoteId('note1');
+      setLayout(defaultLayout);
+    }
   }, []);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("iconTypes", JSON.stringify(iconTypes));
-    }
-  }, [iconTypes]);
+    const autoSave = setTimeout(() => {
+      if (activeNoteId && notes.length > 0) {
+        saveCurrentNote();
+      }
+    }, 1000); // Debounce save for 1 second
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("title", title);
-    }
-  }, [title]);
+    return () => clearTimeout(autoSave);
+  }, [title, layout, texts, iconTypes]);
 
   const newRectRef = useRef<HTMLDivElement | null>(null);
   const [newRectKey, setNewRectKey] = useState<string | null>(null);
@@ -230,13 +260,21 @@ export default function Note() {
   };
 
   const restartCache = () => {
-    localStorage.removeItem("layout");
-    localStorage.removeItem("title");
-    localStorage.removeItem("texts");
-    localStorage.removeItem("checkedState");
+    localStorage.removeItem("notes");
+    localStorage.removeItem("activeNoteId");
+    const initialNote = {
+      id: 'note1',
+      title: '',
+      layout: defaultLayout,
+      texts: {},
+      iconTypes: {}
+    };
+    setNotes([initialNote]);
+    setActiveNoteId('note1');
     setLayout(defaultLayout);
-    setTitle("");
-    setTexts({}); // Reset the texts state
+    setTitle('');
+    setTexts({});
+    setIconTypes({});
   };
 
   const handleMenuSelect = (key: string, option: string) => {
@@ -255,43 +293,94 @@ export default function Note() {
     }));
   };
 
+  const handleNoteSelect = (noteId: string) => {
+    saveCurrentNote(); // Save current note before switching
+    setActiveNoteId(noteId);
+    const selectedNote = notes.find(note => note.id === noteId);
+    if (selectedNote) {
+      setLayout(selectedNote.layout || defaultLayout);
+      setTitle(selectedNote.title || '');
+      setTexts(selectedNote.texts || {});
+      setIconTypes(selectedNote.iconTypes || {});
+    }
+  };
+
+  const createNewNote = () => {
+    saveCurrentNote(); // Save current note before creating new one
+    const newNoteId = `note${Date.now()}`; // Use timestamp for unique IDs
+    const newNote = {
+      id: newNoteId,
+      title: '',
+      layout: defaultLayout,
+      texts: {},
+      iconTypes: {}
+    };
+    const updatedNotes = [...notes, newNote];
+    setNotes(updatedNotes);
+    localStorage.setItem("notes", JSON.stringify(updatedNotes));
+    
+    setActiveNoteId(newNoteId);
+    setLayout(defaultLayout);
+    setTitle('');
+    setTexts({});
+    setIconTypes({});
+  };
+
+  const saveCurrentNote = () => {
+    const updatedNotes = notes.map(note => 
+      note.id === activeNoteId
+        ? { ...note, title, layout, texts, iconTypes }
+        : note
+    );
+    setNotes(updatedNotes);
+    localStorage.setItem("notes", JSON.stringify(updatedNotes));
+    localStorage.setItem("activeNoteId", activeNoteId);
+  };
+
   if (!isClient) {
     return <Skeleton />;
   }
 
   return (
-    <div
-      className="flex h-screen w-screen flex-col overflow-x-hidden bg-black font-serif sm:h-screen sm:w-screen"
-      style={{ fontFamily: "'Playfair Display', serif" }}
-    >
-      <NoteHeader />
-      <button
-        onClick={restartCache}
-        className="m-4 rounded bg-red-500 p-2 text-white"
-      >
-        Restart Cache
-      </button>
-      <div className="mx-72 w-3/5 flex-1 pl-4 pt-4">
-        <div className="mb-10">
-          <Title
-            text={title}
-            placeholder="Add a title"
-            setTitle={setTitle}
-            handleKeyDown={handleTitleKeyDown}
-          />
+    <div className="flex h-screen w-screen overflow-x-hidden bg-black font-serif">
+      <SideMenu
+        notes={notes}
+        activeNoteId={activeNoteId}
+        onNoteSelect={handleNoteSelect}
+        onNewNote={createNewNote}
+      />
+      <div className="flex-1">
+        <div>
+          <NoteHeader />
+          <button
+            onClick={restartCache}
+            className="m-4 rounded bg-red-500 p-2 text-white"
+          >
+            Restart Cache
+          </button>
+          <div className="mx-72 w-3/5 flex-1 pl-4 pt-4">
+            <div className="mb-10">
+              <Title
+                text={title}
+                placeholder="Add a title"
+                setTitle={setTitle}
+                handleKeyDown={handleTitleKeyDown}
+              />
+            </div>
+            <NoteGrid
+              layout={layout}
+              handleKeyDown={handleKeyDown}
+              handleArrowNavigation={handleArrowNavigation} // Pass the handleArrowNavigation function
+              newRectKey={newRectKey}
+              newRectRef={newRectRef}
+              setLayout={setLayout} // Pass the setLayout function
+              texts={texts} // Pass the texts state
+              setTexts={setTexts} // Pass the setTexts function
+              iconTypes={iconTypes} // Pass the iconTypes state
+              handleMenuSelect={handleMenuSelect} // Pass the handleMenuSelect function
+            />
+          </div>
         </div>
-        <NoteGrid
-          layout={layout}
-          handleKeyDown={handleKeyDown}
-          handleArrowNavigation={handleArrowNavigation} // Pass the handleArrowNavigation function
-          newRectKey={newRectKey}
-          newRectRef={newRectRef}
-          setLayout={setLayout} // Pass the setLayout function
-          texts={texts} // Pass the texts state
-          setTexts={setTexts} // Pass the setTexts function
-          iconTypes={iconTypes} // Pass the iconTypes state
-          handleMenuSelect={handleMenuSelect} // Pass the handleMenuSelect function
-        />
       </div>
     </div>
   );

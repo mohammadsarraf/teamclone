@@ -236,6 +236,38 @@ const NoteGrid = ({
     }
   };
 
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Initialize refs after mounting
+  useEffect(() => {
+    if (mounted) {
+      // Initialize your refs and other client-side only logic here
+      Object.keys(texts).forEach(key => {
+        if (contentRefs.current[key]) {
+          contentRefs.current[key].setAttribute("data-grid-id", key);
+        }
+      });
+    }
+  }, [mounted, texts]);
+
+  if (!mounted) {
+    return (
+      <div className="space-y-4">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="flex items-center gap-4">
+            <div className="h-5 w-5 animate-pulse rounded bg-gray-800" />
+            <div className="h-5 w-5 animate-pulse rounded bg-gray-800" />
+            <div className="h-8 w-full animate-pulse rounded bg-gray-800" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div ref={containerRef} className="w-3/5">
       <GridLayout
@@ -392,8 +424,7 @@ const NoteGrid = ({
                   handleArrowNavigation(item.i, e);
                 }}
                 textareaRef={(el) => {
-                  contentRefs.current[item.i] =
-                    el as React.RefObject<HTMLElement>;
+                  contentRefs.current[item.i] = el;
                   if (el) el.setAttribute("data-grid-id", item.i);
                 }}
                 index={index}

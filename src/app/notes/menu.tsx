@@ -1,21 +1,40 @@
-import { useEffect, useRef } from "react";
+"use client";
+
+import React, { useEffect, useRef, MouseEvent as ReactMouseEvent } from "react";
 import { BsClipboard, BsFillFileEarmarkImageFill } from "react-icons/bs";
 import { FaTasks } from "react-icons/fa";
 import { FaParagraph } from "react-icons/fa6";
-import { HiH1, HiH2, HiH3, HiNumberedList } from "react-icons/hi2";
+import { HiH1, HiH2, HiH3 } from "react-icons/hi2";
 import { LiaLine } from "react-icons/lia";
 import { PiListBulletsBold } from "react-icons/pi";
 import { TbQuoteOff } from "react-icons/tb";
 
-export default function Menu({
-  closeMenu,
-  adjustTextareaHeight,
-  onSelect,
-}: {
+interface MenuProps {
   closeMenu: () => void;
   adjustTextareaHeight: () => void;
   onSelect: (option: string) => void;
-}) {
+}
+
+const Menu: React.FC<MenuProps> = ({
+  closeMenu,
+  adjustTextareaHeight,
+  onSelect,
+}) => {
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        closeMenu();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [closeMenu]);
+
   const handleOptionClick = (option: string) => {
     adjustTextareaHeight();
     onSelect(option);
@@ -23,7 +42,7 @@ export default function Menu({
   };
 
   return (
-    <div className="w-fit rounded-lg bg-gray-900">
+    <div ref={menuRef} className="w-fit rounded-lg bg-gray-900">
       <div className="border-b">
         <button
           className="flex w-full items-center gap-2 px-2 py-1 text-left hover:bg-gray-500 focus:bg-gray-500"
@@ -78,13 +97,6 @@ export default function Menu({
           <PiListBulletsBold />
           Bullet point
         </button>
-        {/* <button
-          className="flex w-full items-center gap-2 px-2 py-1 text-left hover:bg-gray-500 focus:bg-gray-500"
-          onClick={() => handleOptionClick("Numbered List")}
-        >
-          <HiNumberedList />
-          Numbered List
-        </button> */}
         <button
           className="flex w-full items-center gap-2 px-2 py-1 text-left hover:bg-gray-500 focus:bg-gray-500"
           onClick={() => handleOptionClick("Blockquote")}
@@ -111,4 +123,6 @@ export default function Menu({
       </div>
     </div>
   );
-}
+};
+
+export default Menu;

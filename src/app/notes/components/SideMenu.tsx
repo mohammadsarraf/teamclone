@@ -116,11 +116,18 @@ export default function SideMenu({
   const rootNotes = notes.filter((note) => !note.folderId);
 
   const renderNoteItem = (note: Note, indent: number = 0) => (
-    <button
+    <div
       key={note.id}
+      role="button"
+      tabIndex={0}
       onClick={() => onNoteSelect(note.id)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          onNoteSelect(note.id);
+        }
+      }}
       onContextMenu={(e) => handleNoteContextMenu(e, note.id)}
-      className={`group flex w-full items-center px-4 py-1.5 text-left transition-colors ${
+      className={`group flex w-full cursor-pointer items-center px-4 py-1.5 text-left transition-colors ${
         activeNoteId === note.id
           ? "bg-zinc-800/50 text-zinc-100"
           : "text-zinc-400 hover:bg-zinc-800/30"
@@ -138,7 +145,7 @@ export default function SideMenu({
       >
         <EllipsisHorizontalIcon className="size-5" />
       </button>
-    </button>
+    </div>
   );
 
   const renderFolderContent = (folder: Folder) => {
@@ -288,7 +295,7 @@ export default function SideMenu({
   }, []);
 
   return (
-    <div className="relative flex w-64 flex-col border-r border-zinc-800 bg-zinc-950">
+    <div className="flex h-full w-64 shrink-0 flex-col overflow-hidden border-r border-zinc-800 bg-zinc-900">
       <div className="flex h-14 items-center justify-between border-b border-zinc-800 px-4">
         <h2 className="font-medium text-zinc-200">Notes</h2>
         <div className="flex gap-2">

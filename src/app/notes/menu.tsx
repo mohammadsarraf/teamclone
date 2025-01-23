@@ -15,7 +15,11 @@ interface MenuProps {
   onSelect: (option: string) => void;
 }
 
-const Menu: React.FC<MenuProps> = ({ closeMenu, adjustTextareaHeight, onSelect }) => {
+const Menu: React.FC<MenuProps> = ({
+  closeMenu,
+  adjustTextareaHeight,
+  onSelect,
+}) => {
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

@@ -8,16 +8,16 @@ import {
 import { NoteItem } from "./NoteItem";
 
 export interface Note {
-    id: string;
-    title: string;
-    folderId: string;
-  }
-  
-  export interface Folder {
-    id: string;
-    name: string;
-  } 
-  
+  id: string;
+  title: string;
+  folderId: string;
+}
+
+export interface Folder {
+  id: string;
+  name: string;
+}
+
 interface FolderItemProps {
   folder: Folder;
   notes: Note[];
@@ -26,7 +26,10 @@ interface FolderItemProps {
   activeNoteId: string;
   editInputRef: React.RefObject<HTMLInputElement>;
   onToggle: (folderId: string) => void;
-  onFolderEdit: (folderId: string, event: React.KeyboardEvent<HTMLInputElement>) => void;
+  onFolderEdit: (
+    folderId: string,
+    event: React.KeyboardEvent<HTMLInputElement>,
+  ) => void;
   onContextMenu: (event: React.MouseEvent, folderId: string) => void;
   onNoteSelect: (id: string) => void;
   onNoteContextMenu: (event: React.MouseEvent, noteId: string) => void;
@@ -115,4 +118,4 @@ export function FolderItem({
       )}
     </div>
   );
-} 
+}

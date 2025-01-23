@@ -1,12 +1,14 @@
-import { DocumentIcon, EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
+import {
+  DocumentIcon,
+  EllipsisHorizontalIcon,
+} from "@heroicons/react/24/outline";
 
 export interface Note {
-    id: string;
-    title: string;
-    folderId: string;
-  }
-  
-  
+  id: string;
+  title: string;
+  folderId: string;
+}
+
 interface NoteItemProps {
   note: Note;
   activeNoteId: string;
@@ -28,7 +30,7 @@ export function NoteItem({
       tabIndex={0}
       onClick={() => onNoteSelect(note.id)}
       onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
+        if (e.key === "Enter" || e.key === " ") {
           onNoteSelect(note.id);
         }
       }}
@@ -53,4 +55,4 @@ export function NoteItem({
       </button>
     </div>
   );
-} 
+}

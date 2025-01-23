@@ -80,4 +80,4 @@ export function NoteContextMenu({
       </button>
     </div>
   );
-} 
+}

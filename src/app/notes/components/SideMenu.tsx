@@ -1,12 +1,12 @@
-import { useState, useRef, useEffect } from 'react';
-import { 
-  PlusIcon, 
-  ChevronDownIcon, 
-  ChevronRightIcon, 
-  FolderIcon, 
+import { useState, useRef, useEffect } from "react";
+import {
+  PlusIcon,
+  ChevronDownIcon,
+  ChevronRightIcon,
+  FolderIcon,
   DocumentIcon,
-  EllipsisHorizontalIcon
-} from '@heroicons/react/24/outline';
+  EllipsisHorizontalIcon,
+} from "@heroicons/react/24/outline";
 
 interface Note {
   id: string;
@@ -33,20 +33,20 @@ interface SideMenuProps {
   onDeleteNote?: (noteId: string) => void;
 }
 
-export default function SideMenu({ 
-  notes, 
-  folders = [], 
-  activeNoteId, 
-  onNoteSelect, 
+export default function SideMenu({
+  notes,
+  folders = [],
+  activeNoteId,
+  onNoteSelect,
   onNewNote,
   onNewFolder,
   onUpdateFolder,
   onMoveNote,
   onDeleteFolder,
-  onDeleteNote
+  onDeleteNote,
 }: SideMenuProps) {
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(
-    new Set(folders.filter(f => f.isExpanded).map(f => f.id))
+    new Set(folders.filter((f) => f.isExpanded).map((f) => f.id)),
   );
   const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
   const [folderContextMenu, setFolderContextMenu] = useState<{
@@ -59,7 +59,7 @@ export default function SideMenu({
     x: number;
     y: number;
   } | null>(null);
-  
+
   const editInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -69,7 +69,7 @@ export default function SideMenu({
   }, [editingFolderId]);
 
   const toggleFolder = (folderId: string) => {
-    setExpandedFolders(prev => {
+    setExpandedFolders((prev) => {
       const next = new Set(prev);
       if (next.has(folderId)) {
         next.delete(folderId);
@@ -80,18 +80,21 @@ export default function SideMenu({
     });
   };
 
-  const handleFolderEdit = (folderId: string, event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter' && onUpdateFolder) {
+  const handleFolderEdit = (
+    folderId: string,
+    event: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
+    if (event.key === "Enter" && onUpdateFolder) {
       onUpdateFolder(folderId, event.currentTarget.value);
       setEditingFolderId(null);
-    } else if (event.key === 'Escape') {
+    } else if (event.key === "Escape") {
       setEditingFolderId(null);
     }
   };
 
   const handleFolderContextMenu = (
     event: React.MouseEvent,
-    folderId: string
+    folderId: string,
   ) => {
     event.preventDefault();
     setFolderContextMenu({
@@ -101,10 +104,7 @@ export default function SideMenu({
     });
   };
 
-  const handleNoteContextMenu = (
-    event: React.MouseEvent,
-    noteId: string
-  ) => {
+  const handleNoteContextMenu = (event: React.MouseEvent, noteId: string) => {
     event.preventDefault();
     setNoteContextMenu({
       noteId,
@@ -113,7 +113,7 @@ export default function SideMenu({
     });
   };
 
-  const rootNotes = notes.filter(note => !note.folderId);
+  const rootNotes = notes.filter((note) => !note.folderId);
 
   const renderNoteItem = (note: Note, indent: number = 0) => (
     <button
@@ -122,13 +122,13 @@ export default function SideMenu({
       onContextMenu={(e) => handleNoteContextMenu(e, note.id)}
       className={`group flex w-full items-center px-4 py-1.5 text-left transition-colors ${
         activeNoteId === note.id
-          ? 'bg-zinc-800/50 text-zinc-100'
-          : 'text-zinc-400 hover:bg-zinc-800/30'
+          ? "bg-zinc-800/50 text-zinc-100"
+          : "text-zinc-400 hover:bg-zinc-800/30"
       }`}
       style={{ paddingLeft: `${indent}rem` }}
     >
-      <DocumentIcon className="mr-2 h-4 w-4" />
-      <span className="flex-1 truncate">{note.title || 'Untitled Note'}</span>
+      <DocumentIcon className="mr-2 size-4" />
+      <span className="flex-1 truncate">{note.title || "Untitled Note"}</span>
       <button
         onClick={(e) => {
           e.stopPropagation();
@@ -136,13 +136,13 @@ export default function SideMenu({
         }}
         className="opacity-0 group-hover:opacity-100"
       >
-        <EllipsisHorizontalIcon className="h-5 w-5" />
+        <EllipsisHorizontalIcon className="size-5" />
       </button>
     </button>
   );
 
   const renderFolderContent = (folder: Folder) => {
-    const folderNotes = notes.filter(note => note.folderId === folder.id);
+    const folderNotes = notes.filter((note) => note.folderId === folder.id);
     const isExpanded = expandedFolders.has(folder.id);
 
     return (
@@ -157,12 +157,12 @@ export default function SideMenu({
           >
             <button className="mr-2">
               {isExpanded ? (
-                <ChevronDownIcon className="h-4 w-4" />
+                <ChevronDownIcon className="size-4" />
               ) : (
-                <ChevronRightIcon className="h-4 w-4" />
+                <ChevronRightIcon className="size-4" />
               )}
             </button>
-            <FolderIcon className="mr-2 h-4 w-4" />
+            <FolderIcon className="mr-2 size-4" />
             {editingFolderId === folder.id ? (
               <input
                 ref={editInputRef}
@@ -183,17 +183,17 @@ export default function SideMenu({
             }}
             className="opacity-0 group-hover:opacity-100"
           >
-            <EllipsisHorizontalIcon className="h-5 w-5" />
+            <EllipsisHorizontalIcon className="size-5" />
           </button>
         </div>
         {isExpanded && (
           <div className="space-y-0.5">
-            {folderNotes.map(note => renderNoteItem(note, 2))}
+            {folderNotes.map((note) => renderNoteItem(note, 2))}
             <button
               onClick={() => onNewNote(folder.id)}
               className="flex w-full items-center px-8 py-1.5 text-left text-zinc-500 hover:bg-zinc-800/30"
             >
-              <PlusIcon className="mr-2 h-4 w-4" />
+              <PlusIcon className="mr-2 size-4" />
               <span>New note</span>
             </button>
           </div>
@@ -242,7 +242,7 @@ export default function SideMenu({
         style={{ top: noteContextMenu.y, left: noteContextMenu.x }}
       >
         <div className="px-4 py-2 text-xs text-zinc-500">Move to folder</div>
-        {folders.map(folder => (
+        {folders.map((folder) => (
           <button
             key={folder.id}
             className="w-full px-4 py-2 text-left text-zinc-200 hover:bg-zinc-700"
@@ -283,8 +283,8 @@ export default function SideMenu({
       setNoteContextMenu(null);
     };
 
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
   return (
@@ -297,20 +297,20 @@ export default function SideMenu({
             className="rounded-md p-1 hover:bg-zinc-800"
             title="New folder"
           >
-            <FolderIcon className="h-5 w-5 text-zinc-400" />
+            <FolderIcon className="size-5 text-zinc-400" />
           </button>
           <button
             onClick={() => onNewNote()}
             className="rounded-md p-1 hover:bg-zinc-800"
             title="New note"
           >
-            <PlusIcon className="h-5 w-5 text-zinc-400" />
+            <PlusIcon className="size-5 text-zinc-400" />
           </button>
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto py-2 space-y-0.5 ml-2">
+      <div className="ml-2 flex-1 space-y-0.5 overflow-y-auto py-2">
         {folders.map(renderFolderContent)}
-        {rootNotes.map(note => renderNoteItem(note))}
+        {rootNotes.map((note) => renderNoteItem(note))}
         {rootNotes.length === 0 && folders.length === 0 && (
           <div className="px-4 py-2 text-sm text-zinc-500">
             No notes yet. Create one to get started.

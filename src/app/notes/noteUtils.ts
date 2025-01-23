@@ -4,6 +4,12 @@ interface Texts {
   [key: string]: string;
 }
 
+export interface Note {
+  id: string;
+  title: string;
+  // Add other required properties
+}
+
 export const handleTextChange = (
   key: string,
   event: React.ChangeEvent<HTMLTextAreaElement>,

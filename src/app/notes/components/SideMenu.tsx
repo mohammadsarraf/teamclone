@@ -288,7 +288,7 @@ export default function SideMenu({
   }, []);
 
   return (
-    <div className="relative flex w-64 flex-col border-r border-zinc-800 bg-zinc-950">
+    <div className="flex h-full w-64 flex-shrink-0 flex-col overflow-hidden border-r border-zinc-800 bg-zinc-900">
       <div className="flex h-14 items-center justify-between border-b border-zinc-800 px-4">
         <h2 className="font-medium text-zinc-200">Notes</h2>
         <div className="flex gap-2">

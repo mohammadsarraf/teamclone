@@ -38,7 +38,9 @@ const Paragraph: React.FC<ParagraphProps> = ({
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         className={`w-full resize-none bg-transparent text-2xl outline-none ${
-          !currentText && index === 0 ? "before:content-[attr(data-placeholder)] before:text-zinc-600" : ""
+          !currentText && index === 0
+            ? "before:text-zinc-600 before:content-[attr(data-placeholder)]"
+            : ""
         }`}
         innerRef={textareaRef} // Now compatible with ContentEditable's innerRef prop
         style={{ fontSize: "1.25rem" }} // Paragraph font size

@@ -8,8 +8,8 @@ import "@fontsource/playfair-display"; // Defaults to weight 400
 import "@fontsource/playfair-display/700.css"; // For weight 700
 import Title from "./components/Title";
 import Skeleton from "./components/Skeleton";
-import SideMenu from './components/SideMenu';
-import { v4 as uuidv4 } from 'uuid';
+import SideMenu from "./components/SideMenu";
+import { v4 as uuidv4 } from "uuid";
 
 interface Texts {
   [key: string]: string;
@@ -35,19 +35,24 @@ export default function Note() {
   const [title, setTitle] = useState<string>("");
   const [texts, setTexts] = useState<Texts>({});
   const [iconTypes, setIconTypes] = useState<{ [key: string]: string }>({});
-  const [notes, setNotes] = useState<Array<{
-    id: string;
-    title: string;
-    layout: Layout[];
-    texts: Texts;
-    iconTypes: { [key: string]: string };
-  }>>([]);
-  const [activeNoteId, setActiveNoteId] = useState<string>('');
-  const [folders, setFolders] = useState<Array<{
-    id: string;
-    name: string;
-    isExpanded?: boolean;
-  }>>([]);
+  const [notes, setNotes] = useState<
+    Array<{
+      id: string;
+      title: string;
+      layout: Layout[];
+      texts: Texts;
+      iconTypes: { [key: string]: string };
+      folderId?: string | null; // Add this line
+    }>
+  >([]);
+  const [activeNoteId, setActiveNoteId] = useState<string>("");
+  const [folders, setFolders] = useState<
+    Array<{
+      id: string;
+      name: string;
+      isExpanded?: boolean;
+    }>
+  >([]);
 
   useEffect(() => {
     setIsClient(true);
@@ -62,7 +67,7 @@ export default function Note() {
     if (savedNotes) {
       const parsedNotes = JSON.parse(savedNotes);
       setNotes(parsedNotes);
-      
+
       // Set active note
       const noteId = savedActiveNoteId || parsedNotes[0]?.id;
       if (noteId) {
@@ -70,7 +75,7 @@ export default function Note() {
         if (activeNote) {
           setActiveNoteId(noteId);
           setLayout(activeNote.layout || defaultLayout);
-          setTitle(activeNote.title || '');
+          setTitle(activeNote.title || "");
           setTexts(activeNote.texts || {});
           setIconTypes(activeNote.iconTypes || {});
         }
@@ -78,14 +83,14 @@ export default function Note() {
     } else {
       // Initialize with a default note
       const initialNote = {
-        id: 'note1',
-        title: '',
+        id: "note1",
+        title: "",
         layout: defaultLayout,
         texts: {},
-        iconTypes: {}
+        iconTypes: {},
       };
       setNotes([initialNote]);
-      setActiveNoteId('note1');
+      setActiveNoteId("note1");
       setLayout(defaultLayout);
     }
   }, []);
@@ -275,16 +280,16 @@ export default function Note() {
     localStorage.removeItem("notes");
     localStorage.removeItem("activeNoteId");
     const initialNote = {
-      id: 'note1',
-      title: '',
+      id: "note1",
+      title: "",
       layout: defaultLayout,
       texts: {},
-      iconTypes: {}
+      iconTypes: {},
     };
     setNotes([initialNote]);
-    setActiveNoteId('note1');
+    setActiveNoteId("note1");
     setLayout(defaultLayout);
-    setTitle('');
+    setTitle("");
     setTexts({});
     setIconTypes({});
   };
@@ -308,10 +313,10 @@ export default function Note() {
   const handleNoteSelect = (noteId: string) => {
     saveCurrentNote(); // Save current note before switching
     setActiveNoteId(noteId);
-    const selectedNote = notes.find(note => note.id === noteId);
+    const selectedNote = notes.find((note) => note.id === noteId);
     if (selectedNote) {
       setLayout(selectedNote.layout || defaultLayout);
-      setTitle(selectedNote.title || '');
+      setTitle(selectedNote.title || "");
       setTexts(selectedNote.texts || {});
       setIconTypes(selectedNote.iconTypes || {});
     }
@@ -322,19 +327,19 @@ export default function Note() {
     const newNoteId = `note${Date.now()}`; // Use timestamp for unique IDs
     const newNote = {
       id: newNoteId,
-      title: '',
+      title: "",
       layout: defaultLayout,
       texts: {},
       iconTypes: {},
-      folderId
+      folderId,
     };
     const updatedNotes = [...notes, newNote];
     setNotes(updatedNotes);
     localStorage.setItem("notes", JSON.stringify(updatedNotes));
-    
+
     setActiveNoteId(newNoteId);
     setLayout(defaultLayout);
-    setTitle('');
+    setTitle("");
     setTexts({});
     setIconTypes({});
   };
@@ -342,17 +347,17 @@ export default function Note() {
   const createNewFolder = () => {
     const newFolder = {
       id: uuidv4(),
-      name: 'New Folder',
-      isExpanded: true
+      name: "New Folder",
+      isExpanded: true,
     };
-    setFolders(prev => [...prev, newFolder]);
+    setFolders((prev) => [...prev, newFolder]);
   };
 
   const saveCurrentNote = () => {
-    const updatedNotes = notes.map(note => 
+    const updatedNotes = notes.map((note) =>
       note.id === activeNoteId
         ? { ...note, title, layout, texts, iconTypes }
-        : note
+        : note,
     );
     setNotes(updatedNotes);
     localStorage.setItem("notes", JSON.stringify(updatedNotes));
@@ -360,32 +365,36 @@ export default function Note() {
   };
 
   const handleUpdateFolder = (folderId: string, newName: string) => {
-    setFolders(prev => prev.map(folder =>
-      folder.id === folderId ? { ...folder, name: newName } : folder
-    ));
+    setFolders((prev) =>
+      prev.map((folder) =>
+        folder.id === folderId ? { ...folder, name: newName } : folder,
+      ),
+    );
   };
 
   const handleMoveNote = (noteId: string, folderId: string | null) => {
-    setNotes(prev => prev.map(note =>
-      note.id === noteId ? { ...note, folderId } : note
-    ));
+    setNotes((prev) =>
+      prev.map((note) => (note.id === noteId ? { ...note, folderId } : note)),
+    );
   };
 
   const handleDeleteFolder = (folderId: string) => {
     // Move all notes from this folder to root
-    setNotes(prev => prev.map(note =>
-      note.folderId === folderId ? { ...note, folderId: null } : note
-    ));
-    
+    setNotes((prev) =>
+      prev.map((note) =>
+        note.folderId === folderId ? { ...note, folderId: null } : note,
+      ),
+    );
+
     // Remove the folder
-    setFolders(prev => prev.filter(folder => folder.id !== folderId));
+    setFolders((prev) => prev.filter((folder) => folder.id !== folderId));
   };
 
   // Add new handler function
   const handleDeleteNote = (noteId: string) => {
     // If deleting active note, switch to another note
     if (noteId === activeNoteId) {
-      const remainingNotes = notes.filter(note => note.id !== noteId);
+      const remainingNotes = notes.filter((note) => note.id !== noteId);
       if (remainingNotes.length > 0) {
         handleNoteSelect(remainingNotes[0].id);
       } else {
@@ -393,9 +402,9 @@ export default function Note() {
         createNewNote();
       }
     }
-    
+
     // Remove the note from the list
-    setNotes(prev => prev.filter(note => note.id !== noteId));
+    setNotes((prev) => prev.filter((note) => note.id !== noteId));
   };
 
   if (!isClient) {
@@ -416,7 +425,7 @@ export default function Note() {
         onDeleteFolder={handleDeleteFolder}
         onDeleteNote={handleDeleteNote} // Add this line
       />
-      <div className="flex h-full w-full flex-col overflow-y-auto">
+      <div className="flex size-full flex-col overflow-y-auto">
         <NoteHeader />
         <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col px-4 py-8">
           <div className="mb-8">

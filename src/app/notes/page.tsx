@@ -294,20 +294,119 @@ export default function Note() {
     setIconTypes({});
   };
 
-  const handleMenuSelect = (key: string, option: string) => {
-    setTexts((prevTexts) => ({
-      ...prevTexts,
-      [key]: prevTexts[key],
-    }));
-    setLayout((prevLayout) =>
-      prevLayout.map((item) =>
-        item.i === key ? { ...item, type: option } : item,
-      ),
-    );
-    setIconTypes((prevIconTypes) => ({
-      ...prevIconTypes,
-      [key]: option,
-    }));
+  const handleMenuSelect = (key: string, option: string, fileData?: { data: string; filename: string }) => {
+    if (option === 'Image' || option === 'Attachment') {
+      if (fileData) {
+        const base64Size = fileData.data.length * 0.75;
+        const fileSizeMB = (base64Size / (1024 * 1024)).toFixed(2);
+
+        // For images, calculate height based on image dimensions
+        if (option === 'Image') {
+          // Create temporary image to get dimensions
+          const img = new Image();
+          img.src = fileData.data;
+          img.onload = () => {
+            // Calculate a more reasonable height based on a max width of 600px
+            // and considering that 1 grid unit = 20px
+            const maxWidth = 200;
+            const scaledHeight = (img.height * Math.min(maxWidth, img.width)) / img.width;
+            // Add extra space for the footer (1 unit = 20px)
+            const gridHeight = Math.max(3, Math.ceil(scaledHeight / 20) + 1);
+
+            setLayout(prevLayout => {
+              const currentIndex = prevLayout.findIndex(item => item.i === key);
+              const newKey = `rect${Date.now()}`;
+              const currentY = prevLayout[currentIndex].y;
+              
+              // Adjust all blocks after the current one
+              const adjustedLayout = prevLayout.map(item => {
+                if (item.y <= currentY) return item;
+                return {
+                  ...item,
+                  y: item.y + (gridHeight - 1)
+                };
+              });
+
+              return [
+                ...adjustedLayout.slice(0, currentIndex + 1).map(item => 
+                  item.i === key 
+                    ? { ...item, type: option, h: gridHeight }
+                    : item
+                ),
+                {
+                  i: newKey,
+                  x: 0,
+                  y: currentY + gridHeight,
+                  w: 12,
+                  h: 1,
+                  type: "Paragraph",
+                  showIcons: true
+                },
+                ...adjustedLayout.slice(currentIndex + 1)
+              ];
+            });
+          };
+        } else {
+          // For non-image attachments, use fixed height
+          const blockHeight = 2;
+          setLayout(prevLayout => {
+            const currentIndex = prevLayout.findIndex(item => item.i === key);
+            const newKey = `rect${Date.now()}`;
+            const currentY = prevLayout[currentIndex].y;
+            
+            const adjustedLayout = prevLayout.map(item => {
+              if (item.y <= currentY) return item;
+              return {
+                ...item,
+                y: item.y + (blockHeight - 1)
+              };
+            });
+
+            return [
+              ...adjustedLayout.slice(0, currentIndex + 1).map(item => 
+                item.i === key 
+                  ? { ...item, type: option, h: blockHeight }
+                  : item
+              ),
+              {
+                i: newKey,
+                x: 0,
+                y: currentY + blockHeight,
+                w: 12,
+                h: 1,
+                type: "Paragraph",
+                showIcons: true
+              },
+              ...adjustedLayout.slice(currentIndex + 1)
+            ];
+          });
+        }
+
+        // Store file data with metadata
+        setTexts(prev => ({
+          ...prev,
+          [key]: JSON.stringify({
+            data: fileData.data,
+            filename: fileData.filename,
+            size: fileSizeMB,
+            type: fileData.filename.split('.').pop()?.toLowerCase(),
+            uploadDate: new Date().toISOString()
+          })
+        }));
+
+        setIconTypes(prev => ({
+          ...prev,
+          [key]: option
+        }));
+
+        setTimeout(() => saveCurrentNote(), 100);
+      }
+    } else {
+      setIconTypes(prev => ({
+        ...prev,
+        [key]: option
+      }));
+    }
   };
 
   const handleNoteSelect = (noteId: string) => {

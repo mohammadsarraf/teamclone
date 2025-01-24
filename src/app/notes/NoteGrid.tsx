@@ -21,6 +21,7 @@ import { BsClipboard, BsFillFileEarmarkImageFill } from "react-icons/bs";
 import SelectionMenu from "./components/SelectionMenu";
 import NumberedList from "./components/NumberedList";
 import { GoNumber } from "react-icons/go";
+import { FileBlock } from './components/FileBlock';
 
 interface Texts {
   [key: string]: string;
@@ -85,7 +86,7 @@ const NoteGrid = ({
   texts: Texts;
   setTexts: React.Dispatch<React.SetStateAction<Texts>>;
   iconTypes: { [key: string]: string };
-  handleMenuSelect: (key: string, option: string) => void;
+  handleMenuSelect: (key: string, option: string, fileData?: { data: string; filename: string }) => void;
 }) => {
   const initialTexts = layout.reduce((acc, item) => {
     if (item.type === "Title") {
@@ -367,8 +368,8 @@ const NoteGrid = ({
                   closeMenu={() =>
                     setMenuVisibility({ ...menuVisibility, [item.i]: false })
                   }
-                  onSelect={(option: string) =>
-                    handleMenuSelect(item.i, option)
+                  onSelect={(option: string, fileData?: { data: string; filename: string }) =>
+                    handleMenuSelect(item.i, option, fileData)
                   }
                   adjustTextareaHeight={() =>
                     handleTextChangeWithHeight(item.i, texts[item.i])
@@ -471,6 +472,38 @@ const NoteGrid = ({
                   contentRefs.current[item.i] = el;
                   if (el) el.setAttribute("data-grid-id", item.i);
                 }}
+              />
+            ) : item.type === "Image" || item.type === "Attachment" ? (
+              <FileBlock
+                type={item.type as 'Image' | 'Attachment'}
+                data={(() => {
+                  try {
+                    const fileData = JSON.parse(texts[item.i] || '{}');
+                    return fileData.data || '';
+                  } catch {
+                    return '';
+                  }
+                })()}
+                filename={(() => {
+                  try {
+                    const fileData = JSON.parse(texts[item.i] || '{}');
+                    return fileData.filename || 'Untitled';
+                  } catch {
+                    return 'Untitled';
+                  }
+                })()}
+                metadata={(() => {
+                  try {
+                    const fileData = JSON.parse(texts[item.i] || '{}');
+                    return {
+                      size: fileData.size,
+                      uploadDate: fileData.uploadDate,
+                      fileType: fileData.type
+                    };
+                  } catch {
+                    return undefined;
+                  }
+                })()}
               />
             ) : (
               <Paragraph

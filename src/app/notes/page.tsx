@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect, RefObject } from "react";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import NoteGrid from "./NoteGrid";
-import NoteHeader from "./NoteHeader";
+import NoteHeader from "./components/NoteHeader";
 import "@fontsource/playfair-display"; // Defaults to weight 400
 import "@fontsource/playfair-display/700.css"; // For weight 700
 import Title from "./components/Title";
@@ -53,6 +53,8 @@ export default function Note() {
       isExpanded?: boolean;
     }>
   >([]);
+  const [isSaving, setIsSaving] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -354,7 +356,11 @@ export default function Note() {
               [newFileKey]: option
             }));
 
-            setTimeout(() => saveCurrentNote(), 100);
+            setTimeout(() => {
+              if (!isSaving) {
+                saveCurrentNote();
+              }
+            }, 100);
           };
         } else {
           // For non-image attachments
@@ -404,7 +410,11 @@ export default function Note() {
             [newFileKey]: option
           }));
 
-          setTimeout(() => saveCurrentNote(), 100);
+          setTimeout(() => {
+            if (!isSaving) {
+              saveCurrentNote();
+            }
+          }, 100);
         }
       }
     } else if (option === 'Divider') {
@@ -460,7 +470,11 @@ export default function Note() {
         [newDividerKey]: 'Divider'
       }));
 
-      setTimeout(() => saveCurrentNote(), 100);
+      setTimeout(() => {
+        if (!isSaving) {
+          saveCurrentNote();
+        }
+      }, 100);
     } else {
       // For all other types (Task, Bullet point, Numbered list, etc.)
       setIconTypes(prev => ({
@@ -526,16 +540,27 @@ export default function Note() {
     setFolders((prev) => [...prev, newFolder]);
   };
 
-  const saveCurrentNote = () => {
-    const updatedNotes = notes.map((note) =>
-      note.id === activeNoteId
-        ? { ...note, title, layout, texts, iconTypes }
-        : note,
-    );
-    setNotes(updatedNotes);
-    localStorage.setItem("notes", JSON.stringify(updatedNotes));
-    localStorage.setItem("activeNoteId", activeNoteId);
+  const saveCurrentNote = async () => {
+    setIsSaving(true);
+    try {
+      const updatedNotes = notes.map((note) =>
+        note.id === activeNoteId
+          ? { ...note, title, layout, texts, iconTypes }
+          : note,
+      );
+      setNotes(updatedNotes);
+      localStorage.setItem("notes", JSON.stringify(updatedNotes));
+      localStorage.setItem("activeNoteId", activeNoteId);
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setHasUnsavedChanges(false);
+    } finally {
+      setIsSaving(false);
+    }
   };
+
+  useEffect(() => {
+    setHasUnsavedChanges(true);
+  }, [title, layout, texts, iconTypes]);
 
   const handleUpdateFolder = (folderId: string, newName: string) => {
     setFolders((prev) =>
@@ -596,10 +621,13 @@ export default function Note() {
         onUpdateFolder={handleUpdateFolder}
         onMoveNote={handleMoveNote}
         onDeleteFolder={handleDeleteFolder}
-        onDeleteNote={handleDeleteNote} // Add this line
+        onDeleteNote={handleDeleteNote}
       />
       <div className="flex size-full flex-col overflow-y-auto">
-        <NoteHeader />
+        <NoteHeader 
+          isSaving={isSaving}
+          hasUnsavedChanges={hasUnsavedChanges}
+        />
         <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col px-4 py-8">
           <div className="mb-8">
             <Title

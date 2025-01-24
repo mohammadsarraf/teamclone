@@ -22,6 +22,7 @@ import SelectionMenu from "./components/SelectionMenu";
 import NumberedList from "./components/NumberedList";
 import { GoNumber } from "react-icons/go";
 import { FileBlock } from './components/FileBlock';
+import { Divider } from './components/Divider';
 
 interface Texts {
   [key: string]: string;
@@ -215,28 +216,26 @@ const NoteGrid = ({
 
   const getIcon = (type: string) => {
     switch (type) {
-      case "Task":
-        return <FaTasks />;
       case "Paragraph":
         return <FaParagraph />;
+      case "Task":
+        return <FaTasks />;
+      case "Bullet point":
+        return <PiListBulletsBold />;
       case "Heading 1":
         return <HiH1 />;
       case "Heading 2":
         return <HiH2 />;
       case "Heading 3":
         return <HiH3 />;
-      case "Bullet point":
-        return <PiListBulletsBold />;
       case "Divider":
         return <LiaLine />;
-      case "Blockquote":
-        return <TbQuoteOff />;
+      case "Numbered list":
+        return <GoNumber />;
       case "Image":
         return <BsFillFileEarmarkImageFill />;
       case "Attachment":
         return <BsClipboard />;
-      case "Numbered list":
-        return <GoNumber />;
       default:
         return <FaParagraph />;
     }
@@ -505,6 +504,8 @@ const NoteGrid = ({
                   }
                 })()}
               />
+            ) : item.type === "Divider" ? (
+              <Divider />
             ) : (
               <Paragraph
                 text={texts[item.i]}

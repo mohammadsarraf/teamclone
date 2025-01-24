@@ -407,11 +407,79 @@ export default function Note() {
           setTimeout(() => saveCurrentNote(), 100);
         }
       }
+    } else if (option === 'Divider') {
+      const newDividerKey = `rect${Date.now()}`;
+      const dividerHeight = 3; // Standard height for divider
+
+      setLayout(prevLayout => {
+        const currentIndex = prevLayout.findIndex(item => item.i === key);
+        const currentY = prevLayout[currentIndex].y;
+
+        // Adjust all blocks at and after the current position
+        const adjustedLayout = prevLayout.map(item => {
+          if (item.y < currentY) return item;
+          return {
+            ...item,
+            y: item.y + dividerHeight
+          };
+        });
+
+        return [
+          ...adjustedLayout.slice(0, currentIndex),
+          {
+            i: newDividerKey,
+            x: 0,
+            y: currentY,
+            w: 12,
+            h: dividerHeight,
+            type: 'Divider',
+            showIcons: true
+          },
+          // Add a new paragraph block after the divider
+          {
+            i: `rect${Date.now() + 1}`,
+            x: 0,
+            y: currentY + dividerHeight,
+            w: 12,
+            h: 1,
+            type: 'Paragraph',
+            showIcons: true
+          },
+          ...adjustedLayout.slice(currentIndex)
+        ];
+      });
+
+      // Set empty text for divider
+      setTexts(prev => ({
+        ...prev,
+        [newDividerKey]: ''
+      }));
+
+      setIconTypes(prev => ({
+        ...prev,
+        [newDividerKey]: 'Divider'
+      }));
+
+      setTimeout(() => saveCurrentNote(), 100);
     } else {
+      // For all other types (Task, Bullet point, Numbered list, etc.)
       setIconTypes(prev => ({
         ...prev,
         [key]: option
       }));
+      // Keep existing text
+      setTexts(prev => ({
+        ...prev,
+        [key]: prev[key] || ''
+      }));
+      // Update layout type if needed
+      setLayout(prev => 
+        prev.map(item => 
+          item.i === key 
+            ? { ...item, type: option }
+            : item
+        )
+      );
     }
   };
 

@@ -18,6 +18,9 @@ import { PiListBulletsBold } from "react-icons/pi";
 import { LiaLine } from "react-icons/lia";
 import { TbQuoteOff } from "react-icons/tb";
 import { BsClipboard, BsFillFileEarmarkImageFill } from "react-icons/bs";
+import SelectionMenu from "./components/SelectionMenu";
+import NumberedList from "./components/NumberedList";
+import { GoNumber } from "react-icons/go";
 
 interface Texts {
   [key: string]: string;
@@ -231,6 +234,8 @@ const NoteGrid = ({
         return <BsFillFileEarmarkImageFill />;
       case "Attachment":
         return <BsClipboard />;
+      case "Numbered list":
+        return <GoNumber />;
       default:
         return <FaParagraph />;
     }
@@ -253,6 +258,45 @@ const NoteGrid = ({
       });
     }
   }, [mounted, texts]);
+
+  const handleBold = () => {
+    document.execCommand('bold', false);
+  };
+
+  const handleItalic = () => {
+    document.execCommand('italic', false);
+  };
+
+  const handleLink = () => {
+    const url = prompt('Enter URL:');
+    if (url) {
+      document.execCommand('createLink', false, url);
+    }
+  };
+
+  const handleClearFormat = () => {
+    document.execCommand('removeFormat', false);
+  };
+
+  const getNumberedListIndex = (key: string) => {
+    const currentIndex = layout.findIndex(item => item.i === key);
+    let count = 1;
+
+    // Find the start of the current numbered list sequence
+    let sequenceStart = currentIndex;
+    while (sequenceStart > 0 && layout[sequenceStart - 1].type === "Numbered list") {
+      sequenceStart--;
+    }
+
+    // Count from sequence start to current item
+    for (let i = sequenceStart; i < currentIndex; i++) {
+      if (layout[i].type === "Numbered list") {
+        count++;
+      }
+    }
+
+    return count;
+  };
 
   if (!mounted) {
     return (
@@ -414,6 +458,20 @@ const NoteGrid = ({
                   if (el) el.setAttribute("data-grid-id", item.i);
                 }}
               />
+            ) : item.type === "Numbered list" ? (
+              <NumberedList
+                text={texts[item.i]}
+                number={getNumberedListIndex(item.i)}
+                handleTextChange={(text) => handleTextChangeWithHeight(item.i, text)}
+                handleKeyDown={(e) => {
+                  handleKeyDown(item.i, e);
+                  handleArrowNavigation(item.i, e);
+                }}
+                textareaRef={(el) => {
+                  contentRefs.current[item.i] = el;
+                  if (el) el.setAttribute("data-grid-id", item.i);
+                }}
+              />
             ) : (
               <Paragraph
                 text={texts[item.i]}
@@ -435,6 +493,12 @@ const NoteGrid = ({
           </div>
         ))}
       </GridLayout>
+      <SelectionMenu
+        onBold={handleBold}
+        onItalic={handleItalic}
+        onLink={handleLink}
+        onClear={handleClearFormat}
+      />
     </div>
   );
 };

@@ -8,6 +8,7 @@ import { HiH1, HiH2, HiH3 } from "react-icons/hi2";
 import { LiaLine } from "react-icons/lia";
 import { PiListBulletsBold } from "react-icons/pi";
 import { TbQuoteOff } from "react-icons/tb";
+import { GoNumber } from "react-icons/go";
 
 interface MenuProps {
   closeMenu: () => void;
@@ -119,6 +120,15 @@ const Menu: React.FC<MenuProps> = ({
         >
           <BsClipboard />
           Attachment
+        </button>
+      </div>
+      <div className="border-b">
+        <button
+          className="flex w-full items-center gap-2 px-2 py-1 text-left hover:bg-gray-500 focus:bg-gray-500"
+          onClick={() => handleOptionClick("Numbered list")}
+        >
+          <GoNumber />
+          Numbered list
         </button>
       </div>
     </div>

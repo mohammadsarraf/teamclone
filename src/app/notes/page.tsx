@@ -128,7 +128,7 @@ export default function Note() {
   ) => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
-      const newKey = `rect${layout.length + 1}`;
+      const newKey = `rect${Object.keys(texts).length + 1}`;
       const index = layout.findIndex((item) => item.i === key);
       const currentType = layout[index].type;
 
@@ -141,7 +141,7 @@ export default function Note() {
           w: 12,
           h: 1,
           type:
-            currentType === "Bullet point" || currentType === "Task"
+            currentType === "Bullet point" || currentType === "Task" || currentType === "Numbered list"
               ? currentType
               : "Paragraph",
           showIcons: true,
@@ -153,7 +153,7 @@ export default function Note() {
       setIconTypes((prevIconTypes) => ({
         ...prevIconTypes,
         [newKey]:
-          currentType === "Bullet point" || currentType === "Task"
+          currentType === "Bullet point" || currentType === "Task" || currentType === "Numbered list"
             ? currentType
             : "Paragraph",
       }));

@@ -299,107 +299,113 @@ export default function Note() {
       if (fileData) {
         const base64Size = fileData.data.length * 0.75;
         const fileSizeMB = (base64Size / (1024 * 1024)).toFixed(2);
+        const newFileKey = `rect${Date.now()}`; // Create key here at the top level
 
-        // For images, calculate height based on image dimensions
         if (option === 'Image') {
-          // Create temporary image to get dimensions
           const img = new Image();
           img.src = fileData.data;
           img.onload = () => {
-            // Calculate a more reasonable height based on a max width of 600px
-            // and considering that 1 grid unit = 20px
             const maxWidth = 200;
             const scaledHeight = (img.height * Math.min(maxWidth, img.width)) / img.width;
-            // Add extra space for the footer (1 unit = 20px)
             const gridHeight = Math.max(3, Math.ceil(scaledHeight / 20) + 1);
 
             setLayout(prevLayout => {
               const currentIndex = prevLayout.findIndex(item => item.i === key);
-              const newKey = `rect${Date.now()}`;
               const currentY = prevLayout[currentIndex].y;
-              
-              // Adjust all blocks after the current one
+
+              // Adjust all blocks at and after the current position
               const adjustedLayout = prevLayout.map(item => {
-                if (item.y <= currentY) return item;
+                if (item.y < currentY) return item;
                 return {
                   ...item,
-                  y: item.y + (gridHeight - 1)
+                  y: item.y + gridHeight
                 };
               });
 
               return [
-                ...adjustedLayout.slice(0, currentIndex + 1).map(item => 
-                  item.i === key 
-                    ? { ...item, type: option, h: gridHeight }
-                    : item
-                ),
+                ...adjustedLayout.slice(0, currentIndex),
                 {
-                  i: newKey,
+                  i: newFileKey,
                   x: 0,
-                  y: currentY + gridHeight,
+                  y: currentY,
                   w: 12,
-                  h: 1,
-                  type: "Paragraph",
+                  h: gridHeight,
+                  type: option,
                   showIcons: true
                 },
-                ...adjustedLayout.slice(currentIndex + 1)
+                ...adjustedLayout.slice(currentIndex)
               ];
             });
+
+            // Update texts and iconTypes with the new file data
+            setTexts(prev => ({
+              ...prev,
+              [newFileKey]: JSON.stringify({
+                data: fileData.data,
+                filename: fileData.filename,
+                size: fileSizeMB,
+                type: fileData.filename.split('.').pop()?.toLowerCase(),
+                uploadDate: new Date().toISOString()
+              })
+            }));
+
+            setIconTypes(prev => ({
+              ...prev,
+              [newFileKey]: option
+            }));
+
+            setTimeout(() => saveCurrentNote(), 100);
           };
         } else {
-          // For non-image attachments, use fixed height
+          // For non-image attachments
           const blockHeight = 2;
+
           setLayout(prevLayout => {
             const currentIndex = prevLayout.findIndex(item => item.i === key);
-            const newKey = `rect${Date.now()}`;
             const currentY = prevLayout[currentIndex].y;
-            
+
             const adjustedLayout = prevLayout.map(item => {
-              if (item.y <= currentY) return item;
+              if (item.y < currentY) return item;
               return {
                 ...item,
-                y: item.y + (blockHeight - 1)
+                y: item.y + blockHeight
               };
             });
 
             return [
-              ...adjustedLayout.slice(0, currentIndex + 1).map(item => 
-                item.i === key 
-                  ? { ...item, type: option, h: blockHeight }
-                  : item
-              ),
+              ...adjustedLayout.slice(0, currentIndex),
               {
-                i: newKey,
+                i: newFileKey,
                 x: 0,
-                y: currentY + blockHeight,
+                y: currentY,
                 w: 12,
-                h: 1,
-                type: "Paragraph",
+                h: blockHeight,
+                type: option,
                 showIcons: true
               },
-              ...adjustedLayout.slice(currentIndex + 1)
+              ...adjustedLayout.slice(currentIndex)
             ];
           });
+
+          // Update texts and iconTypes with the new file data
+          setTexts(prev => ({
+            ...prev,
+            [newFileKey]: JSON.stringify({
+              data: fileData.data,
+              filename: fileData.filename,
+              size: fileSizeMB,
+              type: fileData.filename.split('.').pop()?.toLowerCase(),
+              uploadDate: new Date().toISOString()
+            })
+          }));
+
+          setIconTypes(prev => ({
+            ...prev,
+            [newFileKey]: option
+          }));
+
+          setTimeout(() => saveCurrentNote(), 100);
         }
-
-        // Store file data with metadata
-        setTexts(prev => ({
-          ...prev,
-          [key]: JSON.stringify({
-            data: fileData.data,
-            filename: fileData.filename,
-            size: fileSizeMB,
-            type: fileData.filename.split('.').pop()?.toLowerCase(),
-            uploadDate: new Date().toISOString()
-          })
-        }));
-
-        setIconTypes(prev => ({
-          ...prev,
-          [key]: option
-        }));
-
-        setTimeout(() => saveCurrentNote(), 100);
       }
     } else {
       setIconTypes(prev => ({

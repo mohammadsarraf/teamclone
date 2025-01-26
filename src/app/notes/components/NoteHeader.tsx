@@ -3,13 +3,16 @@ interface NoteHeaderProps {
   hasUnsavedChanges?: boolean;
 }
 
-export default function NoteHeader({ isSaving, hasUnsavedChanges }: NoteHeaderProps) {
+export default function NoteHeader({
+  isSaving,
+  hasUnsavedChanges,
+}: NoteHeaderProps) {
   return (
     <header className="flex h-12 items-center justify-between border-b border-zinc-800 px-4">
       <div className="flex items-center gap-4">
         {/* ... other header content ... */}
       </div>
-      
+
       <div className="flex items-center gap-2 px-4">
         {isSaving ? (
           <div className="flex items-center gap-2">
@@ -24,4 +27,4 @@ export default function NoteHeader({ isSaving, hasUnsavedChanges }: NoteHeaderPr
       </div>
     </header>
   );
-} 
+}

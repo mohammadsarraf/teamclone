@@ -143,7 +143,9 @@ export default function Note() {
           w: 12,
           h: 1,
           type:
-            currentType === "Bullet point" || currentType === "Task" || currentType === "Numbered list"
+            currentType === "Bullet point" ||
+            currentType === "Task" ||
+            currentType === "Numbered list"
               ? currentType
               : "Paragraph",
           showIcons: true,
@@ -155,7 +157,9 @@ export default function Note() {
       setIconTypes((prevIconTypes) => ({
         ...prevIconTypes,
         [newKey]:
-          currentType === "Bullet point" || currentType === "Task" || currentType === "Numbered list"
+          currentType === "Bullet point" ||
+          currentType === "Task" ||
+          currentType === "Numbered list"
             ? currentType
             : "Paragraph",
       }));
@@ -296,31 +300,38 @@ export default function Note() {
     setIconTypes({});
   };
 
-  const handleMenuSelect = (key: string, option: string, fileData?: { data: string; filename: string }) => {
-    if (option === 'Image' || option === 'Attachment') {
+  const handleMenuSelect = (
+    key: string,
+    option: string,
+    fileData?: { data: string; filename: string },
+  ) => {
+    if (option === "Image" || option === "Attachment") {
       if (fileData) {
         const base64Size = fileData.data.length * 0.75;
         const fileSizeMB = (base64Size / (1024 * 1024)).toFixed(2);
         const newFileKey = `rect${Date.now()}`; // Create key here at the top level
 
-        if (option === 'Image') {
+        if (option === "Image") {
           const img = new Image();
           img.src = fileData.data;
           img.onload = () => {
             const maxWidth = 200;
-            const scaledHeight = (img.height * Math.min(maxWidth, img.width)) / img.width;
+            const scaledHeight =
+              (img.height * Math.min(maxWidth, img.width)) / img.width;
             const gridHeight = Math.max(3, Math.ceil(scaledHeight / 20) + 1);
 
-            setLayout(prevLayout => {
-              const currentIndex = prevLayout.findIndex(item => item.i === key);
+            setLayout((prevLayout) => {
+              const currentIndex = prevLayout.findIndex(
+                (item) => item.i === key,
+              );
               const currentY = prevLayout[currentIndex].y;
 
               // Adjust all blocks at and after the current position
-              const adjustedLayout = prevLayout.map(item => {
+              const adjustedLayout = prevLayout.map((item) => {
                 if (item.y < currentY) return item;
                 return {
                   ...item,
-                  y: item.y + gridHeight
+                  y: item.y + gridHeight,
                 };
               });
 
@@ -333,27 +344,27 @@ export default function Note() {
                   w: 12,
                   h: gridHeight,
                   type: option,
-                  showIcons: true
+                  showIcons: true,
                 },
-                ...adjustedLayout.slice(currentIndex)
+                ...adjustedLayout.slice(currentIndex),
               ];
             });
 
             // Update texts and iconTypes with the new file data
-            setTexts(prev => ({
+            setTexts((prev) => ({
               ...prev,
               [newFileKey]: JSON.stringify({
                 data: fileData.data,
                 filename: fileData.filename,
                 size: fileSizeMB,
-                type: fileData.filename.split('.').pop()?.toLowerCase(),
-                uploadDate: new Date().toISOString()
-              })
+                type: fileData.filename.split(".").pop()?.toLowerCase(),
+                uploadDate: new Date().toISOString(),
+              }),
             }));
 
-            setIconTypes(prev => ({
+            setIconTypes((prev) => ({
               ...prev,
-              [newFileKey]: option
+              [newFileKey]: option,
             }));
 
             setTimeout(() => {
@@ -366,15 +377,15 @@ export default function Note() {
           // For non-image attachments
           const blockHeight = 2;
 
-          setLayout(prevLayout => {
-            const currentIndex = prevLayout.findIndex(item => item.i === key);
+          setLayout((prevLayout) => {
+            const currentIndex = prevLayout.findIndex((item) => item.i === key);
             const currentY = prevLayout[currentIndex].y;
 
-            const adjustedLayout = prevLayout.map(item => {
+            const adjustedLayout = prevLayout.map((item) => {
               if (item.y < currentY) return item;
               return {
                 ...item,
-                y: item.y + blockHeight
+                y: item.y + blockHeight,
               };
             });
 
@@ -387,27 +398,27 @@ export default function Note() {
                 w: 12,
                 h: blockHeight,
                 type: option,
-                showIcons: true
+                showIcons: true,
               },
-              ...adjustedLayout.slice(currentIndex)
+              ...adjustedLayout.slice(currentIndex),
             ];
           });
 
           // Update texts and iconTypes with the new file data
-          setTexts(prev => ({
+          setTexts((prev) => ({
             ...prev,
             [newFileKey]: JSON.stringify({
               data: fileData.data,
               filename: fileData.filename,
               size: fileSizeMB,
-              type: fileData.filename.split('.').pop()?.toLowerCase(),
-              uploadDate: new Date().toISOString()
-            })
+              type: fileData.filename.split(".").pop()?.toLowerCase(),
+              uploadDate: new Date().toISOString(),
+            }),
           }));
 
-          setIconTypes(prev => ({
+          setIconTypes((prev) => ({
             ...prev,
-            [newFileKey]: option
+            [newFileKey]: option,
           }));
 
           setTimeout(() => {
@@ -417,20 +428,20 @@ export default function Note() {
           }, 100);
         }
       }
-    } else if (option === 'Divider') {
+    } else if (option === "Divider") {
       const newDividerKey = `rect${Date.now()}`;
       const dividerHeight = 3; // Standard height for divider
 
-      setLayout(prevLayout => {
-        const currentIndex = prevLayout.findIndex(item => item.i === key);
+      setLayout((prevLayout) => {
+        const currentIndex = prevLayout.findIndex((item) => item.i === key);
         const currentY = prevLayout[currentIndex].y;
 
         // Adjust all blocks at and after the current position
-        const adjustedLayout = prevLayout.map(item => {
+        const adjustedLayout = prevLayout.map((item) => {
           if (item.y < currentY) return item;
           return {
             ...item,
-            y: item.y + dividerHeight
+            y: item.y + dividerHeight,
           };
         });
 
@@ -442,8 +453,8 @@ export default function Note() {
             y: currentY,
             w: 12,
             h: dividerHeight,
-            type: 'Divider',
-            showIcons: true
+            type: "Divider",
+            showIcons: true,
           },
           // Add a new paragraph block after the divider
           {
@@ -452,22 +463,22 @@ export default function Note() {
             y: currentY + dividerHeight,
             w: 12,
             h: 1,
-            type: 'Paragraph',
-            showIcons: true
+            type: "Paragraph",
+            showIcons: true,
           },
-          ...adjustedLayout.slice(currentIndex)
+          ...adjustedLayout.slice(currentIndex),
         ];
       });
 
       // Set empty text for divider
-      setTexts(prev => ({
+      setTexts((prev) => ({
         ...prev,
-        [newDividerKey]: ''
+        [newDividerKey]: "",
       }));
 
-      setIconTypes(prev => ({
+      setIconTypes((prev) => ({
         ...prev,
-        [newDividerKey]: 'Divider'
+        [newDividerKey]: "Divider",
       }));
 
       setTimeout(() => {
@@ -477,22 +488,18 @@ export default function Note() {
       }, 100);
     } else {
       // For all other types (Task, Bullet point, Numbered list, etc.)
-      setIconTypes(prev => ({
+      setIconTypes((prev) => ({
         ...prev,
-        [key]: option
+        [key]: option,
       }));
       // Keep existing text
-      setTexts(prev => ({
+      setTexts((prev) => ({
         ...prev,
-        [key]: prev[key] || ''
+        [key]: prev[key] || "",
       }));
       // Update layout type if needed
-      setLayout(prev => 
-        prev.map(item => 
-          item.i === key 
-            ? { ...item, type: option }
-            : item
-        )
+      setLayout((prev) =>
+        prev.map((item) => (item.i === key ? { ...item, type: option } : item)),
       );
     }
   };
@@ -551,7 +558,7 @@ export default function Note() {
       setNotes(updatedNotes);
       localStorage.setItem("notes", JSON.stringify(updatedNotes));
       localStorage.setItem("activeNoteId", activeNoteId);
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
       setHasUnsavedChanges(false);
     } finally {
       setIsSaving(false);
@@ -624,10 +631,7 @@ export default function Note() {
         onDeleteNote={handleDeleteNote}
       />
       <div className="flex size-full flex-col overflow-y-auto">
-        <NoteHeader 
-          isSaving={isSaving}
-          hasUnsavedChanges={hasUnsavedChanges}
-        />
+        <NoteHeader isSaving={isSaving} hasUnsavedChanges={hasUnsavedChanges} />
         <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col px-4 py-8">
           <div className="mb-8">
             <Title

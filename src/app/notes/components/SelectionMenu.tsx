@@ -33,25 +33,25 @@ export default function SelectionMenu({
       const range = selection.getRangeAt(0);
       const rect = range.getBoundingClientRect();
       const scrollY = window.scrollY;
-      
+
       // Calculate position relative to viewport
       const menuHeight = 40; // Height of our menu
       const buffer = 10; // Space between selection and menu
-      
+
       setPosition({
         // Center horizontally over selection
-        left: Math.max(0, rect.left + (rect.width / 2) - 84),
+        left: Math.max(0, rect.left + rect.width / 2 - 84),
         // Position above selection, but ensure it stays in viewport
         top: Math.max(0, rect.top + scrollY - menuHeight - buffer),
       });
       setIsVisible(true);
     };
 
-    document.addEventListener('selectionchange', handleSelection);
-    window.addEventListener('scroll', handleSelection); // Handle scroll position
+    document.addEventListener("selectionchange", handleSelection);
+    window.addEventListener("scroll", handleSelection); // Handle scroll position
     return () => {
-      document.removeEventListener('selectionchange', handleSelection);
-      window.removeEventListener('scroll', handleSelection);
+      document.removeEventListener("selectionchange", handleSelection);
+      window.removeEventListener("scroll", handleSelection);
     };
   }, []);
 
@@ -63,7 +63,7 @@ export default function SelectionMenu({
       style={{
         top: `${position.top}px`,
         left: `${position.left}px`,
-        transform: 'translateX(-50%)', // Center the menu
+        transform: "translateX(-50%)", // Center the menu
       }}
     >
       <button
@@ -96,4 +96,4 @@ export default function SelectionMenu({
       </button>
     </div>
   );
-} 
+}

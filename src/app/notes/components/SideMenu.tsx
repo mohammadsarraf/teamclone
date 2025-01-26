@@ -81,14 +81,14 @@ export default function SideMenu({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
         setIsSearching(true);
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   const toggleFolder = (folderId: string) => {
@@ -142,11 +142,11 @@ export default function SideMenu({
 
   const getFilteredNotes = () => {
     if (!searchQuery) return notes;
-    
-    const searchTerms = searchQuery.toLowerCase().split(' ');
-    return notes.filter(note => {
+
+    const searchTerms = searchQuery.toLowerCase().split(" ");
+    return notes.filter((note) => {
       const title = note.title.toLowerCase();
-      return searchTerms.every(term => title.includes(term));
+      return searchTerms.every((term) => title.includes(term));
     });
   };
 
@@ -352,7 +352,7 @@ export default function SideMenu({
                   }
                 }}
                 onBlur={() => {
-                  if (searchQuery === '') {
+                  if (searchQuery === "") {
                     setIsSearching(false);
                   }
                 }}
@@ -409,7 +409,9 @@ export default function SideMenu({
         )}
         {filteredNotes.length === 0 && (
           <div className="px-4 py-2 text-sm text-zinc-500">
-            {searchQuery ? "No matching notes found." : "No notes yet. Create one to get started."}
+            {searchQuery
+              ? "No matching notes found."
+              : "No notes yet. Create one to get started."}
           </div>
         )}
       </div>

@@ -21,8 +21,8 @@ import { BsClipboard, BsFillFileEarmarkImageFill } from "react-icons/bs";
 import SelectionMenu from "./components/SelectionMenu";
 import NumberedList from "./components/NumberedList";
 import { GoNumber } from "react-icons/go";
-import { FileBlock } from './components/FileBlock';
-import { Divider } from './components/Divider';
+import { FileBlock } from "./components/FileBlock";
+import { Divider } from "./components/Divider";
 
 interface Texts {
   [key: string]: string;
@@ -87,7 +87,11 @@ const NoteGrid = ({
   texts: Texts;
   setTexts: React.Dispatch<React.SetStateAction<Texts>>;
   iconTypes: { [key: string]: string };
-  handleMenuSelect: (key: string, option: string, fileData?: { data: string; filename: string }) => void;
+  handleMenuSelect: (
+    key: string,
+    option: string,
+    fileData?: { data: string; filename: string },
+  ) => void;
 }) => {
   const initialTexts = layout.reduce((acc, item) => {
     if (item.type === "Title") {
@@ -260,31 +264,34 @@ const NoteGrid = ({
   }, [mounted, texts]);
 
   const handleBold = () => {
-    document.execCommand('bold', false);
+    document.execCommand("bold", false);
   };
 
   const handleItalic = () => {
-    document.execCommand('italic', false);
+    document.execCommand("italic", false);
   };
 
   const handleLink = () => {
-    const url = prompt('Enter URL:');
+    const url = prompt("Enter URL:");
     if (url) {
-      document.execCommand('createLink', false, url);
+      document.execCommand("createLink", false, url);
     }
   };
 
   const handleClearFormat = () => {
-    document.execCommand('removeFormat', false);
+    document.execCommand("removeFormat", false);
   };
 
   const getNumberedListIndex = (key: string) => {
-    const currentIndex = layout.findIndex(item => item.i === key);
+    const currentIndex = layout.findIndex((item) => item.i === key);
     let count = 1;
 
     // Find the start of the current numbered list sequence
     let sequenceStart = currentIndex;
-    while (sequenceStart > 0 && layout[sequenceStart - 1].type === "Numbered list") {
+    while (
+      sequenceStart > 0 &&
+      layout[sequenceStart - 1].type === "Numbered list"
+    ) {
       sequenceStart--;
     }
 
@@ -367,9 +374,10 @@ const NoteGrid = ({
                   closeMenu={() =>
                     setMenuVisibility({ ...menuVisibility, [item.i]: false })
                   }
-                  onSelect={(option: string, fileData?: { data: string; filename: string }) =>
-                    handleMenuSelect(item.i, option, fileData)
-                  }
+                  onSelect={(
+                    option: string,
+                    fileData?: { data: string; filename: string },
+                  ) => handleMenuSelect(item.i, option, fileData)}
                   adjustTextareaHeight={() =>
                     handleTextChangeWithHeight(item.i, texts[item.i])
                   }
@@ -462,7 +470,9 @@ const NoteGrid = ({
               <NumberedList
                 text={texts[item.i]}
                 number={getNumberedListIndex(item.i)}
-                handleTextChange={(text) => handleTextChangeWithHeight(item.i, text)}
+                handleTextChange={(text) =>
+                  handleTextChangeWithHeight(item.i, text)
+                }
                 handleKeyDown={(e) => {
                   handleKeyDown(item.i, e);
                   handleArrowNavigation(item.i, e);
@@ -474,30 +484,30 @@ const NoteGrid = ({
               />
             ) : item.type === "Image" || item.type === "Attachment" ? (
               <FileBlock
-                type={item.type as 'Image' | 'Attachment'}
+                type={item.type as "Image" | "Attachment"}
                 data={(() => {
                   try {
-                    const fileData = JSON.parse(texts[item.i] || '{}');
-                    return fileData.data || '';
+                    const fileData = JSON.parse(texts[item.i] || "{}");
+                    return fileData.data || "";
                   } catch {
-                    return '';
+                    return "";
                   }
                 })()}
                 filename={(() => {
                   try {
-                    const fileData = JSON.parse(texts[item.i] || '{}');
-                    return fileData.filename || 'Untitled';
+                    const fileData = JSON.parse(texts[item.i] || "{}");
+                    return fileData.filename || "Untitled";
                   } catch {
-                    return 'Untitled';
+                    return "Untitled";
                   }
                 })()}
                 metadata={(() => {
                   try {
-                    const fileData = JSON.parse(texts[item.i] || '{}');
+                    const fileData = JSON.parse(texts[item.i] || "{}");
                     return {
                       size: fileData.size,
                       uploadDate: fileData.uploadDate,
-                      fileType: fileData.type
+                      fileType: fileData.type,
                     };
                   } catch {
                     return undefined;

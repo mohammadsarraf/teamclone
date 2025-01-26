@@ -13,7 +13,10 @@ import { GoNumber } from "react-icons/go";
 interface MenuProps {
   closeMenu: () => void;
   adjustTextareaHeight: () => void;
-  onSelect: (option: string, fileData?: { data: string; filename: string }) => void;
+  onSelect: (
+    option: string,
+    fileData?: { data: string; filename: string },
+  ) => void;
 }
 
 const Menu: React.FC<MenuProps> = ({
@@ -44,25 +47,28 @@ const Menu: React.FC<MenuProps> = ({
     closeMenu();
   };
 
-  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>, type: 'Image' | 'Attachment') => {
+  const handleFileSelect = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+    type: "Image" | "Attachment",
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     // Check file size (5MB limit)
     if (file.size > 5 * 1024 * 1024) {
-      alert('File size must be less than 5MB');
+      alert("File size must be less than 5MB");
       return;
     }
 
     // For images, check dimensions and compress if needed
-    if (type === 'Image') {
+    if (type === "Image") {
       const img = new Image();
       const reader = new FileReader();
-      
+
       reader.onload = (e) => {
         img.src = e.target?.result as string;
         img.onload = () => {
-          const canvas = document.createElement('canvas');
+          const canvas = document.createElement("canvas");
           let width = img.width;
           let height = img.height;
 
@@ -81,11 +87,11 @@ const Menu: React.FC<MenuProps> = ({
 
           canvas.width = width;
           canvas.height = height;
-          const ctx = canvas.getContext('2d');
+          const ctx = canvas.getContext("2d");
           ctx?.drawImage(img, 0, 0, width, height);
 
           // Convert to base64 with reduced quality
-          const base64String = canvas.toDataURL('image/jpeg', 0.8);
+          const base64String = canvas.toDataURL("image/jpeg", 0.8);
           onSelect(type, { data: base64String, filename: file.name });
         };
       };
@@ -103,7 +109,10 @@ const Menu: React.FC<MenuProps> = ({
   };
 
   return (
-    <div ref={menuRef} className="w-fit rounded-lg border border-zinc-700 bg-zinc-800 shadow-xl">
+    <div
+      ref={menuRef}
+      className="w-fit rounded-lg border border-zinc-700 bg-zinc-800 shadow-xl"
+    >
       <div className="border-b">
         <button
           className="flex w-full items-center gap-2 px-2 py-1 text-left hover:bg-gray-500 focus:bg-gray-500"
@@ -172,14 +181,14 @@ const Menu: React.FC<MenuProps> = ({
           type="file"
           accept="image/*"
           className="hidden"
-          onChange={(e) => handleFileSelect(e, 'Image')}
+          onChange={(e) => handleFileSelect(e, "Image")}
         />
         <input
           ref={fileInputRef}
           type="file"
           accept=".pdf,.doc,.docx,.txt,.zip,.rar"
           className="hidden"
-          onChange={(e) => handleFileSelect(e, 'Attachment')}
+          onChange={(e) => handleFileSelect(e, "Attachment")}
         />
         <button
           className="flex w-full items-center gap-2 px-3 py-2 text-left text-zinc-300 hover:bg-zinc-700/50 hover:text-zinc-50"

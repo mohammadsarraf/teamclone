@@ -18,6 +18,11 @@ import { PiListBulletsBold } from "react-icons/pi";
 import { LiaLine } from "react-icons/lia";
 import { TbQuoteOff } from "react-icons/tb";
 import { BsClipboard, BsFillFileEarmarkImageFill } from "react-icons/bs";
+import SelectionMenu from "./components/SelectionMenu";
+import NumberedList from "./components/NumberedList";
+import { GoNumber } from "react-icons/go";
+import { FileBlock } from "./components/FileBlock";
+import { Divider } from "./components/Divider";
 
 interface Texts {
   [key: string]: string;
@@ -82,7 +87,11 @@ const NoteGrid = ({
   texts: Texts;
   setTexts: React.Dispatch<React.SetStateAction<Texts>>;
   iconTypes: { [key: string]: string };
-  handleMenuSelect: (key: string, option: string) => void;
+  handleMenuSelect: (
+    key: string,
+    option: string,
+    fileData?: { data: string; filename: string },
+  ) => void;
 }) => {
   const initialTexts = layout.reduce((acc, item) => {
     if (item.type === "Title") {
@@ -211,22 +220,22 @@ const NoteGrid = ({
 
   const getIcon = (type: string) => {
     switch (type) {
-      case "Task":
-        return <FaTasks />;
       case "Paragraph":
         return <FaParagraph />;
+      case "Task":
+        return <FaTasks />;
+      case "Bullet point":
+        return <PiListBulletsBold />;
       case "Heading 1":
         return <HiH1 />;
       case "Heading 2":
         return <HiH2 />;
       case "Heading 3":
         return <HiH3 />;
-      case "Bullet point":
-        return <PiListBulletsBold />;
       case "Divider":
         return <LiaLine />;
-      case "Blockquote":
-        return <TbQuoteOff />;
+      case "Numbered list":
+        return <GoNumber />;
       case "Image":
         return <BsFillFileEarmarkImageFill />;
       case "Attachment":
@@ -253,6 +262,48 @@ const NoteGrid = ({
       });
     }
   }, [mounted, texts]);
+
+  const handleBold = () => {
+    document.execCommand("bold", false);
+  };
+
+  const handleItalic = () => {
+    document.execCommand("italic", false);
+  };
+
+  const handleLink = () => {
+    const url = prompt("Enter URL:");
+    if (url) {
+      document.execCommand("createLink", false, url);
+    }
+  };
+
+  const handleClearFormat = () => {
+    document.execCommand("removeFormat", false);
+  };
+
+  const getNumberedListIndex = (key: string) => {
+    const currentIndex = layout.findIndex((item) => item.i === key);
+    let count = 1;
+
+    // Find the start of the current numbered list sequence
+    let sequenceStart = currentIndex;
+    while (
+      sequenceStart > 0 &&
+      layout[sequenceStart - 1].type === "Numbered list"
+    ) {
+      sequenceStart--;
+    }
+
+    // Count from sequence start to current item
+    for (let i = sequenceStart; i < currentIndex; i++) {
+      if (layout[i].type === "Numbered list") {
+        count++;
+      }
+    }
+
+    return count;
+  };
 
   if (!mounted) {
     return (
@@ -323,9 +374,10 @@ const NoteGrid = ({
                   closeMenu={() =>
                     setMenuVisibility({ ...menuVisibility, [item.i]: false })
                   }
-                  onSelect={(option: string) =>
-                    handleMenuSelect(item.i, option)
-                  }
+                  onSelect={(
+                    option: string,
+                    fileData?: { data: string; filename: string },
+                  ) => handleMenuSelect(item.i, option, fileData)}
                   adjustTextareaHeight={() =>
                     handleTextChangeWithHeight(item.i, texts[item.i])
                   }
@@ -414,6 +466,56 @@ const NoteGrid = ({
                   if (el) el.setAttribute("data-grid-id", item.i);
                 }}
               />
+            ) : item.type === "Numbered list" ? (
+              <NumberedList
+                text={texts[item.i]}
+                number={getNumberedListIndex(item.i)}
+                handleTextChange={(text) =>
+                  handleTextChangeWithHeight(item.i, text)
+                }
+                handleKeyDown={(e) => {
+                  handleKeyDown(item.i, e);
+                  handleArrowNavigation(item.i, e);
+                }}
+                textareaRef={(el) => {
+                  contentRefs.current[item.i] = el;
+                  if (el) el.setAttribute("data-grid-id", item.i);
+                }}
+              />
+            ) : item.type === "Image" || item.type === "Attachment" ? (
+              <FileBlock
+                type={item.type as "Image" | "Attachment"}
+                data={(() => {
+                  try {
+                    const fileData = JSON.parse(texts[item.i] || "{}");
+                    return fileData.data || "";
+                  } catch {
+                    return "";
+                  }
+                })()}
+                filename={(() => {
+                  try {
+                    const fileData = JSON.parse(texts[item.i] || "{}");
+                    return fileData.filename || "Untitled";
+                  } catch {
+                    return "Untitled";
+                  }
+                })()}
+                metadata={(() => {
+                  try {
+                    const fileData = JSON.parse(texts[item.i] || "{}");
+                    return {
+                      size: fileData.size,
+                      uploadDate: fileData.uploadDate,
+                      fileType: fileData.type,
+                    };
+                  } catch {
+                    return undefined;
+                  }
+                })()}
+              />
+            ) : item.type === "Divider" ? (
+              <Divider />
             ) : (
               <Paragraph
                 text={texts[item.i]}
@@ -435,6 +537,12 @@ const NoteGrid = ({
           </div>
         ))}
       </GridLayout>
+      <SelectionMenu
+        onBold={handleBold}
+        onItalic={handleItalic}
+        onLink={handleLink}
+        onClear={handleClearFormat}
+      />
     </div>
   );
 };

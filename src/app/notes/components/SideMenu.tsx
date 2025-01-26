@@ -6,6 +6,8 @@ import {
   FolderIcon,
   DocumentIcon,
   EllipsisHorizontalIcon,
+  MagnifyingGlassIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 
 interface Note {
@@ -59,6 +61,9 @@ export default function SideMenu({
     x: number;
     y: number;
   } | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const editInputRef = useRef<HTMLInputElement>(null);
 
@@ -67,6 +72,24 @@ export default function SideMenu({
       editInputRef.current.focus();
     }
   }, [editingFolderId]);
+
+  useEffect(() => {
+    if (isSearching && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [isSearching]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setIsSearching(true);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const toggleFolder = (folderId: string) => {
     setExpandedFolders((prev) => {
@@ -113,7 +136,23 @@ export default function SideMenu({
     });
   };
 
-  const rootNotes = notes.filter((note) => !note.folderId);
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+  };
+
+  const getFilteredNotes = () => {
+    if (!searchQuery) return notes;
+
+    const searchTerms = searchQuery.toLowerCase().split(" ");
+    return notes.filter((note) => {
+      const title = note.title.toLowerCase();
+      return searchTerms.every((term) => title.includes(term));
+    });
+  };
+
+  const filteredNotes = getFilteredNotes();
+
+  const filteredRootNotes = filteredNotes.filter((note) => !note.folderId);
 
   const renderNoteItem = (note: Note, indent: number = 0) => (
     <div
@@ -297,7 +336,51 @@ export default function SideMenu({
   return (
     <div className="flex h-full w-64 shrink-0 flex-col overflow-hidden border-r border-zinc-800 bg-zinc-900">
       <div className="flex h-14 items-center justify-between border-b border-zinc-800 px-4">
-        <h2 className="font-medium text-zinc-200">Notes</h2>
+        <div className="flex flex-1 items-center gap-2">
+          {isSearching ? (
+            <div className="flex w-full items-center gap-2">
+              <MagnifyingGlassIcon className="size-4 text-zinc-400" />
+              <input
+                ref={searchInputRef}
+                type="text"
+                value={searchQuery}
+                onChange={(e) => handleSearch(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Escape") {
+                    setIsSearching(false);
+                    setSearchQuery("");
+                  }
+                }}
+                onBlur={() => {
+                  if (searchQuery === "") {
+                    setIsSearching(false);
+                  }
+                }}
+                placeholder="Search notes..."
+                className="w-full bg-transparent text-sm text-zinc-200 placeholder:text-zinc-500 focus:outline-none"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => {
+                    setSearchQuery("");
+                    setIsSearching(false);
+                  }}
+                  className="rounded-md p-1 hover:bg-zinc-800"
+                >
+                  <XMarkIcon className="size-4 text-zinc-400" />
+                </button>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={() => setIsSearching(true)}
+              className="rounded-md p-1 hover:bg-zinc-800"
+              title="Search notes"
+            >
+              <MagnifyingGlassIcon className="size-4 text-zinc-400" />
+            </button>
+          )}
+        </div>
         <div className="flex gap-2">
           <button
             onClick={onNewFolder}
@@ -316,11 +399,19 @@ export default function SideMenu({
         </div>
       </div>
       <div className="ml-2 flex-1 space-y-0.5 overflow-y-auto py-2">
-        {folders.map(renderFolderContent)}
-        {rootNotes.map((note) => renderNoteItem(note))}
-        {rootNotes.length === 0 && folders.length === 0 && (
+        {searchQuery ? (
+          filteredNotes.map((note) => renderNoteItem(note))
+        ) : (
+          <>
+            {folders.map(renderFolderContent)}
+            {filteredRootNotes.map((note) => renderNoteItem(note))}
+          </>
+        )}
+        {filteredNotes.length === 0 && (
           <div className="px-4 py-2 text-sm text-zinc-500">
-            No notes yet. Create one to get started.
+            {searchQuery
+              ? "No matching notes found."
+              : "No notes yet. Create one to get started."}
           </div>
         )}
       </div>

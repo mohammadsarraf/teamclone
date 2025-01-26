@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect, RefObject } from "react";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import NoteGrid from "./NoteGrid";
-import NoteHeader from "./NoteHeader";
+import NoteHeader from "./components/NoteHeader";
 import "@fontsource/playfair-display"; // Defaults to weight 400
 import "@fontsource/playfair-display/700.css"; // For weight 700
 import Title from "./components/Title";
@@ -53,6 +53,8 @@ export default function Note() {
       isExpanded?: boolean;
     }>
   >([]);
+  const [isSaving, setIsSaving] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -128,7 +130,7 @@ export default function Note() {
   ) => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
-      const newKey = `rect${layout.length + 1}`;
+      const newKey = `rect${Object.keys(texts).length + 1}`;
       const index = layout.findIndex((item) => item.i === key);
       const currentType = layout[index].type;
 
@@ -141,7 +143,9 @@ export default function Note() {
           w: 12,
           h: 1,
           type:
-            currentType === "Bullet point" || currentType === "Task"
+            currentType === "Bullet point" ||
+            currentType === "Task" ||
+            currentType === "Numbered list"
               ? currentType
               : "Paragraph",
           showIcons: true,
@@ -153,7 +157,9 @@ export default function Note() {
       setIconTypes((prevIconTypes) => ({
         ...prevIconTypes,
         [newKey]:
-          currentType === "Bullet point" || currentType === "Task"
+          currentType === "Bullet point" ||
+          currentType === "Task" ||
+          currentType === "Numbered list"
             ? currentType
             : "Paragraph",
       }));
@@ -294,20 +300,208 @@ export default function Note() {
     setIconTypes({});
   };
 
-  const handleMenuSelect = (key: string, option: string) => {
-    setTexts((prevTexts) => ({
-      ...prevTexts,
-      [key]: prevTexts[key],
-    }));
-    setLayout((prevLayout) =>
-      prevLayout.map((item) =>
-        item.i === key ? { ...item, type: option } : item,
-      ),
-    );
-    setIconTypes((prevIconTypes) => ({
-      ...prevIconTypes,
-      [key]: option,
-    }));
+  const handleMenuSelect = (
+    key: string,
+    option: string,
+    fileData?: { data: string; filename: string },
+  ) => {
+    if (option === "Image" || option === "Attachment") {
+      if (fileData) {
+        const base64Size = fileData.data.length * 0.75;
+        const fileSizeMB = (base64Size / (1024 * 1024)).toFixed(2);
+        const newFileKey = `rect${Date.now()}`; // Create key here at the top level
+
+        if (option === "Image") {
+          const img = new Image();
+          img.src = fileData.data;
+          img.onload = () => {
+            const maxWidth = 200;
+            const scaledHeight =
+              (img.height * Math.min(maxWidth, img.width)) / img.width;
+            const gridHeight = Math.max(3, Math.ceil(scaledHeight / 20) + 1);
+
+            setLayout((prevLayout) => {
+              const currentIndex = prevLayout.findIndex(
+                (item) => item.i === key,
+              );
+              const currentY = prevLayout[currentIndex].y;
+
+              // Adjust all blocks at and after the current position
+              const adjustedLayout = prevLayout.map((item) => {
+                if (item.y < currentY) return item;
+                return {
+                  ...item,
+                  y: item.y + gridHeight,
+                };
+              });
+
+              return [
+                ...adjustedLayout.slice(0, currentIndex),
+                {
+                  i: newFileKey,
+                  x: 0,
+                  y: currentY,
+                  w: 12,
+                  h: gridHeight,
+                  type: option,
+                  showIcons: true,
+                },
+                ...adjustedLayout.slice(currentIndex),
+              ];
+            });
+
+            // Update texts and iconTypes with the new file data
+            setTexts((prev) => ({
+              ...prev,
+              [newFileKey]: JSON.stringify({
+                data: fileData.data,
+                filename: fileData.filename,
+                size: fileSizeMB,
+                type: fileData.filename.split(".").pop()?.toLowerCase(),
+                uploadDate: new Date().toISOString(),
+              }),
+            }));
+
+            setIconTypes((prev) => ({
+              ...prev,
+              [newFileKey]: option,
+            }));
+
+            setTimeout(() => {
+              if (!isSaving) {
+                saveCurrentNote();
+              }
+            }, 100);
+          };
+        } else {
+          // For non-image attachments
+          const blockHeight = 2;
+
+          setLayout((prevLayout) => {
+            const currentIndex = prevLayout.findIndex((item) => item.i === key);
+            const currentY = prevLayout[currentIndex].y;
+
+            const adjustedLayout = prevLayout.map((item) => {
+              if (item.y < currentY) return item;
+              return {
+                ...item,
+                y: item.y + blockHeight,
+              };
+            });
+
+            return [
+              ...adjustedLayout.slice(0, currentIndex),
+              {
+                i: newFileKey,
+                x: 0,
+                y: currentY,
+                w: 12,
+                h: blockHeight,
+                type: option,
+                showIcons: true,
+              },
+              ...adjustedLayout.slice(currentIndex),
+            ];
+          });
+
+          // Update texts and iconTypes with the new file data
+          setTexts((prev) => ({
+            ...prev,
+            [newFileKey]: JSON.stringify({
+              data: fileData.data,
+              filename: fileData.filename,
+              size: fileSizeMB,
+              type: fileData.filename.split(".").pop()?.toLowerCase(),
+              uploadDate: new Date().toISOString(),
+            }),
+          }));
+
+          setIconTypes((prev) => ({
+            ...prev,
+            [newFileKey]: option,
+          }));
+
+          setTimeout(() => {
+            if (!isSaving) {
+              saveCurrentNote();
+            }
+          }, 100);
+        }
+      }
+    } else if (option === "Divider") {
+      const newDividerKey = `rect${Date.now()}`;
+      const dividerHeight = 3; // Standard height for divider
+
+      setLayout((prevLayout) => {
+        const currentIndex = prevLayout.findIndex((item) => item.i === key);
+        const currentY = prevLayout[currentIndex].y;
+
+        // Adjust all blocks at and after the current position
+        const adjustedLayout = prevLayout.map((item) => {
+          if (item.y < currentY) return item;
+          return {
+            ...item,
+            y: item.y + dividerHeight,
+          };
+        });
+
+        return [
+          ...adjustedLayout.slice(0, currentIndex),
+          {
+            i: newDividerKey,
+            x: 0,
+            y: currentY,
+            w: 12,
+            h: dividerHeight,
+            type: "Divider",
+            showIcons: true,
+          },
+          // Add a new paragraph block after the divider
+          {
+            i: `rect${Date.now() + 1}`,
+            x: 0,
+            y: currentY + dividerHeight,
+            w: 12,
+            h: 1,
+            type: "Paragraph",
+            showIcons: true,
+          },
+          ...adjustedLayout.slice(currentIndex),
+        ];
+      });
+
+      // Set empty text for divider
+      setTexts((prev) => ({
+        ...prev,
+        [newDividerKey]: "",
+      }));
+
+      setIconTypes((prev) => ({
+        ...prev,
+        [newDividerKey]: "Divider",
+      }));
+
+      setTimeout(() => {
+        if (!isSaving) {
+          saveCurrentNote();
+        }
+      }, 100);
+    } else {
+      // For all other types (Task, Bullet point, Numbered list, etc.)
+      setIconTypes((prev) => ({
+        ...prev,
+        [key]: option,
+      }));
+      // Keep existing text
+      setTexts((prev) => ({
+        ...prev,
+        [key]: prev[key] || "",
+      }));
+      // Update layout type if needed
+      setLayout((prev) =>
+        prev.map((item) => (item.i === key ? { ...item, type: option } : item)),
+      );
+    }
   };
 
   const handleNoteSelect = (noteId: string) => {
@@ -353,16 +547,27 @@ export default function Note() {
     setFolders((prev) => [...prev, newFolder]);
   };
 
-  const saveCurrentNote = () => {
-    const updatedNotes = notes.map((note) =>
-      note.id === activeNoteId
-        ? { ...note, title, layout, texts, iconTypes }
-        : note,
-    );
-    setNotes(updatedNotes);
-    localStorage.setItem("notes", JSON.stringify(updatedNotes));
-    localStorage.setItem("activeNoteId", activeNoteId);
+  const saveCurrentNote = async () => {
+    setIsSaving(true);
+    try {
+      const updatedNotes = notes.map((note) =>
+        note.id === activeNoteId
+          ? { ...note, title, layout, texts, iconTypes }
+          : note,
+      );
+      setNotes(updatedNotes);
+      localStorage.setItem("notes", JSON.stringify(updatedNotes));
+      localStorage.setItem("activeNoteId", activeNoteId);
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      setHasUnsavedChanges(false);
+    } finally {
+      setIsSaving(false);
+    }
   };
+
+  useEffect(() => {
+    setHasUnsavedChanges(true);
+  }, [title, layout, texts, iconTypes]);
 
   const handleUpdateFolder = (folderId: string, newName: string) => {
     setFolders((prev) =>
@@ -423,10 +628,10 @@ export default function Note() {
         onUpdateFolder={handleUpdateFolder}
         onMoveNote={handleMoveNote}
         onDeleteFolder={handleDeleteFolder}
-        onDeleteNote={handleDeleteNote} // Add this line
+        onDeleteNote={handleDeleteNote}
       />
       <div className="flex size-full flex-col overflow-y-auto">
-        <NoteHeader />
+        <NoteHeader isSaving={isSaving} hasUnsavedChanges={hasUnsavedChanges} />
         <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col px-4 py-8">
           <div className="mb-8">
             <Title

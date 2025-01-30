@@ -64,57 +64,38 @@ const ShapeItem = ({
 
   return (
     <Suspense fallback={<div className="size-full bg-gray-700" />}>
-      <div className="size-full">
-        <ShapeComponents type={type} color={color} />
+      <div className="flex size-full items-center justify-center">
+        <div className="size-full">
+          <ShapeComponents type={type} color={color} />
+        </div>
       </div>
     </Suspense>
   );
 };
 
-const initialLayout: Block[] = [
-  {
-    i: "triangle",
-    x: 0,
-    y: 0,
-    w: 2,
-    h: 2,
-    shape: "triangle",
-    color: "bg-blue-500",
-    maintainRatio: true,
-  },
-  {
-    i: "circle",
-    x: 3,
-    y: 0,
-    w: 2,
-    h: 2,
-    shape: "circle",
-    color: "bg-red-500",
-    maintainRatio: true,
-  },
-  {
-    i: "square",
-    x: 6,
-    y: 0,
-    w: 2,
-    h: 2,
-    shape: "square",
-    color: "bg-green-500",
-    maintainRatio: true,
-  },
-  {
-    i: "text1",
-    x: 0,
-    y: 3,
-    w: 2,
-    h: 1,
-    shape: "text",
-    color: "bg-gray-500",
-    text: "Edit this text",
-  },
-];
+const initialLayout: Block[] = [];
 
+const createNewShape = (type: "triangle" | "circle" | "square" | "text", layout: Block[]) => {
+  const id = `${type}${layout.length + 1}`;
+  const colors = {
+    triangle: "bg-blue-500",
+    circle: "bg-red-500",
+    square: "bg-green-500",
+    text: "bg-gray-500",
+  };
 
+  return {
+    i: id,
+    x: 0, // Start at the top-left
+    y: 0,
+    w: type === "text" ? 2 : 2,
+    h: type === "text" ? 1 : 2,
+    shape: type,
+    color: colors[type],
+    maintainRatio: type !== "text",
+    ...(type === "text" && { text: "Edit this text" }),
+  };
+};
 
 export default function TestPage() {
   const [layout, setLayout] = useState<Block[]>(initialLayout);
@@ -165,6 +146,16 @@ export default function TestPage() {
     );
   };
 
+  const addShape = (type: "triangle" | "circle" | "square") => {
+    const newShape = createNewShape(type, layout);
+    setLayout([...layout, newShape]);
+  };
+
+  const addTextBox = () => {
+    const newTextBox = createNewShape("text", layout);
+    setLayout([...layout, newTextBox]);
+  };
+
   return (
     <div className="flex h-screen w-screen flex-col bg-gray-900" style={{ zIndex: 0 }}>
       <MenuBar
@@ -174,8 +165,10 @@ export default function TestPage() {
         setRows={setRows}
         onReset={() => {
           localStorage.removeItem("shapeLayout");
-          setLayout(initialLayout);
+          setLayout([]);
         }}
+        onAddShape={addShape}
+        onAddTextBox={addTextBox}
       />
 
       <div className="relative flex-1 overflow-auto">

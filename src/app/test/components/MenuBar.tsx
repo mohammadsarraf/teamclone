@@ -4,14 +4,18 @@ interface MenuBarProps {
   setCols: (cols: number) => void;
   setRows: (rows: number) => void;
   onReset: () => void;
+  onAddShape: (type: "triangle" | "circle" | "square") => void;
+  onAddTextBox: () => void;
 }
 
-export const MenuBar = ({
+export const MenuBar: React.FC<MenuBarProps> = ({
   cols,
   rows,
   setCols,
   setRows,
   onReset,
+  onAddShape,
+  onAddTextBox,
 }: MenuBarProps) => {
   return (
     <div className="flex h-14 items-center justify-between border-b border-gray-700 bg-gray-800 px-4 shadow-lg">
@@ -50,6 +54,33 @@ export const MenuBar = ({
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => onAddShape("triangle")}
+          className="rounded bg-blue-500 px-3 py-1 text-white hover:bg-blue-600"
+        >
+          Add Triangle
+        </button>
+        <button
+          onClick={() => onAddShape("circle")}
+          className="rounded bg-red-500 px-3 py-1 text-white hover:bg-red-600"
+        >
+          Add Circle
+        </button>
+        <button
+          onClick={() => onAddShape("square")}
+          className="rounded bg-green-500 px-3 py-1 text-white hover:bg-green-600"
+        >
+          Add Square
+        </button>
+        <button
+          onClick={onAddTextBox}
+          className="rounded bg-gray-500 px-3 py-1 text-white hover:bg-gray-600"
+        >
+          Add Text
+        </button>
       </div>
     </div>
   );

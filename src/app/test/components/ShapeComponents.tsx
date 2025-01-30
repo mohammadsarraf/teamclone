@@ -8,49 +8,37 @@ interface ShapeProps {
 }
 
 const ShapeComponents = ({ type, color }: ShapeProps) => {
-  const colorHex = color.includes("blue")
-    ? "#3B82F6"
-    : color.includes("red")
-      ? "#EF4444"
-      : color.includes("green")
-        ? "#10B981"
-        : "#FFFFFF";
+  const shapeClass = `size-full ${color}`;
 
   const handleSelect = () => {
     console.log("Shape selected");
   };
 
-  return (
-    <div>
-      <ShapeWrapper onSelect={handleSelect} isText={false}>
-        <div
-          className="flex size-full items-center justify-center"
-          style={{ transition: "transform 200ms ease" }}
-        >
-          <div className="aspect-square max-h-full w-full">
-            <svg
-              width="100%"
-              height="100%"
-              viewBox="0 0 100 100"
-              preserveAspectRatio="xMidYMid meet"
-            >
-              {type === "square" && (
-                <rect x="5" y="5" width="90" height="90" fill={colorHex} />
-              )}
-
-              {type === "circle" && (
-                <circle cx="50" cy="50" r="45" fill={colorHex} />
-              )}
-
-              {type === "triangle" && (
-                <polygon points="50,5 95,95 5,95" fill={colorHex} />
-              )}
-            </svg>
-          </div>
+  switch (type) {
+    case "triangle":
+      return (
+        <div className="size-full">
+          <div
+            className={shapeClass}
+            style={{
+              clipPath: "polygon(50% 0%, 0% 100%, 100% 100%)",
+              width: "100%",
+              height: "100%",
+            }}
+          />
         </div>
-      </ShapeWrapper>
-    </div>
-  );
+      );
+    case "circle":
+      return (
+        <div className={`${shapeClass} rounded-full`} />
+      );
+    case "square":
+      return (
+        <div className={shapeClass} />
+      );
+    default:
+      return null;
+  }
 };
 
 export default ShapeComponents;

@@ -1,6 +1,6 @@
-import { ReactNode } from 'react';
+import { ReactNode } from "react";
 import GridLayout from "react-grid-layout";
-import { Block } from '../types';
+import { Block } from "../types";
 
 interface GridContainerProps {
   cols: number;
@@ -21,7 +21,7 @@ interface GridContainerProps {
   transformScale: number;
 }
 
-export const GridContainer = ({ 
+export const GridContainer = ({
   cols,
   rows,
   unitSize,
@@ -30,10 +30,13 @@ export const GridContainer = ({
   ...props
 }: GridContainerProps) => {
   return (
-    <div className="min-h-full min-w-full" style={{ 
-      width: `${cols * unitSize}px`,
-      height: `${rows * unitSize}px` 
-    }}>
+    <div
+      className="min-h-full min-w-full"
+      style={{
+        width: `${cols * unitSize}px`,
+        height: `${rows * unitSize}px`,
+      }}
+    >
       <GridLayout
         className="layout"
         layout={layout}
@@ -50,4 +53,4 @@ export const GridContainer = ({
       </GridLayout>
     </div>
   );
-}; 
+};

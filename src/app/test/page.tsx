@@ -1,24 +1,24 @@
 "use client";
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from "react";
 import GridLayout from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import { BsFillTriangleFill } from "react-icons/bs";
 import { FaCircle, FaSquare } from "react-icons/fa";
-import dynamic from 'next/dynamic';
-import { useWindowSize } from './hooks/useWindowSize';
-import { MenuBar } from './components/MenuBar';
-import { GridOverlay } from './components/GridOverlay';
-import { GridContainer } from './components/GridContainer';
+import dynamic from "next/dynamic";
+import { useWindowSize } from "./hooks/useWindowSize";
+import { MenuBar } from "./components/MenuBar";
+import { GridOverlay } from "./components/GridOverlay";
+import { GridContainer } from "./components/GridContainer";
 
 // Dynamically import Zdog components with no SSR
-const ZdogComponents = dynamic(() => import('./components/ZdogComponents'), {
-  ssr: false
+const ZdogComponents = dynamic(() => import("./components/ZdogComponents"), {
+  ssr: false,
 });
 
 // Dynamically import Three components with no SSR
-const ShapeComponents = dynamic(() => import('./components/ShapeComponents'), {
-  ssr: false
+const ShapeComponents = dynamic(() => import("./components/ShapeComponents"), {
+  ssr: false,
 });
 
 interface Block {
@@ -27,7 +27,7 @@ interface Block {
   y: number;
   w: number;
   h: number;
-  shape: 'triangle' | 'circle' | 'square' | string;
+  shape: "triangle" | "circle" | "square" | string;
   color: string;
   maintainRatio?: boolean;
 }
@@ -38,12 +38,18 @@ interface ShapeWrapperProps {
   onSelect?: () => void;
 }
 
-const ShapeItem = ({ type, color }: { type: Block['shape'], color: string }) => {
+const ShapeItem = ({
+  type,
+  color,
+}: {
+  type: Block["shape"];
+  color: string;
+}) => {
   if (!type) return null;
-  
+
   return (
-    <Suspense fallback={<div className="w-full h-full bg-gray-700" />}>
-      <div className="w-full h-full">
+    <Suspense fallback={<div className="size-full bg-gray-700" />}>
+      <div className="size-full">
         <ShapeComponents type={type} color={color} />
       </div>
     </Suspense>
@@ -52,41 +58,41 @@ const ShapeItem = ({ type, color }: { type: Block['shape'], color: string }) => 
 
 const initialLayout: Block[] = [
   {
-    i: 'triangle',
+    i: "triangle",
     x: 0,
     y: 0,
     w: 2,
     h: 2,
-    shape: 'triangle',
-    color: 'bg-blue-500',
+    shape: "triangle",
+    color: "bg-blue-500",
     maintainRatio: true,
   },
   {
-    i: 'circle',
+    i: "circle",
     x: 3,
     y: 0,
     w: 2,
     h: 2,
-    shape: 'circle',
-    color: 'bg-red-500',
+    shape: "circle",
+    color: "bg-red-500",
     maintainRatio: true,
   },
   {
-    i: 'square',
+    i: "square",
     x: 6,
     y: 0,
     w: 2,
     h: 2,
-    shape: 'square',
-    color: 'bg-green-500',
+    shape: "square",
+    color: "bg-green-500",
     maintainRatio: true,
   },
 ];
 
 const ShapeWrapper = ({ children, isActive, onSelect }: ShapeWrapperProps) => {
   return (
-    <div 
-      className={`h-full w-full cursor-move flex items-center justify-center`}
+    <div
+      className={`flex size-full cursor-move items-center justify-center`}
       onClick={onSelect}
     >
       {children}
@@ -120,13 +126,13 @@ export default function TestPage() {
   };
 
   const handleResizeStop = (layout: any[], oldItem: any, newItem: any) => {
-    const block = layout.find(item => item.i === newItem.i);
+    const block = layout.find((item) => item.i === newItem.i);
     if (block?.maintainRatio) {
-      const updatedLayout = layout.map(item => {
+      const updatedLayout = layout.map((item) => {
         if (item.i === newItem.i) {
           return {
             ...item,
-            h: newItem.w
+            h: newItem.w,
           };
         }
         return item;
@@ -136,20 +142,20 @@ export default function TestPage() {
   };
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-gray-900">
+    <div className="flex h-screen w-screen flex-col bg-gray-900">
       <MenuBar
         cols={cols}
         rows={rows}
         setCols={setCols}
         setRows={setRows}
         onReset={() => {
-          localStorage.removeItem('shapeLayout');
+          localStorage.removeItem("shapeLayout");
           setLayout(initialLayout);
         }}
       />
 
-      <div className="flex-1 relative overflow-auto">
-        <GridOverlay 
+      <div className="relative flex-1 overflow-auto">
+        <GridOverlay
           show={isDragging || isResizing}
           cols={cols}
           rows={rows}
@@ -173,16 +179,16 @@ export default function TestPage() {
           allowOverlap={true}
           verticalCompact={false}
           compactType={null}
-          resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
+          resizeHandles={["s", "w", "e", "n", "sw", "nw", "se", "ne"]}
           transformScale={1}
         >
           {layout.map((block) => (
             <div
               key={block.i}
-              style={{ 
+              style={{
                 zIndex: activeShape === block.i ? 10 : 1,
                 padding: 0,
-                margin: 0
+                margin: 0,
               }}
             >
               <ShapeWrapper
@@ -197,4 +203,4 @@ export default function TestPage() {
       </div>
     </div>
   );
-} 
+}

@@ -150,7 +150,7 @@ export default function Toolbar({
             Color
           </button>
         </div>
-        <button 
+        <button
           onClick={onClose}
           className="text-xl text-gray-400 hover:text-gray-600"
         >
@@ -187,7 +187,7 @@ export default function Toolbar({
           <div className="w-[90%] max-w-2xl rounded-lg bg-white p-4 shadow-xl">
             <div className="mb-4 flex items-center justify-between border-b pb-2">
               <h3 className="text-lg font-medium">Choose Layout</h3>
-              <button 
+              <button
                 onClick={() => setShowDropdown(false)}
                 className="text-xl text-gray-400 hover:text-gray-600"
               >

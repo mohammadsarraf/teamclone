@@ -1,5 +1,5 @@
 "use client";
-import { Illustration, Box, Cylinder, Shape } from 'react-zdog';
+import { Illustration, Box, Cylinder, Shape } from "react-zdog";
 
 interface ZdogProps {
   type: string;
@@ -7,14 +7,18 @@ interface ZdogProps {
 }
 
 const ZdogComponents = ({ type, color }: ZdogProps) => {
-  const colorHex = color.includes('blue') ? '#3B82F6' : 
-                  color.includes('red') ? '#EF4444' : 
-                  color.includes('green') ? '#10B981' : '#FFFFFF';
+  const colorHex = color.includes("blue")
+    ? "#3B82F6"
+    : color.includes("red")
+      ? "#EF4444"
+      : color.includes("green")
+        ? "#10B981"
+        : "#FFFFFF";
 
   return (
-    <Illustration zoom={8} className="w-full h-full">
-      {type === 'square' && (
-        <Box 
+    <Illustration zoom={8} className="size-full">
+      {type === "square" && (
+        <Box
           width={20}
           height={20}
           depth={20}
@@ -23,7 +27,7 @@ const ZdogComponents = ({ type, color }: ZdogProps) => {
           rotate={{ y: 0.5 }}
         />
       )}
-      {type === 'circle' && (
+      {type === "circle" && (
         <Cylinder
           diameter={20}
           length={1}
@@ -32,7 +36,7 @@ const ZdogComponents = ({ type, color }: ZdogProps) => {
           rotate={{ x: 0.5 }}
         />
       )}
-      {type === 'triangle' && (
+      {type === "triangle" && (
         <Shape
           path={[
             { x: -10, y: 10 },
@@ -49,4 +53,4 @@ const ZdogComponents = ({ type, color }: ZdogProps) => {
   );
 };
 
-export default ZdogComponents; 
+export default ZdogComponents;

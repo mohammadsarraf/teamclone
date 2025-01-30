@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { AiOutlineSearch } from "react-icons/ai";
 import { CgScrollH } from "react-icons/cg";
 import { FaMapMarkerAlt } from "react-icons/fa";
@@ -29,7 +29,10 @@ interface AddBlockProps {
   handleAddBlock: (text: string, type?: string) => void;
 }
 
-export default function AddBlock({ handleClose, handleAddBlock }: AddBlockProps) {
+export default function AddBlock({
+  handleClose,
+  handleAddBlock,
+}: AddBlockProps) {
   const [showShapesMenu, setShowShapesMenu] = useState(false);
 
   const handleShapesClick = () => {
@@ -63,15 +66,21 @@ export default function AddBlock({ handleClose, handleAddBlock }: AddBlockProps)
               onClick={() => handleAddBlock("Text Block")}
               className="justify-left flex items-center rounded bg-white px-4 py-2 text-black transition-all hover:bg-blue-400"
             >
-              <RiText className="mr-4 flex items-center text-blue-600" size={20} />
+              <RiText
+                className="mr-4 flex items-center text-blue-600"
+                size={20}
+              />
               <span className="text-black">Text</span>
             </button>
             {/* ... other buttons ... */}
-            <button 
+            <button
               onClick={handleShapesClick}
               className="justify-left flex items-center rounded bg-white px-4 py-2 text-black transition-all hover:bg-blue-400"
             >
-              <FaShapes className="mr-4 flex items-center text-blue-600" size={20} />
+              <FaShapes
+                className="mr-4 flex items-center text-blue-600"
+                size={20}
+              />
               <span className="text-black">Shape</span>
             </button>
             {/* ... rest of the buttons ... */}
@@ -81,7 +90,7 @@ export default function AddBlock({ handleClose, handleAddBlock }: AddBlockProps)
         // Shapes Sub-menu
         <div className="p-4">
           <div className="mb-4 flex items-center justify-between">
-            <button 
+            <button
               onClick={() => setShowShapesMenu(false)}
               className="text-blue-600 hover:text-blue-800"
             >
@@ -97,10 +106,10 @@ export default function AddBlock({ handleClose, handleAddBlock }: AddBlockProps)
           <h3 className="mb-4 text-lg font-bold">Shapes</h3>
           <div className="grid grid-cols-2 gap-4">
             <button
-              onClick={() => handleAddBlock('', 'triangle')}
+              onClick={() => handleAddBlock("", "triangle")}
               className="justify-left flex items-center rounded bg-white px-4 py-2 text-black transition-all hover:bg-blue-400"
             >
-              <div className="mr-4 h-5 w-5 border-b-[12px] border-l-[8px] border-r-[8px] border-b-blue-600 border-l-transparent border-r-transparent" />
+              <div className="mr-4 size-5 border-x-8 border-b-[12px] border-x-transparent border-b-blue-600" />
               <span className="text-black">Triangle</span>
             </button>
             {/* Add more shape options here */}

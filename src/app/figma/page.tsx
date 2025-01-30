@@ -9,7 +9,7 @@ export default function Page() {
   const [isEditing, setIsEditing] = useState(false);
   const [isDesignMenuVisible, setIsDesignMenuVisible] = useState(false);
   const [isElementMenuVisible, setIsElementMenuVisible] = useState(false);
-  const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
+  const [viewMode, setViewMode] = useState<"desktop" | "mobile">("desktop");
   const [selectedLayout, setSelectedLayout] = useState("Option 1");
   const [bgColor, setBgColor] = useState("bg-black");
 
@@ -27,18 +27,16 @@ export default function Page() {
       <main className="flex grow p-6">
         <div className="flex w-full flex-col overflow-hidden rounded-lg bg-[#141414] shadow-xl">
           {!isEditing && (
-            <TopMenu 
-              setIsEditing={setIsEditing} 
+            <TopMenu
+              setIsEditing={setIsEditing}
               viewMode={viewMode}
               setViewMode={setViewMode}
             />
           )}
           <div className="flex grow justify-center p-6">
-            <div 
+            <div
               className={`flex h-full flex-col overflow-hidden transition-all duration-300 ${
-                viewMode === 'mobile' 
-                  ? 'w-[375px]' 
-                  : 'w-full'
+                viewMode === "mobile" ? "w-[375px]" : "w-full"
               }`}
             >
               <HeaderContent

@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import GridLayout from "react-grid-layout";
 import ContentEditable from "react-contenteditable";
 import ActiveBlock from "./activeBlock";
-import Triangle from './shapes/Triangle';
+import Triangle from "./shapes/Triangle";
 
 interface GridProps {
   layout: any[];
@@ -30,7 +30,10 @@ interface BlockProps {
   isActive: boolean;
   isEditing: boolean;
   onBlockClick: (id: string) => void;
-  onTextChange: (index: number, event: React.ChangeEvent<HTMLInputElement>) => void;
+  onTextChange: (
+    index: number,
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => void;
   handleColorChange: (color: string) => void;
   handleHeadingClick: (size: string) => void;
   handleAlignClick: (align: string) => void;
@@ -47,25 +50,23 @@ interface BlockWrapperProps {
   menuContent?: React.ReactNode;
 }
 
-const BlockWrapper = ({ 
+const BlockWrapper = ({
   children,
   isActive,
   isEditing,
   isHovered,
   onEdit,
-  menuContent
+  menuContent,
 }: BlockWrapperProps) => {
   return (
     <div
-      className={`relative h-full w-full rounded-lg border-2 transition-all duration-200 ${
-        isActive ? 'border-blue-500 shadow-lg' : 'border-transparent'
-      } ${isEditing ? 'hover:border-gray-600' : ''}`}
+      className={`relative size-full rounded-lg border-2 transition-all duration-200 ${
+        isActive ? "border-blue-500 shadow-lg" : "border-transparent"
+      } ${isEditing ? "hover:border-gray-600" : ""}`}
       onClick={() => isEditing && onEdit?.()}
     >
       {(isActive || isHovered) && menuContent && (
-        <div className="absolute -top-12 left-0 z-20 w-full">
-          {menuContent}
-        </div>
+        <div className="absolute -top-12 left-0 z-20 w-full">{menuContent}</div>
       )}
       {children}
     </div>
@@ -75,9 +76,9 @@ const BlockWrapper = ({
 const ShapeBlock = ({ ...props }: BlockProps) => {
   // Convert color class to actual color
   const colorMap: { [key: string]: string } = {
-    'text-white': 'border-white',
-    'text-blue-500': 'border-blue-500',
-    'text-red-500': 'border-red-500',
+    "text-white": "border-white",
+    "text-blue-500": "border-blue-500",
+    "text-red-500": "border-red-500",
     // Add more color mappings as needed
   };
 
@@ -102,15 +103,15 @@ const ShapeBlock = ({ ...props }: BlockProps) => {
         />
       }
     >
-      <div className="h-full w-full p-4">
-        <Triangle color={colorMap[props.block.color] || 'border-white'} />
+      <div className="size-full p-4">
+        <Triangle color={colorMap[props.block.color] || "border-white"} />
       </div>
     </BlockWrapper>
   );
 };
 
 const Block = ({ ...props }: BlockProps) => {
-  if (props.block.type === 'triangle') {
+  if (props.block.type === "triangle") {
     return <ShapeBlock {...props} />;
   }
 
@@ -139,14 +140,14 @@ const Block = ({ ...props }: BlockProps) => {
         html={props.block.text}
         disabled={!props.isEditing || props.activeBlock !== props.block.i}
         onChange={(event) => props.onTextChange(props.index, event)}
-        className={`h-full w-full rounded-lg p-4 min-h-[40px] overflow-auto
+        className={`size-full min-h-[40px] overflow-auto rounded-lg p-4
           ${props.block.fontSize} ${props.block.color} ${props.block.italic} ${props.block.textAlign}
-          ${props.isEditing ? 'cursor-text' : 'cursor-default'}
+          ${props.isEditing ? "cursor-text" : "cursor-default"}
           focus:outline-none focus:ring-2 focus:ring-blue-500`}
-        style={{ 
-          transition: 'all 0.2s ease-in-out',
-          display: 'flex',
-          alignItems: 'center'
+        style={{
+          transition: "all 0.2s ease-in-out",
+          display: "flex",
+          alignItems: "center",
         }}
       />
     </BlockWrapper>
@@ -175,7 +176,7 @@ export default function Grid({
   );
 
   return (
-    <div className="relative h-full w-full p-4">
+    <div className="relative size-full p-4">
       <GridLayout
         className="layout"
         layout={layout}
@@ -194,12 +195,15 @@ export default function Grid({
         useCSSTransforms={true}
       >
         {layout.map((block, index) => (
-          <div 
+          <div
             key={block.i}
             onMouseEnter={() => setHoveredBlock(block.i)}
             onMouseLeave={() => setHoveredBlock(null)}
             className="absolute"
-            style={{ zIndex: hoveredBlock === block.i || activeBlock === block.i ? 10 : 1 }}
+            style={{
+              zIndex:
+                hoveredBlock === block.i || activeBlock === block.i ? 10 : 1,
+            }}
           >
             <Block
               block={block}

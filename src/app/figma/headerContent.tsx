@@ -49,17 +49,21 @@ export default function HeaderContent({
     headerHeight,
   });
 
-  const handleElementChange = (elementType: keyof HeaderElements, value: boolean) => {
-    setElements(prev => ({
+  const handleElementChange = (
+    elementType: keyof HeaderElements,
+    value: boolean,
+  ) => {
+    setElements((prev) => ({
       ...prev,
-      [elementType]: value
+      [elementType]: value,
     }));
   };
 
   const handleHeightChange = (scaleValue: number) => {
     const minHeight = 60;
     const maxHeight = 200;
-    const pixelHeight = minHeight + ((maxHeight - minHeight) * (scaleValue - 1)) / 9;
+    const pixelHeight =
+      minHeight + ((maxHeight - minHeight) * (scaleValue - 1)) / 9;
     setHeaderHeight(Math.round(pixelHeight));
   };
 
@@ -116,13 +120,15 @@ export default function HeaderContent({
 
       {/* Edit Tools */}
       {isHeaderEditing && (
-        <div className="absolute -bottom-16 left-0 right-0 flex items-center justify-center gap-4">
+        <div className="absolute inset-x-0 -bottom-16 flex items-center justify-center gap-4">
           {/* Design Menu Button */}
           <button
             className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium shadow-lg transition-all
-              ${isDesignMenuVisible 
-                ? "bg-blue-600 text-white" 
-                : "bg-white text-gray-900 hover:bg-gray-50"}`}
+              ${
+                isDesignMenuVisible
+                  ? "bg-blue-600 text-white"
+                  : "bg-white text-gray-900 hover:bg-gray-50"
+              }`}
             onClick={() => {
               setIsDesignMenuVisible(!isDesignMenuVisible);
               setIsElementMenuVisible(false);
@@ -135,9 +141,11 @@ export default function HeaderContent({
           {/* Elements Menu Button */}
           <button
             className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium shadow-lg transition-all
-              ${isElementMenuVisible 
-                ? "bg-blue-600 text-white" 
-                : "bg-white text-gray-900 hover:bg-gray-50"}`}
+              ${
+                isElementMenuVisible
+                  ? "bg-blue-600 text-white"
+                  : "bg-white text-gray-900 hover:bg-gray-50"
+              }`}
             onClick={() => {
               setIsElementMenuVisible(!isElementMenuVisible);
               setIsDesignMenuVisible(false);
@@ -186,8 +194,10 @@ export default function HeaderContent({
         <div className="absolute right-0 top-full z-50 mt-4 w-80">
           <div className="rounded-lg bg-white p-4 shadow-xl">
             <div className="mb-4 flex items-center justify-between border-b pb-2">
-              <h3 className="text-sm font-medium text-gray-900">Add Elements</h3>
-              <button 
+              <h3 className="text-sm font-medium text-gray-900">
+                Add Elements
+              </h3>
+              <button
                 onClick={() => setIsElementMenuVisible(false)}
                 className="text-gray-400 hover:text-gray-600"
               >

@@ -1,6 +1,9 @@
-import { HiOutlineShoppingCart, HiOutlineTemplate, HiOutlineUser } from "react-icons/hi";
+import {
+  HiOutlineShoppingCart,
+  HiOutlineTemplate,
+  HiOutlineUser,
+} from "react-icons/hi";
 import { TiSocialSkypeOutline } from "react-icons/ti";
-
 
 interface ElementToolbarProps {
   elements: {
@@ -18,29 +21,29 @@ export default function ElementToolbar({
 }: ElementToolbarProps) {
   const menuItems = [
     {
-      id: 'isButton',
+      id: "isButton",
       name: "Button",
       icon: <HiOutlineTemplate className="size-5" />,
-      description: "Add call-to-action button"
+      description: "Add call-to-action button",
     },
     {
-      id: 'isSocial',
+      id: "isSocial",
       name: "Social Links",
       icon: <TiSocialSkypeOutline className="size-5" />,
-      description: "Add social media links"
+      description: "Add social media links",
     },
     {
-      id: 'isCart',
+      id: "isCart",
       name: "Shopping Cart",
       icon: <HiOutlineShoppingCart className="size-5" />,
-      description: "Add shopping cart"
+      description: "Add shopping cart",
     },
     {
-      id: 'isAccount',
+      id: "isAccount",
       name: "Account",
       icon: <HiOutlineUser className="size-5" />,
-      description: "Add account access"
-    }
+      description: "Add account access",
+    },
   ];
 
   return (
@@ -48,9 +51,7 @@ export default function ElementToolbar({
       {menuItems.map((item) => (
         <div key={item.id} className="flex items-center justify-between">
           <div className="flex items-start gap-3">
-            <div className="mt-1 text-gray-500">
-              {item.icon}
-            </div>
+            <div className="mt-1 text-gray-500">{item.icon}</div>
             <div>
               <h4 className="text-sm font-medium text-gray-900">{item.name}</h4>
               <p className="text-xs text-gray-500">{item.description}</p>
@@ -64,9 +65,11 @@ export default function ElementToolbar({
               onChange={(e) => onElementChange(item.id, e.target.checked)}
             />
             <div className="peer h-6 w-11 rounded-full bg-gray-200 transition-colors peer-checked:bg-blue-600">
-              <span 
+              <span
                 className={`absolute left-1 top-1 size-4 rounded-full bg-white transition-transform duration-200 ${
-                  elements[item.id as keyof typeof elements] ? 'translate-x-5' : 'translate-x-0'
+                  elements[item.id as keyof typeof elements]
+                    ? "translate-x-5"
+                    : "translate-x-0"
                 }`}
               />
             </div>

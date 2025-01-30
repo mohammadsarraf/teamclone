@@ -1,5 +1,5 @@
 import { FaSearch } from "react-icons/fa";
-import { 
+import {
   HiHome,
   HiTemplate,
   HiShoppingBag,
@@ -10,7 +10,7 @@ import {
   HiSpeakerphone,
   HiUserGroup,
   HiChartBar,
-  HiCurrencyDollar
+  HiCurrencyDollar,
 } from "react-icons/hi";
 
 export default function Sidebar() {

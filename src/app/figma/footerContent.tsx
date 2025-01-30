@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import { useState } from "react";
 import AddBlock from "./addBlock";
 import Grid from "./Grid"; // Import the Grid component
@@ -21,7 +21,13 @@ interface Block {
 }
 
 // Edit Menu Component
-const EditMenu = ({ onAdd, isEditing }: { onAdd: () => void, isEditing: boolean }) => {
+const EditMenu = ({
+  onAdd,
+  isEditing,
+}: {
+  onAdd: () => void;
+  isEditing: boolean;
+}) => {
   return (
     <div className="absolute -top-14 flex w-full justify-between px-4">
       <button
@@ -56,7 +62,7 @@ const GridLayout = () => {
         {[...Array(6)].map((_, index) => (
           <div
             key={index}
-            className="h-8 w-8 rounded bg-gray-700 hover:bg-gray-600 transition-colors"
+            className="size-8 rounded bg-gray-700 transition-colors hover:bg-gray-600"
           />
         ))}
       </div>
@@ -64,7 +70,7 @@ const GridLayout = () => {
         {[...Array(6)].map((_, index) => (
           <div
             key={index}
-            className="h-8 w-8 rounded bg-gray-700 hover:bg-gray-600 transition-colors"
+            className="size-8 rounded bg-gray-700 transition-colors hover:bg-gray-600"
           />
         ))}
       </div>
@@ -72,7 +78,7 @@ const GridLayout = () => {
         {[...Array(6)].map((_, index) => (
           <div
             key={index}
-            className="h-8 w-8 rounded bg-gray-700 hover:bg-gray-600 transition-colors"
+            className="size-8 rounded bg-gray-700 transition-colors hover:bg-gray-600"
           />
         ))}
       </div>
@@ -102,7 +108,7 @@ const FooterContent = () => {
     setIsEditing(false);
   };
 
-  const handleAddBlock = (blockText: string, type: string = 'text') => {
+  const handleAddBlock = (blockText: string, type: string = "text") => {
     const newBlock: Block = {
       i: `block-${layout.length + 1}`,
       x: (layout.length * 2) % 12,
@@ -165,7 +171,7 @@ const FooterContent = () => {
 
   return (
     <footer className="group relative flex h-80 flex-col bg-gradient-to-b from-gray-900 to-black text-white shadow-xl">
-      <div className="relative h-full w-full">
+      <div className="relative size-full">
         <Grid
           layout={layout}
           activeBlock={activeBlock}
@@ -179,7 +185,7 @@ const FooterContent = () => {
         />
 
         {!isEditing && <EditButton onClick={handleEditClick} />}
-        
+
         {isEditing && !isAdding && (
           <EditMenu onAdd={handleAddClick} isEditing={isEditing} />
         )}

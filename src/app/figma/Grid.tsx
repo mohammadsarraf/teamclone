@@ -1,7 +1,8 @@
+import React, { useState } from 'react';
 import GridLayout from "react-grid-layout";
 import ContentEditable from "react-contenteditable";
 import ActiveBlock from "./activeBlock";
-import { useState } from "react";
+import Triangle from './shapes/Triangle';
 
 interface GridProps {
   layout: any[];
@@ -22,6 +23,135 @@ interface GridProps {
   // handleLinkClick: () => void;
   handleAlignClick: (align: string) => void;
 }
+
+interface BlockProps {
+  block: any;
+  index: number;
+  isActive: boolean;
+  isEditing: boolean;
+  onBlockClick: (id: string) => void;
+  onTextChange: (index: number, event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleColorChange: (color: string) => void;
+  handleHeadingClick: (size: string) => void;
+  handleAlignClick: (align: string) => void;
+  isHovered: boolean;
+  activeBlock: string | null;
+}
+
+interface BlockWrapperProps {
+  children: React.ReactNode;
+  isActive: boolean;
+  isEditing: boolean;
+  isHovered: boolean;
+  onEdit?: () => void;
+  menuContent?: React.ReactNode;
+}
+
+const BlockWrapper = ({ 
+  children,
+  isActive,
+  isEditing,
+  isHovered,
+  onEdit,
+  menuContent
+}: BlockWrapperProps) => {
+  return (
+    <div
+      className={`relative h-full w-full rounded-lg border-2 transition-all duration-200 ${
+        isActive ? 'border-blue-500 shadow-lg' : 'border-transparent'
+      } ${isEditing ? 'hover:border-gray-600' : ''}`}
+      onClick={() => isEditing && onEdit?.()}
+    >
+      {(isActive || isHovered) && menuContent && (
+        <div className="absolute -top-12 left-0 z-20 w-full">
+          {menuContent}
+        </div>
+      )}
+      {children}
+    </div>
+  );
+};
+
+const ShapeBlock = ({ ...props }: BlockProps) => {
+  // Convert color class to actual color
+  const colorMap: { [key: string]: string } = {
+    'text-white': 'border-white',
+    'text-blue-500': 'border-blue-500',
+    'text-red-500': 'border-red-500',
+    // Add more color mappings as needed
+  };
+
+  return (
+    <BlockWrapper
+      isActive={props.isActive}
+      isEditing={props.isEditing}
+      isHovered={props.isHovered}
+      onEdit={() => props.onBlockClick(props.block.i)}
+      menuContent={
+        <ActiveBlock
+          block={props.block}
+          index={props.index}
+          isEditing={props.isEditing}
+          activeBlock={props.activeBlock}
+          handleBlockClick={props.onBlockClick}
+          handleTextChange={props.onTextChange}
+          color={props.block.color}
+          handleColorChange={props.handleColorChange}
+          handleHeadingClick={props.handleHeadingClick}
+          handleAlignClick={props.handleAlignClick}
+        />
+      }
+    >
+      <div className="h-full w-full p-4">
+        <Triangle color={colorMap[props.block.color] || 'border-white'} />
+      </div>
+    </BlockWrapper>
+  );
+};
+
+const Block = ({ ...props }: BlockProps) => {
+  if (props.block.type === 'triangle') {
+    return <ShapeBlock {...props} />;
+  }
+
+  return (
+    <BlockWrapper
+      isActive={props.isActive}
+      isEditing={props.isEditing}
+      isHovered={props.isHovered}
+      onEdit={() => props.onBlockClick(props.block.i)}
+      menuContent={
+        <ActiveBlock
+          block={props.block}
+          index={props.index}
+          isEditing={props.isEditing}
+          activeBlock={props.activeBlock}
+          handleBlockClick={props.onBlockClick}
+          handleTextChange={props.onTextChange}
+          color={props.block.color}
+          handleColorChange={props.handleColorChange}
+          handleHeadingClick={props.handleHeadingClick}
+          handleAlignClick={props.handleAlignClick}
+        />
+      }
+    >
+      <ContentEditable
+        html={props.block.text}
+        disabled={!props.isEditing || props.activeBlock !== props.block.i}
+        onChange={(event) => props.onTextChange(props.index, event)}
+        className={`h-full w-full rounded-lg p-4 min-h-[40px] overflow-auto
+          ${props.block.fontSize} ${props.block.color} ${props.block.italic} ${props.block.textAlign}
+          ${props.isEditing ? 'cursor-text' : 'cursor-default'}
+          focus:outline-none focus:ring-2 focus:ring-blue-500`}
+        style={{ 
+          transition: 'all 0.2s ease-in-out',
+          display: 'flex',
+          alignItems: 'center'
+        }}
+      />
+    </BlockWrapper>
+  );
+};
 
 export default function Grid({
   layout,
@@ -45,62 +175,48 @@ export default function Grid({
   );
 
   return (
-    <GridLayout
-      className="grid size-full"
-      cols={12}
-      rowHeight={30}
-      width={windowWidth}
-      isDraggable
-      isResizable
-      useCSSTransforms
-      layout={layout}
-      draggableHandle=".drag-handle"
-      draggableCancel=".no-drag"
-      verticalCompact={false}
-      preventCollision
-      allowOverlap={true} // Enable overlapping
-      onLayoutChange={handleLayoutChange}
-    >
-      {layout.map((block, index) => (
-        <div
-          key={block.i}
-          className="drag-handle relative bg-transparent hover:border"
-          onClick={() => handleBlockClick(block.i)}
-          onMouseEnter={() => setHoveredBlock(block.i)}
-          onMouseLeave={() => setHoveredBlock(null)}
-        >
-          {(activeBlock === block.i || hoveredBlock === block.i) && (
-            <div
-              className={`no-drag absolute -top-12 left-0 z-20 w-full ${activeBlock === block.i ? "" : "invisible"}`}
-            >
-              <ActiveBlock
-                block={block}
-                index={index}
-                isEditing={true}
-                activeBlock={activeBlock}
-                handleBlockClick={handleBlockClick}
-                handleTextChange={handleTextChange}
-                color={block.color}
-                handleColorChange={handleColorChange}
-                handleHeadingClick={handleHeadingClick}
-                // handleItalicClick={handleItalicClick}
-                // handleBoldClick={handleBoldClick}
-                // handleMaximizeClick={handleMaximizeClick}
-                // handleFormatColorTextClick={handleFormatColorTextClick}
-                // handleLinkClick={handleLinkClick}
-                handleAlignClick={handleAlignClick}
-              />
-            </div>
-          )}
-          <ContentEditable
-            html={block.text}
-            disabled={!isEditing || activeBlock !== block.i}
-            onChange={(event) => handleTextChange(index, event)}
-            onBlur={() => handleBlockClick("")} // Hide ActiveBlock on blur
-            className={`${block.fontSize} ${block.color} ${block.textAlign} size-full `}
-          />
-        </div>
-      ))}
-    </GridLayout>
+    <div className="relative h-full w-full p-4">
+      <GridLayout
+        className="layout"
+        layout={layout}
+        cols={12}
+        rowHeight={30}
+        width={windowWidth}
+        isDraggable={isEditing}
+        isResizable={isEditing}
+        onLayoutChange={handleLayoutChange}
+        margin={[0, 0]}
+        containerPadding={[0, 0]}
+        preventCollision={false}
+        allowOverlap={true}
+        verticalCompact={false}
+        compactType={null}
+        useCSSTransforms={true}
+      >
+        {layout.map((block, index) => (
+          <div 
+            key={block.i}
+            onMouseEnter={() => setHoveredBlock(block.i)}
+            onMouseLeave={() => setHoveredBlock(null)}
+            className="absolute"
+            style={{ zIndex: hoveredBlock === block.i || activeBlock === block.i ? 10 : 1 }}
+          >
+            <Block
+              block={block}
+              index={index}
+              isActive={activeBlock === block.i}
+              isEditing={isEditing}
+              onBlockClick={handleBlockClick}
+              onTextChange={handleTextChange}
+              handleColorChange={handleColorChange}
+              handleHeadingClick={handleHeadingClick}
+              handleAlignClick={handleAlignClick}
+              isHovered={hoveredBlock === block.i}
+              activeBlock={activeBlock}
+            />
+          </div>
+        ))}
+      </GridLayout>
+    </div>
   );
 }

@@ -15,7 +15,7 @@ export const GridOverlay = ({
 
   return (
     <div
-      className="pointer-events-none absolute inset-0 z-0"
+      className="pointer-events-none absolute inset-0"
       style={{
         display: "grid",
         gridTemplateColumns: `repeat(${cols}, ${unitSize}px)`,
@@ -27,6 +27,7 @@ export const GridOverlay = ({
         height: `${rows * unitSize}px`,
         minWidth: "100%",
         minHeight: "100%",
+        zIndex: 1,
       }}
     >
       {Array.from({ length: cols * rows }).map((_, i) => (

@@ -21,31 +21,45 @@ const ShapeComponents = dynamic(() => import("./components/ShapeComponents"), {
   ssr: false,
 });
 
+const TextBox = dynamic(() => import("./components/TextBox"), { ssr: false });
+
 interface Block {
   i: string;
   x: number;
   y: number;
   w: number;
   h: number;
-  shape: "triangle" | "circle" | "square" | string;
+  shape: "triangle" | "circle" | "square" | "text" | string;
   color: string;
   maintainRatio?: boolean;
+  text?: string;
 }
 
 interface ShapeWrapperProps {
   children: React.ReactNode;
   isActive?: boolean;
   onSelect?: () => void;
+  isText?: boolean;
 }
 
 const ShapeItem = ({
   type,
   color,
+  text,
+  onTextChange,
+  isActive,
 }: {
   type: Block["shape"];
   color: string;
+  text?: string;
+  onTextChange?: (newText: string) => void;
+  isActive?: boolean;
 }) => {
   if (!type) return null;
+
+  if (type === "text") {
+    return <TextBox text={text || ""} onTextChange={onTextChange!} isActive={isActive} />;
+  }
 
   return (
     <Suspense fallback={<div className="size-full bg-gray-700" />}>
@@ -87,13 +101,27 @@ const initialLayout: Block[] = [
     color: "bg-green-500",
     maintainRatio: true,
   },
+  {
+    i: "text1",
+    x: 0,
+    y: 3,
+    w: 2,
+    h: 1,
+    shape: "text",
+    color: "bg-gray-500",
+    text: "Edit this text",
+  },
 ];
 
-const ShapeWrapper = ({ children, isActive, onSelect }: ShapeWrapperProps) => {
+const ShapeWrapper = ({ children, isActive, onSelect, isText }: ShapeWrapperProps) => {
   return (
     <div
-      className={`flex size-full cursor-move items-center justify-center`}
-      onClick={onSelect}
+      className={`size-full ${isText ? '' : 'cursor-move'}`}
+      onClick={(e) => {
+        if (!isText) {
+          onSelect?.();
+        }
+      }}
     >
       {children}
     </div>
@@ -141,8 +169,16 @@ export default function TestPage() {
     }
   };
 
+  const handleTextChange = (blockId: string, newText: string) => {
+    setLayout((prevLayout) =>
+      prevLayout.map((block) =>
+        block.i === blockId ? { ...block, text: newText } : block
+      )
+    );
+  };
+
   return (
-    <div className="flex h-screen w-screen flex-col bg-gray-900">
+    <div className="flex h-screen w-screen flex-col bg-gray-900" style={{ zIndex: 0 }}>
       <MenuBar
         cols={cols}
         rows={rows}
@@ -182,20 +218,28 @@ export default function TestPage() {
           resizeHandles={["s", "w", "e", "n", "sw", "nw", "se", "ne"]}
           transformScale={1}
         >
-          {layout.map((block) => (
+          {layout.map((block, index) => (
             <div
               key={block.i}
               style={{
-                zIndex: activeShape === block.i ? 10 : 1,
+                zIndex: 2 + index,
                 padding: 0,
                 margin: 0,
+                position: 'relative',
               }}
             >
               <ShapeWrapper
                 isActive={activeShape === block.i}
                 onSelect={() => setActiveShape(block.i)}
+                isText={block.shape === 'text'}
               >
-                <ShapeItem type={block.shape} color={block.color} />
+                <ShapeItem
+                  type={block.shape}
+                  color={block.color}
+                  text={block.text}
+                  onTextChange={(newText) => handleTextChange(block.i, newText)}
+                  isActive={activeShape === block.i}
+                />
               </ShapeWrapper>
             </div>
           ))}

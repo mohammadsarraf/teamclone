@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import ShapeWrapper from "./ShapeWrapper";
 
 interface ShapeProps {
   type: string;
@@ -15,31 +16,39 @@ const ShapeComponents = ({ type, color }: ShapeProps) => {
         ? "#10B981"
         : "#FFFFFF";
 
+  const handleSelect = () => {
+    console.log("Shape selected");
+  };
+
   return (
-    <div
-      className="flex size-full items-center justify-center"
-      style={{ transition: "transform 200ms ease" }}
-    >
-      <div className="aspect-square max-h-full w-full">
-        <svg
-          width="100%"
-          height="100%"
-          viewBox="0 0 100 100"
-          preserveAspectRatio="xMidYMid meet"
+    <div>
+      <ShapeWrapper onSelect={handleSelect} isText={false}>
+        <div
+          className="flex size-full items-center justify-center"
+          style={{ transition: "transform 200ms ease" }}
         >
-          {type === "square" && (
-            <rect x="5" y="5" width="90" height="90" fill={colorHex} />
-          )}
+          <div className="aspect-square max-h-full w-full">
+            <svg
+              width="100%"
+              height="100%"
+              viewBox="0 0 100 100"
+              preserveAspectRatio="xMidYMid meet"
+            >
+              {type === "square" && (
+                <rect x="5" y="5" width="90" height="90" fill={colorHex} />
+              )}
 
-          {type === "circle" && (
-            <circle cx="50" cy="50" r="45" fill={colorHex} />
-          )}
+              {type === "circle" && (
+                <circle cx="50" cy="50" r="45" fill={colorHex} />
+              )}
 
-          {type === "triangle" && (
-            <polygon points="50,5 95,95 5,95" fill={colorHex} />
-          )}
-        </svg>
-      </div>
+              {type === "triangle" && (
+                <polygon points="50,5 95,95 5,95" fill={colorHex} />
+              )}
+            </svg>
+          </div>
+        </div>
+      </ShapeWrapper>
     </div>
   );
 };

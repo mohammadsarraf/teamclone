@@ -10,6 +10,7 @@ import { useWindowSize } from "./hooks/useWindowSize";
 import { MenuBar } from "./components/MenuBar";
 import { GridOverlay } from "./components/GridOverlay";
 import { GridContainer } from "./components/GridContainer";
+import ShapeWrapper from "./components/ShapeWrapper";
 
 // Dynamically import Zdog components with no SSR
 const ZdogComponents = dynamic(() => import("./components/ZdogComponents"), {
@@ -113,20 +114,7 @@ const initialLayout: Block[] = [
   },
 ];
 
-const ShapeWrapper = ({ children, isActive, onSelect, isText }: ShapeWrapperProps) => {
-  return (
-    <div
-      className={`size-full ${isText ? '' : 'cursor-move'}`}
-      onClick={(e) => {
-        if (!isText) {
-          onSelect?.();
-        }
-      }}
-    >
-      {children}
-    </div>
-  );
-};
+
 
 export default function TestPage() {
   const [layout, setLayout] = useState<Block[]>(initialLayout);
@@ -229,7 +217,6 @@ export default function TestPage() {
               }}
             >
               <ShapeWrapper
-                isActive={activeShape === block.i}
                 onSelect={() => setActiveShape(block.i)}
                 isText={block.shape === 'text'}
               >
@@ -238,7 +225,6 @@ export default function TestPage() {
                   color={block.color}
                   text={block.text}
                   onTextChange={(newText) => handleTextChange(block.i, newText)}
-                  isActive={activeShape === block.i}
                 />
               </ShapeWrapper>
             </div>

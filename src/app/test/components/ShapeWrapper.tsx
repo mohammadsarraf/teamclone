@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 interface ShapeWrapperProps {
   children: React.ReactNode;
@@ -8,16 +8,38 @@ interface ShapeWrapperProps {
 }
 
 const ShapeWrapper = ({ children, isActive, onSelect, isText }: ShapeWrapperProps) => {
+  const [menuVisible, setMenuVisible] = useState(false);
+
+  const handleFocus = () => {
+    setMenuVisible(true);
+  };
+
+  const handleBlur = () => {
+    setMenuVisible(false);
+  };
+
   return (
     <div 
       className={`size-full ${isText ? '' : 'cursor-move'}`}
-      onClick={(e) => {
+      tabIndex={0} // Make the div focusable
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+      onClick={() => {
         if (!isText) {
           onSelect?.();
         }
       }}
     >
       {children}
+      {menuVisible && (
+        <div className="menu">
+          <ul>
+            <li onClick={() => console.log('Edit')}>Edit</li>
+            <li onClick={() => console.log('Delete')}>Delete</li>
+            <li onClick={() => console.log('Duplicate')}>Duplicate</li>
+          </ul>
+        </div>
+      )}
     </div>
   );
 };

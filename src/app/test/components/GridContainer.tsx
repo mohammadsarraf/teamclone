@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import GridLayout from "react-grid-layout";
+import GridLayout, { Layout } from "react-grid-layout";
 import { Block } from "../types";
 
 interface GridContainerProps {
@@ -8,17 +8,21 @@ interface GridContainerProps {
   unitSize: number;
   layout: Block[];
   children: ReactNode;
-  onLayoutChange: (layout: any[]) => void;
-  onResizeStop: (layout: any[], oldItem: any, newItem: any) => void;
+  onLayoutChange: (layout: Layout[]) => void;
+  onResizeStop: (layout: Layout[], oldItem: Layout, newItem: Layout) => void;
   onResizeStart: () => void;
   onDragStart: () => void;
-  onDragStop: () => void;
+  onDragStop: (layout: Layout[]) => void;
   preventCollision: boolean;
   allowOverlap: boolean;
   verticalCompact: boolean;
   compactType: any;
-  resizeHandles: string[];
+  resizeHandles: ('s' | 'w' | 'e' | 'n' | 'sw' | 'nw' | 'se' | 'ne')[];
   transformScale: number;
+  margin: [number, number];
+  containerPadding: [number, number];
+  isDraggable: boolean;
+  isResizable: boolean;
 }
 
 export const GridContainer = ({
@@ -43,10 +47,6 @@ export const GridContainer = ({
         cols={cols}
         rowHeight={unitSize}
         width={cols * unitSize}
-        margin={[0, 0]}
-        containerPadding={[0, 0]}
-        isDraggable={true}
-        isResizable={true}
         {...props}
       >
         {children}

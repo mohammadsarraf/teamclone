@@ -12,6 +12,7 @@ import { GridOverlay } from "./components/GridOverlay";
 import { GridContainer } from "./components/GridContainer";
 import ShapeWrapper from "./components/ShapeWrapper";
 import ShapeDesignMenu from "./components/ShapeDesignMenu";
+import { Layout } from 'react-grid-layout';
 
 // Dynamically import Zdog components with no SSR
 const ZdogComponents = dynamic(() => import("./components/ZdogComponents"), {
@@ -25,12 +26,7 @@ const ShapeComponents = dynamic(() => import("./components/ShapeComponents"), {
 
 const TextBox = dynamic(() => import("./components/TextBox"), { ssr: false });
 
-interface Block {
-  i: string;
-  x: number;
-  y: number;
-  w: number;
-  h: number;
+interface Block extends Layout {
   shape: "triangle" | "circle" | "square" | "text" | string;
   color: string;
   maintainRatio?: boolean;
@@ -333,7 +329,7 @@ export default function TestPage() {
           }}
           onResizeStart={() => setIsResizing(true)}
           onDragStart={() => setIsDragging(true)}
-          onDragStop={(layout) => {
+          onDragStop={(layout: Layout[]) => {
             setIsDragging(false);
             handleLayoutChange(layout);
           }}
@@ -343,7 +339,7 @@ export default function TestPage() {
           compactType={null}
           isDraggable={true}
           isResizable={true}
-          resizeHandles={["s", "w", "e", "n", "sw", "nw", "se", "ne"]}
+          resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
           transformScale={1}
           margin={[0, 0]}
           containerPadding={[0, 0]}

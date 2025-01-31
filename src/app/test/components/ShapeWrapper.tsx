@@ -31,24 +31,24 @@ const ShapeWrapper: React.FC<ShapeWrapperProps> = ({
   isActive, 
   onSelect, 
   isText,
+  currentShape = "",
   onShapeChange,
   onColorChange,
-  onDelete,
-  onDuplicate,
-  currentShape,
-  onOpacityChange,
-  onRotationChange,
+  onDelete = () => {},
+  onDuplicate = () => {},
+  onOpacityChange = () => {},
+  onRotationChange = () => {},
   onBorderChange,
-  currentOpacity,
-  currentRotation,
+  currentOpacity = 100,
+  currentRotation = 0,
   currentBorder,
-  onFlipHorizontal,
-  onFlipVertical,
+  onFlipHorizontal = () => {},
+  onFlipVertical = () => {},
   onShadowChange,
-  currentShadow,
-  currentFlipH,
-  currentFlipV,
-  currentColor,
+  currentShadow = false,
+  currentFlipH = false,
+  currentFlipV = false,
+  currentColor = "#3b82f6",
 }) => {
   const [menuVisible, setMenuVisible] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -116,24 +116,20 @@ const ShapeWrapper: React.FC<ShapeWrapperProps> = ({
           onMouseDown={(e) => e.stopPropagation()}
         >
           <ShapeDesignMenu
-            currentShape={currentShape || ""}
-            onShapeChange={onShapeChange!}
-            onColorChange={handleColorChange}
+            selectedColor={currentColor}
+            onColorChange={onColorChange || (() => {})}
+            currentShape={currentShape}
+            onShapeChange={onShapeChange || (() => {})}
             onDelete={onDelete}
             onDuplicate={onDuplicate}
             onOpacityChange={onOpacityChange}
             onRotationChange={onRotationChange}
-            onBorderChange={onBorderChange}
             currentOpacity={currentOpacity}
             currentRotation={currentRotation}
-            currentBorder={currentBorder}
             onFlipHorizontal={onFlipHorizontal}
             onFlipVertical={onFlipVertical}
-            onShadowChange={onShadowChange}
-            currentShadow={currentShadow}
             currentFlipH={currentFlipH}
             currentFlipV={currentFlipV}
-            selectedColor={shapeColor}
           />
           
           {/* Arrow pointer */}

@@ -57,7 +57,7 @@ const ShapeDesignMenu: React.FC<ShapeDesignMenuProps> = ({
       {/* Transform */}
       <div className="mb-4 border-b border-gray-200 pb-3">
         <h3 className="mb-2 font-medium text-gray-800">Transform</h3>
-        
+
         {/* Rotation */}
         <div className="mb-3">
           <div className="flex items-center justify-between">
@@ -217,4 +217,4 @@ const ShapeDesignMenu: React.FC<ShapeDesignMenuProps> = ({
   );
 };
 
-export default ShapeDesignMenu; 
+export default ShapeDesignMenu;

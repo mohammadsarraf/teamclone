@@ -34,8 +34,8 @@ interface ShapeWrapperProps {
   currentFont?: string;
   onFontSize?: (size: number) => void;
   currentFontSize?: number;
-  onTextAlign?: (align: 'left' | 'center' | 'right') => void;
-  currentTextAlign?: 'left' | 'center' | 'right';
+  onTextAlign?: (align: "left" | "center" | "right") => void;
+  currentTextAlign?: "left" | "center" | "right";
   onBold?: () => void;
   isBold?: boolean;
   onItalic?: () => void;
@@ -74,7 +74,7 @@ const ShapeWrapper: React.FC<ShapeWrapperProps> = ({
   currentColor = "#3b82f6",
   totalShapes,
   index,
-  className = '',
+  className = "",
   onFontChange,
   currentFont,
   onFontSize,
@@ -148,96 +148,94 @@ const ShapeWrapper: React.FC<ShapeWrapperProps> = ({
       onBlur={handleBlur}
       onClick={handleClick}
       onMouseDown={handleMouseDown}
-      style={{ 
+      style={{
         zIndex: menuVisible ? 10000 : index,
       }}
     >
       {/* Content area */}
-      <div
-        ref={contentRef}
-        className={`size-full ${!isText && "cursor-move"}`}
-      >
+      <div ref={contentRef} className={`size-full ${!isText && "cursor-move"}`}>
         {children}
       </div>
 
       {/* Selection outline */}
       <div
-        className={`absolute inset-0 rounded border-2 border-transparent transition-colors pointer-events-none ${
-          menuVisible 
-            ? isText 
-              ? "border-blue-500 bg-gray-800/5" 
+        className={`pointer-events-none absolute inset-0 rounded border-2 border-transparent transition-colors ${
+          menuVisible
+            ? isText
+              ? "border-blue-500 bg-gray-800/5"
               : "border-blue-500"
             : "group-hover:border-blue-500/50"
         }`}
       />
 
       {/* Render menu in a portal */}
-      {menuVisible && createPortal(
-        <div
-          ref={menuRef}
-          className="fixed z-[99999] menu-content"
-          style={{
-            top: menuPosition.top,
-            right: menuPosition.right,
-            transform: 'translateX(100%)',
-          }}
-          onMouseDown={(e) => e.stopPropagation()}
-        >
-          {isText ? (
-            <TextDesignMenu
-              selectedColor={currentColor}
-              onColorChange={onColorChange || (() => {})}
-              onDelete={onDelete}
-              onDuplicate={onDuplicate}
-              onOpacityChange={onOpacityChange}
-              currentOpacity={currentOpacity}
-              onFontChange={onFontChange}
-              currentFont={currentFont}
-              onFontSize={onFontSize}
-              currentFontSize={currentFontSize}
-              onTextAlign={onTextAlign}
-              currentTextAlign={currentTextAlign}
-              onBold={onBold}
-              isBold={isBold}
-              onItalic={onItalic}
-              isItalic={isItalic}
-              onUnderline={onUnderline}
-              isUnderline={isUnderline}
-              onLineHeight={onLineHeight}
-              currentLineHeight={currentLineHeight}
-              onLetterSpacing={onLetterSpacing}
-              currentLetterSpacing={currentLetterSpacing}
-            />
-          ) : (
-            <ShapeDesignMenu
-              selectedColor={currentColor}
-              onColorChange={onColorChange || (() => {})}
-              currentShape={currentShape}
-              onShapeChange={onShapeChange || (() => {})}
-              onDelete={onDelete}
-              onDuplicate={onDuplicate}
-              onOpacityChange={onOpacityChange}
-              onRotationChange={onRotationChange}
-              currentOpacity={currentOpacity}
-              currentRotation={currentRotation}
-              onFlipHorizontal={onFlipHorizontal}
-              onFlipVertical={onFlipVertical}
-              currentFlipH={currentFlipH}
-              currentFlipV={currentFlipV}
-              onBorderChange={onBorderChange}
-              currentBorder={currentBorder}
-              onShadowChange={onShadowChange}
-              currentShadow={currentShadow}
-            />
-          )}
+      {menuVisible &&
+        createPortal(
+          <div
+            ref={menuRef}
+            className="menu-content fixed z-[99999]"
+            style={{
+              top: menuPosition.top,
+              right: menuPosition.right,
+              transform: "translateX(100%)",
+            }}
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            {isText ? (
+              <TextDesignMenu
+                selectedColor={currentColor}
+                onColorChange={onColorChange || (() => {})}
+                onDelete={onDelete}
+                onDuplicate={onDuplicate}
+                onOpacityChange={onOpacityChange}
+                currentOpacity={currentOpacity}
+                onFontChange={onFontChange}
+                currentFont={currentFont}
+                onFontSize={onFontSize}
+                currentFontSize={currentFontSize}
+                onTextAlign={onTextAlign}
+                currentTextAlign={currentTextAlign}
+                onBold={onBold}
+                isBold={isBold}
+                onItalic={onItalic}
+                isItalic={isItalic}
+                onUnderline={onUnderline}
+                isUnderline={isUnderline}
+                onLineHeight={onLineHeight}
+                currentLineHeight={currentLineHeight}
+                onLetterSpacing={onLetterSpacing}
+                currentLetterSpacing={currentLetterSpacing}
+              />
+            ) : (
+              <ShapeDesignMenu
+                selectedColor={currentColor}
+                onColorChange={onColorChange || (() => {})}
+                currentShape={currentShape}
+                onShapeChange={onShapeChange || (() => {})}
+                onDelete={onDelete}
+                onDuplicate={onDuplicate}
+                onOpacityChange={onOpacityChange}
+                onRotationChange={onRotationChange}
+                currentOpacity={currentOpacity}
+                currentRotation={currentRotation}
+                onFlipHorizontal={onFlipHorizontal}
+                onFlipVertical={onFlipVertical}
+                currentFlipH={currentFlipH}
+                currentFlipV={currentFlipV}
+                onBorderChange={onBorderChange}
+                currentBorder={currentBorder}
+                onShadowChange={onShadowChange}
+                currentShadow={currentShadow}
+              />
+            )}
 
-          {/* Arrow pointer */}
-          <div className="absolute -left-2 top-3 size-4">
-            <div className="size-4 rotate-45 bg-[#f8fafc]"></div>
-          </div>
-        </div>,
-        document.body
-      )}
+            {/* Arrow pointer */}
+            <div className="absolute -left-2 top-3 size-4">
+              <div className="size-4 rotate-45 bg-[#f8fafc]"></div>
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 };

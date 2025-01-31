@@ -7,4 +7,4 @@ export const colors = [
   { name: "Pink", value: "#ec4899" },
   { name: "Orange", value: "#f97316" },
   { name: "Teal", value: "#14b8a6" },
-]; 
+];

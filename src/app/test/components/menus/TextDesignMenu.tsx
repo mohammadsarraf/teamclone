@@ -1,8 +1,14 @@
 import React from "react";
-import { 
-  RiAlignLeft, RiAlignCenter, RiAlignRight,
-  RiTextSpacing, RiFontSize, RiBold, RiItalic, RiUnderline,
-  RiLineHeight
+import {
+  RiAlignLeft,
+  RiAlignCenter,
+  RiAlignRight,
+  RiTextSpacing,
+  RiFontSize,
+  RiBold,
+  RiItalic,
+  RiUnderline,
+  RiLineHeight,
 } from "react-icons/ri";
 import { fonts } from "./constants/fonts";
 import { colors } from "./constants/colors";
@@ -17,11 +23,11 @@ const TextDesignMenu: React.FC<TextDesignMenuProps> = ({
   onDelete,
   onDuplicate,
   onFontChange = () => {},
-  currentFont = 'Inter',
+  currentFont = "Inter",
   onFontSize = () => {},
   currentFontSize = 16,
   onTextAlign = () => {},
-  currentTextAlign = 'left',
+  currentTextAlign = "left",
   onBold = () => {},
   isBold = false,
   onItalic = () => {},
@@ -38,16 +44,16 @@ const TextDesignMenu: React.FC<TextDesignMenuProps> = ({
       {/* Typography */}
       <div className="mb-4 border-b border-gray-200 pb-3">
         <h3 className="mb-2 font-medium text-gray-800">Typography</h3>
-        
+
         {/* Font Family */}
         <div className="mb-3">
           <select
             value={currentFont}
             onChange={(e) => onFontChange(e.target.value)}
-            className="w-full rounded-lg border border-gray-200 bg-white text-gray-500 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none"
+            className="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-500 focus:border-blue-500 focus:outline-none"
           >
             {fonts.map((font) => (
-              <option key={font.value} value={font.value} >
+              <option key={font.value} value={font.value}>
                 {font.name}
               </option>
             ))}
@@ -99,31 +105,31 @@ const TextDesignMenu: React.FC<TextDesignMenuProps> = ({
         {/* Text Alignment */}
         <div className="flex rounded-lg bg-gray-100 p-0.5">
           <button
-            onClick={() => onTextAlign('left')}
+            onClick={() => onTextAlign("left")}
             className={`flex-1 rounded p-1.5 ${
-              currentTextAlign === 'left'
-                ? 'bg-white text-blue-500 shadow'
-                : 'text-gray-700'
+              currentTextAlign === "left"
+                ? "bg-white text-blue-500 shadow"
+                : "text-gray-700"
             }`}
           >
             <RiAlignLeft />
           </button>
           <button
-            onClick={() => onTextAlign('center')}
+            onClick={() => onTextAlign("center")}
             className={`flex-1 rounded p-1.5 ${
-              currentTextAlign === 'center'
-                ? 'bg-white text-blue-500 shadow'
-                : 'text-gray-700'
+              currentTextAlign === "center"
+                ? "bg-white text-blue-500 shadow"
+                : "text-gray-700"
             }`}
           >
             <RiAlignCenter />
           </button>
           <button
-            onClick={() => onTextAlign('right')}
+            onClick={() => onTextAlign("right")}
             className={`flex-1 rounded p-1.5 ${
-              currentTextAlign === 'right'
-                ? 'bg-white text-blue-500 shadow'
-                : 'text-gray-700'
+              currentTextAlign === "right"
+                ? "bg-white text-blue-500 shadow"
+                : "text-gray-700"
             }`}
           >
             <RiAlignRight />
@@ -134,7 +140,7 @@ const TextDesignMenu: React.FC<TextDesignMenuProps> = ({
       {/* Spacing */}
       <div className="mb-4 border-b border-gray-200 pb-3">
         <h3 className="mb-2 font-medium text-gray-800">Spacing</h3>
-        
+
         {/* Line Height */}
         <div className="mb-3">
           <div className="flex items-center justify-between">
@@ -155,7 +161,7 @@ const TextDesignMenu: React.FC<TextDesignMenuProps> = ({
             style={{
               background: getSliderBackground(
                 ((currentLineHeight - 1) / 1) * 100,
-                100
+                100,
               ),
             }}
           />
@@ -168,7 +174,9 @@ const TextDesignMenu: React.FC<TextDesignMenuProps> = ({
               <RiTextSpacing className="text-gray-500" />
               <span className="text-sm text-gray-600">Letter Spacing</span>
             </div>
-            <span className="text-sm text-gray-600">{currentLetterSpacing}px</span>
+            <span className="text-sm text-gray-600">
+              {currentLetterSpacing}px
+            </span>
           </div>
           <input
             type="range"
@@ -180,7 +188,7 @@ const TextDesignMenu: React.FC<TextDesignMenuProps> = ({
             style={{
               background: getSliderBackground(
                 ((currentLetterSpacing + 2) / 12) * 100,
-                100
+                100,
               ),
             }}
           />
@@ -243,4 +251,4 @@ const TextDesignMenu: React.FC<TextDesignMenuProps> = ({
   );
 };
 
-export default TextDesignMenu; 
+export default TextDesignMenu;

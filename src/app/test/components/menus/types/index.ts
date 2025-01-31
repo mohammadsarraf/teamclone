@@ -9,8 +9,8 @@ export interface TextDesignMenuProps {
   currentFont?: string;
   onFontSize?: (size: number) => void;
   currentFontSize?: number;
-  onTextAlign?: (align: 'left' | 'center' | 'right') => void;
-  currentTextAlign?: 'left' | 'center' | 'right';
+  onTextAlign?: (align: "left" | "center" | "right") => void;
+  currentTextAlign?: "left" | "center" | "right";
   onBold?: () => void;
   isBold?: boolean;
   onItalic?: () => void;
@@ -42,4 +42,4 @@ export interface ShapeDesignMenuProps {
   currentBorder?: { width: number; color: string };
   onShadowChange?: (hasShadow: boolean) => void;
   currentShadow?: boolean;
-} 
+}

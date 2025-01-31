@@ -35,7 +35,7 @@ interface Block extends Layout {
   opacity: number;
   font?: string;
   fontSize?: number;
-  textAlign?: 'left' | 'center' | 'right';
+  textAlign?: "left" | "center" | "right";
   isBold?: boolean;
   isItalic?: boolean;
   isUnderline?: boolean;
@@ -73,8 +73,8 @@ interface ShapeWrapperProps {
   currentFont?: string;
   onFontSize?: (size: number) => void;
   currentFontSize?: number;
-  onTextAlign?: (align: 'left' | 'center' | 'right') => void;
-  currentTextAlign?: 'left' | 'center' | 'right';
+  onTextAlign?: (align: "left" | "center" | "right") => void;
+  currentTextAlign?: "left" | "center" | "right";
   onBold?: () => void;
   isBold?: boolean;
   onItalic?: () => void;
@@ -119,7 +119,7 @@ const ShapeItem = ({
   onStartEdit?: () => void;
   font?: string;
   fontSize?: number;
-  textAlign?: 'left' | 'center' | 'right';
+  textAlign?: "left" | "center" | "right";
   isBold?: boolean;
   isItalic?: boolean;
   isUnderline?: boolean;
@@ -226,16 +226,16 @@ const TestPage = () => {
     const handleClickOutside = (e: MouseEvent) => {
       // Check if click is outside of any menu and not on a shape
       if (
-        activeMenu && 
-        !(e.target as HTMLElement).closest('.menu-content') && 
-        !(e.target as HTMLElement).closest('.shape-wrapper')
+        activeMenu &&
+        !(e.target as HTMLElement).closest(".menu-content") &&
+        !(e.target as HTMLElement).closest(".shape-wrapper")
       ) {
         setActiveMenu(null);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [activeMenu]);
 
   const handleLayoutChange = (newLayout: any[]) => {
@@ -421,7 +421,7 @@ const TestPage = () => {
   const handleFontChange = (blockId: string, font: string) => {
     setLayout((prevLayout) =>
       prevLayout.map((block) =>
-        block.i === blockId ? { ...block, font } : block
+        block.i === blockId ? { ...block, font } : block,
       ),
     );
   };
@@ -429,15 +429,18 @@ const TestPage = () => {
   const handleFontSizeChange = (blockId: string, fontSize: number) => {
     setLayout((prevLayout) =>
       prevLayout.map((block) =>
-        block.i === blockId ? { ...block, fontSize } : block
+        block.i === blockId ? { ...block, fontSize } : block,
       ),
     );
   };
 
-  const handleTextAlignChange = (blockId: string, textAlign: 'left' | 'center' | 'right') => {
+  const handleTextAlignChange = (
+    blockId: string,
+    textAlign: "left" | "center" | "right",
+  ) => {
     setLayout((prevLayout) =>
       prevLayout.map((block) =>
-        block.i === blockId ? { ...block, textAlign } : block
+        block.i === blockId ? { ...block, textAlign } : block,
       ),
     );
   };
@@ -445,7 +448,7 @@ const TestPage = () => {
   const handleBoldChange = (blockId: string) => {
     setLayout((prevLayout) =>
       prevLayout.map((block) =>
-        block.i === blockId ? { ...block, isBold: !block.isBold } : block
+        block.i === blockId ? { ...block, isBold: !block.isBold } : block,
       ),
     );
   };
@@ -453,7 +456,7 @@ const TestPage = () => {
   const handleItalicChange = (blockId: string) => {
     setLayout((prevLayout) =>
       prevLayout.map((block) =>
-        block.i === blockId ? { ...block, isItalic: !block.isItalic } : block
+        block.i === blockId ? { ...block, isItalic: !block.isItalic } : block,
       ),
     );
   };
@@ -461,7 +464,9 @@ const TestPage = () => {
   const handleUnderlineChange = (blockId: string) => {
     setLayout((prevLayout) =>
       prevLayout.map((block) =>
-        block.i === blockId ? { ...block, isUnderline: !block.isUnderline } : block
+        block.i === blockId
+          ? { ...block, isUnderline: !block.isUnderline }
+          : block,
       ),
     );
   };
@@ -469,15 +474,18 @@ const TestPage = () => {
   const handleLineHeightChange = (blockId: string, lineHeight: number) => {
     setLayout((prevLayout) =>
       prevLayout.map((block) =>
-        block.i === blockId ? { ...block, lineHeight } : block
+        block.i === blockId ? { ...block, lineHeight } : block,
       ),
     );
   };
 
-  const handleLetterSpacingChange = (blockId: string, letterSpacing: number) => {
+  const handleLetterSpacingChange = (
+    blockId: string,
+    letterSpacing: number,
+  ) => {
     setLayout((prevLayout) =>
       prevLayout.map((block) =>
-        block.i === blockId ? { ...block, letterSpacing } : block
+        block.i === blockId ? { ...block, letterSpacing } : block,
       ),
     );
   };
@@ -536,14 +544,16 @@ const TestPage = () => {
           transformScale={1}
           margin={[0, 0]}
           containerPadding={[0, 0]}
-          style={{ height: '100%' }}
+          style={{ height: "100%" }}
         >
           {layout.map((block, index) => (
             <div
               key={block.i}
               style={{
-                ...block,
                 position: "relative",
+                width: block.w,
+                height: block.h,
+                transform: `translate(${block.x}px, ${block.y}px)`,
               }}
             >
               <ShapeWrapper
@@ -555,8 +565,12 @@ const TestPage = () => {
                 onColorChange={(color) => handleColorChange(block.i, color)}
                 onDelete={() => handleDelete(block.i)}
                 onDuplicate={() => handleDuplicate(block.i)}
-                onOpacityChange={(opacity) => handleOpacityChange(block.i, opacity)}
-                onRotationChange={(rotation) => handleRotationChange(block.i, rotation)}
+                onOpacityChange={(opacity) =>
+                  handleOpacityChange(block.i, opacity)
+                }
+                onRotationChange={(rotation) =>
+                  handleRotationChange(block.i, rotation)
+                }
                 onBorderChange={handleBorderChange}
                 currentOpacity={block.opacity}
                 currentRotation={block.rotation || 0}
@@ -583,9 +597,13 @@ const TestPage = () => {
                 isItalic={block.isItalic}
                 onUnderline={() => handleUnderlineChange(block.i)}
                 isUnderline={block.isUnderline}
-                onLineHeight={(height) => handleLineHeightChange(block.i, height)}
+                onLineHeight={(height) =>
+                  handleLineHeightChange(block.i, height)
+                }
                 currentLineHeight={block.lineHeight}
-                onLetterSpacing={(spacing) => handleLetterSpacingChange(block.i, spacing)}
+                onLetterSpacing={(spacing) =>
+                  handleLetterSpacingChange(block.i, spacing)
+                }
                 currentLetterSpacing={block.letterSpacing}
               >
                 <ShapeItem

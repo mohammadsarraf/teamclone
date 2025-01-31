@@ -1,18 +1,14 @@
 "use client";
-import React, { useState, useEffect, Suspense } from "react";
-import GridLayout from "react-grid-layout";
+import React, { useState, Suspense } from "react";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
-import { BsFillTriangleFill } from "react-icons/bs";
-import { FaCircle, FaSquare } from "react-icons/fa";
 import dynamic from "next/dynamic";
 import { useWindowSize } from "./hooks/useWindowSize";
 import { MenuBar } from "./components/MenuBar";
 import { GridOverlay } from "./components/GridOverlay";
 import { GridContainer } from "./components/GridContainer";
 import ShapeWrapper from "./components/ShapeWrapper";
-import ShapeDesignMenu from "./components/ShapeDesignMenu";
-import { Layout } from 'react-grid-layout';
+import { Layout } from "react-grid-layout";
 
 // Dynamically import Zdog components with no SSR
 const ZdogComponents = dynamic(() => import("./components/ZdogComponents"), {
@@ -88,7 +84,13 @@ const ShapeItem = ({
   if (!type) return null;
 
   if (type === "text") {
-    return <TextBox text={text || ""} onTextChange={onTextChange!} isActive={isActive} />;
+    return (
+      <TextBox
+        text={text || ""}
+        onTextChange={onTextChange!}
+        isActive={isActive}
+      />
+    );
   }
 
   return (
@@ -111,7 +113,10 @@ const ShapeItem = ({
 
 const initialLayout: Block[] = [];
 
-const createNewShape = (type: "triangle" | "circle" | "square" | "text", layout: Block[]) => {
+const createNewShape = (
+  type: "triangle" | "circle" | "square" | "text",
+  layout: Block[],
+) => {
   const id = `${type}${layout.length + 1}`;
   const defaultColor = "#3b82f6"; // Default blue color
   const colors = {
@@ -142,24 +147,29 @@ export default function TestPage() {
   const [isResizing, setIsResizing] = useState(false);
   const [cols, setCols] = useState(12);
   const [rows, setRows] = useState(12);
-  const [positions, setPositions] = useState<{ [key: string]: { x: number; y: number; w: number; h: number } }>({});
+  const [positions, setPositions] = useState<{
+    [key: string]: { x: number; y: number; w: number; h: number };
+  }>({});
 
   const containerWidth = useWindowSize();
   const unitSize = containerWidth / cols;
 
   const handleLayoutChange = (newLayout: any[]) => {
-    const newPositions = newLayout.reduce((acc, item) => {
-      acc[item.i] = {
-        x: item.x,
-        y: item.y,
-        w: item.w,
-        h: item.h,
-      };
-      return acc;
-    }, {} as { [key: string]: { x: number; y: number; w: number; h: number } });
-    
+    const newPositions = newLayout.reduce(
+      (acc, item) => {
+        acc[item.i] = {
+          x: item.x,
+          y: item.y,
+          w: item.w,
+          h: item.h,
+        };
+        return acc;
+      },
+      {} as { [key: string]: { x: number; y: number; w: number; h: number } },
+    );
+
     setPositions(newPositions);
-    
+
     setLayout((prevLayout) => {
       return prevLayout.map((block) => {
         const pos = newPositions[block.i];
@@ -193,8 +203,8 @@ export default function TestPage() {
   const handleTextChange = (blockId: string, newText: string) => {
     setLayout((prevLayout) =>
       prevLayout.map((block) =>
-        block.i === blockId ? { ...block, text: newText } : block
-      )
+        block.i === blockId ? { ...block, text: newText } : block,
+      ),
     );
   };
 
@@ -208,10 +218,15 @@ export default function TestPage() {
     setLayout([...layout, newTextBox]);
   };
 
-  const handleShapeChange = (blockId: string, type: "triangle" | "circle" | "square") => {
-    setLayout((prevLayout) => prevLayout.map((block) =>
-      block.i === blockId ? { ...block, shape: type } : block
-    ));
+  const handleShapeChange = (
+    blockId: string,
+    type: "triangle" | "circle" | "square",
+  ) => {
+    setLayout((prevLayout) =>
+      prevLayout.map((block) =>
+        block.i === blockId ? { ...block, shape: type } : block,
+      ),
+    );
   };
 
   const handleColorChange = (blockId: string, color: string) => {
@@ -254,47 +269,62 @@ export default function TestPage() {
   };
 
   const handleOpacityChange = (blockId: string, opacity: number) => {
-    setLayout((prevLayout) => prevLayout.map((block) =>
-      block.i === blockId ? { ...block, opacity } : block
-    ));
+    setLayout((prevLayout) =>
+      prevLayout.map((block) =>
+        block.i === blockId ? { ...block, opacity } : block,
+      ),
+    );
   };
 
   const handleRotationChange = (blockId: string, rotation: number) => {
-    setLayout((prevLayout) => prevLayout.map((block) =>
-      block.i === blockId ? { ...block, rotation } : block
-    ));
+    setLayout((prevLayout) =>
+      prevLayout.map((block) =>
+        block.i === blockId ? { ...block, rotation } : block,
+      ),
+    );
   };
 
   const handleBorderChange = (border: { width: number; color: string }) => {
     if (activeShape !== null) {
-      setLayout(layout.map((block) =>
-        block.i === activeShape ? { ...block, border } : block
-      ));
+      setLayout(
+        layout.map((block) =>
+          block.i === activeShape ? { ...block, border } : block,
+        ),
+      );
     }
   };
 
   const handleFlipH = (blockId: string) => {
-    setLayout((prevLayout) => prevLayout.map((block) =>
-      block.i === blockId ? { ...block, flipH: !block.flipH } : block
-    ));
+    setLayout((prevLayout) =>
+      prevLayout.map((block) =>
+        block.i === blockId ? { ...block, flipH: !block.flipH } : block,
+      ),
+    );
   };
 
   const handleFlipV = (blockId: string) => {
-    setLayout((prevLayout) => prevLayout.map((block) =>
-      block.i === blockId ? { ...block, flipV: !block.flipV } : block
-    ));
+    setLayout((prevLayout) =>
+      prevLayout.map((block) =>
+        block.i === blockId ? { ...block, flipV: !block.flipV } : block,
+      ),
+    );
   };
 
   const handleShadowChange = (shadow: boolean) => {
     if (activeShape !== null) {
-      setLayout(layout.map((block) =>
-        block.i === activeShape ? { ...block, shadow } : block
-      ));
+      setLayout(
+        layout.map((block) =>
+          block.i === activeShape ? { ...block, shadow } : block,
+        ),
+      );
     }
   };
 
   return (
-    <div className="flex h-screen w-screen flex-col bg-gray-900" style={{ zIndex: 0 }}>
+    <div
+      className="flex h-screen w-screen flex-col bg-gray-900"
+      style={{ zIndex: 0 }}
+    >
       <MenuBar
         cols={cols}
         rows={rows}
@@ -339,7 +369,7 @@ export default function TestPage() {
           compactType={null}
           isDraggable={true}
           isResizable={true}
-          resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
+          resizeHandles={["s", "w", "e", "n", "sw", "nw", "se", "ne"]}
           transformScale={1}
           margin={[0, 0]}
           containerPadding={[0, 0]}
@@ -351,19 +381,23 @@ export default function TestPage() {
                 zIndex: 2 + index,
                 padding: 0,
                 margin: 0,
-                position: 'relative',
+                position: "relative",
               }}
             >
               <ShapeWrapper
                 onSelect={() => setActiveShape(block.i)}
-                isText={block.shape === 'text'}
+                isText={block.shape === "text"}
                 currentShape={block.shape}
                 onShapeChange={(type) => handleShapeChange(block.i, type)}
                 onColorChange={(color) => handleColorChange(block.i, color)}
                 onDelete={() => handleDelete(block.i)}
                 onDuplicate={() => handleDuplicate(block.i)}
-                onOpacityChange={(opacity) => handleOpacityChange(block.i, opacity)}
-                onRotationChange={(rotation) => handleRotationChange(block.i, rotation)}
+                onOpacityChange={(opacity) =>
+                  handleOpacityChange(block.i, opacity)
+                }
+                onRotationChange={(rotation) =>
+                  handleRotationChange(block.i, rotation)
+                }
                 onBorderChange={handleBorderChange}
                 currentOpacity={block.opacity}
                 currentRotation={block.rotation || 0}

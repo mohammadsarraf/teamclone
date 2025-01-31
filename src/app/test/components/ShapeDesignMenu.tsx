@@ -20,6 +20,10 @@ interface ShapeDesignMenuProps {
   currentFlipV: boolean;
   onDelete: () => void;
   onDuplicate: () => void;
+  onBorderChange?: (options: { width: number; color: string }) => void;
+  currentBorder?: { width: number; color: string };
+  onShadowChange?: (hasShadow: boolean) => void;
+  currentShadow?: boolean;
 }
 
 const getSliderBackground = (value: number, max: number) => {
@@ -27,8 +31,8 @@ const getSliderBackground = (value: number, max: number) => {
   return `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${percentage}%, #e5e7eb ${percentage}%, #e5e7eb 100%)`;
 };
 
-const ShapeDesignMenu: React.FC<ShapeDesignMenuProps> = ({ 
-  selectedColor, 
+const ShapeDesignMenu: React.FC<ShapeDesignMenuProps> = ({
+  selectedColor,
   onColorChange,
   currentShape,
   onShapeChange,
@@ -42,6 +46,10 @@ const ShapeDesignMenu: React.FC<ShapeDesignMenuProps> = ({
   currentFlipV,
   onDelete,
   onDuplicate,
+  onBorderChange = () => {},
+  currentBorder = { width: 0, color: "#000000" },
+  onShadowChange = () => {},
+  currentShadow = false,
 }) => {
   const shapes = [
     { type: "triangle", icon: BsTriangle, label: "Triangle" },
@@ -71,12 +79,16 @@ const ShapeDesignMenu: React.FC<ShapeDesignMenuProps> = ({
             return (
               <button
                 key={shape.type}
-                onClick={() => onShapeChange(shape.type as "triangle" | "circle" | "square")}
+                onClick={() =>
+                  onShapeChange(shape.type as "triangle" | "circle" | "square")
+                }
                 className={`flex flex-col items-center rounded-lg p-2 text-gray-700 hover:bg-blue-50 ${
-                  currentShape === shape.type ? 'bg-blue-50 ring-1 ring-blue-500' : ''
+                  currentShape === shape.type
+                    ? "bg-blue-50 ring-1 ring-blue-500"
+                    : ""
                 }`}
               >
-                <Icon className="h-6 w-6" />
+                <Icon className="size-6" />
                 <span className="mt-1 text-xs">{shape.label}</span>
               </button>
             );
@@ -92,14 +104,16 @@ const ShapeDesignMenu: React.FC<ShapeDesignMenuProps> = ({
             <button
               key={color.value}
               className={`size-6 rounded-full transition-transform hover:scale-110 hover:ring-2 hover:ring-blue-400 hover:ring-offset-2 ${
-                selectedColor === color.value ? 'ring-2 ring-blue-400 ring-offset-2' : ''
+                selectedColor === color.value
+                  ? "ring-2 ring-blue-400 ring-offset-2"
+                  : ""
               }`}
               style={{ backgroundColor: color.value }}
               onClick={() => onColorChange(color.value)}
             />
           ))}
         </div>
-        
+
         <div className="mt-3">
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-600">Opacity</span>
@@ -114,9 +128,9 @@ const ShapeDesignMenu: React.FC<ShapeDesignMenuProps> = ({
             className="mt-1 h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-gray-200"
             style={{
               background: getSliderBackground(currentOpacity, 100),
-              height: '6px',
-              borderRadius: '4px',
-              WebkitAppearance: 'none',
+              height: "6px",
+              borderRadius: "4px",
+              WebkitAppearance: "none",
             }}
           />
         </div>
@@ -140,29 +154,29 @@ const ShapeDesignMenu: React.FC<ShapeDesignMenuProps> = ({
               className="mt-1 h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-gray-200"
               style={{
                 background: getSliderBackground(currentRotation, 360),
-                height: '6px',
-                borderRadius: '4px',
-                WebkitAppearance: 'none',
+                height: "6px",
+                borderRadius: "4px",
+                WebkitAppearance: "none",
               }}
             />
           </div>
           <div className="flex gap-2">
-            <button 
+            <button
               onClick={onFlipHorizontal}
               className={`flex flex-1 items-center justify-center gap-1 rounded-lg border border-gray-200 p-2 text-sm text-gray-700 hover:border-blue-500 hover:bg-blue-50 ${
-                currentFlipH ? 'bg-blue-50 border-blue-500' : ''
+                currentFlipH ? "border-blue-500 bg-blue-50" : ""
               }`}
             >
-              <MdOutlineFlip className="h-4 w-4" />
+              <MdOutlineFlip className="size-4" />
               Flip H
             </button>
-            <button 
+            <button
               onClick={onFlipVertical}
               className={`flex flex-1 items-center justify-center gap-1 rounded-lg border border-gray-200 p-2 text-sm text-gray-700 hover:border-blue-500 hover:bg-blue-50 ${
-                currentFlipV ? 'bg-blue-50 border-blue-500' : ''
+                currentFlipV ? "border-blue-500 bg-blue-50" : ""
               }`}
             >
-              <MdOutlineFlip className="h-4 w-4 rotate-90" />
+              <MdOutlineFlip className="size-4 rotate-90" />
               Flip V
             </button>
           </div>
@@ -175,7 +189,7 @@ const ShapeDesignMenu: React.FC<ShapeDesignMenuProps> = ({
         <div className="space-y-2">
           <div className="flex items-center justify-between rounded px-2 py-1.5 hover:bg-blue-50">
             <div className="flex items-center gap-2">
-              <RxBorderWidth className="h-4 w-4 text-gray-600" />
+              <RxBorderWidth className="size-4 text-gray-600" />
               <span className="text-sm text-gray-700">Border</span>
             </div>
             <div className="flex items-center gap-2">
@@ -183,25 +197,39 @@ const ShapeDesignMenu: React.FC<ShapeDesignMenuProps> = ({
                 type="number"
                 min="0"
                 max="10"
-                value={0}
+                value={currentBorder.width}
+                onChange={(e) =>
+                  onBorderChange({
+                    ...currentBorder,
+                    width: Number(e.target.value),
+                  })
+                }
                 className="w-16 rounded bg-gray-100 px-2 py-1 text-sm"
               />
               <input
                 type="color"
-                value="#000000"
-                className="h-6 w-6 cursor-pointer"
+                value={currentBorder.color}
+                onChange={(e) =>
+                  onBorderChange({
+                    ...currentBorder,
+                    color: e.target.value,
+                  })
+                }
+                className="size-6 cursor-pointer"
               />
             </div>
           </div>
           <div className="flex items-center justify-between rounded px-2 py-1.5 hover:bg-blue-50">
             <div className="flex items-center gap-2">
-              <RxShadow className="h-4 w-4 text-gray-600" />
+              <RxShadow className="size-4 text-gray-600" />
               <span className="text-sm text-gray-700">Shadow</span>
             </div>
             <label className="relative inline-flex cursor-pointer items-center">
-              <input 
-                type="checkbox" 
-                className="peer sr-only" 
+              <input
+                type="checkbox"
+                checked={currentShadow}
+                onChange={(e) => onShadowChange(e.target.checked)}
+                className="peer sr-only"
               />
               <div className="peer h-5 w-9 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:size-4 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"></div>
             </label>

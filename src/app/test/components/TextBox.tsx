@@ -1,6 +1,6 @@
 "use client";
-import { useEditor, EditorContent } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 import { useRef } from "react";
 
 interface TextBoxProps {
@@ -26,13 +26,13 @@ const TextBox = ({ text, onTextChange, isActive }: TextBoxProps) => {
     ],
     content: text,
     editable: true,
-    autofocus: 'end',
+    autofocus: "end",
     onUpdate: ({ editor }) => {
       onTextChange(editor.getText());
     },
     editorProps: {
       attributes: {
-        class: 'size-full outline-none',
+        class: "size-full outline-none",
       },
     },
   });
@@ -41,7 +41,7 @@ const TextBox = ({ text, onTextChange, isActive }: TextBoxProps) => {
     <>
       {/* Text Menu */}
       {isActive && (
-        <div 
+        <div
           className="fixed flex items-center space-x-2 rounded bg-gray-800 px-3 py-1.5 text-sm text-white shadow-lg"
           style={{
             top: containerRef.current?.getBoundingClientRect().top! - 40 || 0,
@@ -49,15 +49,13 @@ const TextBox = ({ text, onTextChange, isActive }: TextBoxProps) => {
             zIndex: 1000,
           }}
         >
-          <span className="text-gray-400">
-            Click to edit text
-          </span>
+          <span className="text-gray-400">Click to edit text</span>
         </div>
       )}
 
       {/* Text Content */}
-      <div 
-        className="size-full" 
+      <div
+        className="size-full"
         ref={containerRef}
         onClick={(e) => e.stopPropagation()}
       >
@@ -70,4 +68,4 @@ const TextBox = ({ text, onTextChange, isActive }: TextBoxProps) => {
   );
 };
 
-export default TextBox; 
+export default TextBox;

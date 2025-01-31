@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use client";
 import { Illustration, Box, Cylinder, Shape } from "react-zdog";
 

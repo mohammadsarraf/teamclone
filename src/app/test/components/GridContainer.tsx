@@ -17,7 +17,7 @@ interface GridContainerProps {
   allowOverlap: boolean;
   verticalCompact: boolean;
   compactType: any;
-  resizeHandles: ('s' | 'w' | 'e' | 'n' | 'sw' | 'nw' | 'se' | 'ne')[];
+  resizeHandles: ("s" | "w" | "e" | "n" | "sw" | "nw" | "se" | "ne")[];
   transformScale: number;
   margin: [number, number];
   containerPadding: [number, number];

@@ -116,41 +116,42 @@ const Block = ({ ...props }: BlockProps) => {
   }
 
   return (
-    <BlockWrapper
-      isActive={props.isActive}
-      isEditing={props.isEditing}
-      isHovered={props.isHovered}
-      onEdit={() => props.onBlockClick(props.block.i)}
-      menuContent={
-        <ActiveBlock
-          block={props.block}
-          index={props.index}
-          isEditing={props.isEditing}
-          activeBlock={props.activeBlock}
-          handleBlockClick={props.onBlockClick}
-          handleTextChange={props.onTextChange}
-          color={props.block.color}
-          handleColorChange={props.handleColorChange}
-          handleHeadingClick={props.handleHeadingClick}
-          handleAlignClick={props.handleAlignClick}
-        />
-      }
-    >
-      <ContentEditable
-        html={props.block.text}
-        disabled={!props.isEditing || props.activeBlock !== props.block.i}
-        onChange={(event) => props.onTextChange(props.index, event)}
-        className={`size-full min-h-[40px] overflow-auto rounded-lg p-4
-          ${props.block.fontSize} ${props.block.color} ${props.block.italic} ${props.block.textAlign}
-          ${props.isEditing ? "cursor-text" : "cursor-default"}
-          focus:outline-none focus:ring-2 focus:ring-blue-500`}
-        style={{
-          transition: "all 0.2s ease-in-out",
-          display: "flex",
-          alignItems: "center",
-        }}
-      />
-    </BlockWrapper>
+    <p>Hello</p>
+    // <BlockWrapper
+    //   isActive={props.isActive}
+    //   isEditing={props.isEditing}
+    //   isHovered={props.isHovered}
+    //   onEdit={() => props.onBlockClick(props.block.i)}
+    //   menuContent={
+    //     <ActiveBlock
+    //       block={props.block}
+    //       index={props.index}
+    //       isEditing={props.isEditing}
+    //       activeBlock={props.activeBlock}
+    //       handleBlockClick={props.onBlockClick}
+    //       handleTextChange={props.onTextChange}
+    //       color={props.block.color}
+    //       handleColorChange={props.handleColorChange}
+    //       handleHeadingClick={props.handleHeadingClick}
+    //       handleAlignClick={props.handleAlignClick}
+    //     />
+    //   }
+    // >
+    //   <ContentEditable
+    //     html={props.block.text}
+    //     disabled={!props.isEditing || props.activeBlock !== props.block.i}
+    //     onChange={(event) => props.onTextChange(props.index, event)}
+    //     className={`size-full min-h-[40px] overflow-auto rounded-lg p-4
+    //       ${props.block.fontSize} ${props.block.color} ${props.block.italic} ${props.block.textAlign}
+    //       ${props.isEditing ? 'cursor-text' : 'cursor-default'}
+    //       focus:outline-none focus:ring-2 focus:ring-blue-500`}
+    //     style={{
+    //       transition: 'all 0.2s ease-in-out',
+    //       display: 'flex',
+    //       alignItems: 'center'
+    //     }}
+    //   />
+    // </BlockWrapper>
   );
 };
 

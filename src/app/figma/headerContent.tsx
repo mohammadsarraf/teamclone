@@ -204,10 +204,10 @@ export default function HeaderContent({
                 ×
               </button>
             </div>
-            <ElementToolbar
+            {/* <ElementToolbar
               elements={elements}
               onElementChange={handleElementChange}
-            />
+            /> */}
           </div>
         </div>
       )}

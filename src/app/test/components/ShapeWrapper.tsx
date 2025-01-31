@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import ShapeDesignMenu from './ShapeDesignMenu';
+import ShapeDesignMenu from "./ShapeDesignMenu";
 
 interface ShapeWrapperProps {
   children: React.ReactNode;
@@ -26,10 +26,10 @@ interface ShapeWrapperProps {
   currentColor?: string;
 }
 
-const ShapeWrapper: React.FC<ShapeWrapperProps> = ({ 
-  children, 
-  isActive, 
-  onSelect, 
+const ShapeWrapper: React.FC<ShapeWrapperProps> = ({
+  children,
+  isActive,
+  onSelect,
   isText,
   currentShape = "",
   onShapeChange,
@@ -53,7 +53,7 @@ const ShapeWrapper: React.FC<ShapeWrapperProps> = ({
   const [menuVisible, setMenuVisible] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const [shapeColor, setShapeColor] = useState(currentColor || '#3b82f6'); // Default blue color
+  const [shapeColor, setShapeColor] = useState(currentColor || "#3b82f6"); // Default blue color
 
   const handleClick = (e: React.MouseEvent) => {
     if (menuRef.current?.contains(e.target as Node)) {
@@ -63,7 +63,7 @@ const ShapeWrapper: React.FC<ShapeWrapperProps> = ({
     if (contentRef.current?.contains(e.target as Node)) {
       e.stopPropagation();
       onSelect?.();
-      
+
       if (!isText) {
         setMenuVisible(true);
       }
@@ -88,7 +88,7 @@ const ShapeWrapper: React.FC<ShapeWrapperProps> = ({
   };
 
   return (
-    <div 
+    <div
       className="group relative size-full"
       tabIndex={0}
       onFocus={handleFocus}
@@ -96,9 +96,9 @@ const ShapeWrapper: React.FC<ShapeWrapperProps> = ({
       onClick={handleClick}
     >
       {/* Content area */}
-      <div 
+      <div
         ref={contentRef}
-        className={`size-full ${!isText && 'cursor-move'}`}
+        className={`size-full ${!isText && "cursor-move"}`}
         onMouseDown={(e) => {
           if (!isText) {
             e.stopPropagation();
@@ -107,10 +107,10 @@ const ShapeWrapper: React.FC<ShapeWrapperProps> = ({
       >
         {children}
       </div>
-      
+
       {/* Design Menu */}
       {menuVisible && !isText && (
-        <div 
+        <div
           ref={menuRef}
           className="absolute -right-1 top-0 z-50 translate-x-full"
           onMouseDown={(e) => e.stopPropagation()}
@@ -130,17 +130,23 @@ const ShapeWrapper: React.FC<ShapeWrapperProps> = ({
             onFlipVertical={onFlipVertical}
             currentFlipH={currentFlipH}
             currentFlipV={currentFlipV}
+            onBorderChange={onBorderChange}
+            currentBorder={currentBorder}
+            onShadowChange={onShadowChange}
+            currentShadow={currentShadow}
           />
-          
+
           {/* Arrow pointer */}
-          <div className="absolute -left-2 top-3 h-4 w-4">
-            <div className="h-4 w-4 rotate-45 transform bg-[#f8fafc]"></div>
+          <div className="absolute -left-2 top-3 size-4">
+            <div className="size-4 rotate-45 bg-[#f8fafc]"></div>
           </div>
         </div>
       )}
 
       {/* Selection outline */}
-      <div className={`absolute inset-0 rounded border-2 border-transparent transition-colors ${menuVisible ? 'border-blue-500' : 'group-hover:border-blue-500/50'}`} />
+      <div
+        className={`absolute inset-0 rounded border-2 border-transparent transition-colors ${menuVisible ? "border-blue-500" : "group-hover:border-blue-500/50"}`}
+      />
     </div>
   );
 };

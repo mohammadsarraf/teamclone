@@ -11,17 +11,17 @@ interface ShapeProps {
   flipV: boolean;
 }
 
-const ShapeComponents = ({ 
-  type, 
-  color, 
-  opacity = 100, 
+const ShapeComponents = ({
+  type,
+  color,
+  opacity = 100,
   rotation = 0,
   flipH = false,
   flipV = false,
 }: ShapeProps) => {
   const shapeStyle = {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
     backgroundColor: color,
     opacity: opacity / 100,
     transform: `
@@ -29,7 +29,7 @@ const ShapeComponents = ({
       scaleX(${flipH ? -1 : 1})
       scaleY(${flipV ? -1 : 1})
     `,
-    transition: 'transform 0.2s, opacity 0.2s',
+    transition: "transform 0.2s, opacity 0.2s",
   };
 
   const handleSelect = () => {
@@ -49,13 +49,9 @@ const ShapeComponents = ({
         </div>
       );
     case "circle":
-      return (
-        <div style={shapeStyle} className="rounded-full" />
-      );
+      return <div style={shapeStyle} className="rounded-full" />;
     case "square":
-      return (
-        <div style={shapeStyle} />
-      );
+      return <div style={shapeStyle} />;
     default:
       return null;
   }

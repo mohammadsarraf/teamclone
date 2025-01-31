@@ -34,6 +34,12 @@ interface Block {
   color: string;
   maintainRatio?: boolean;
   text?: string;
+  rotation?: number;
+  border?: { width: number; color: string };
+  shadow?: boolean;
+  flipH?: boolean;
+  flipV?: boolean;
+  opacity: number;
 }
 
 interface ShapeWrapperProps {
@@ -41,6 +47,24 @@ interface ShapeWrapperProps {
   isActive?: boolean;
   onSelect?: () => void;
   isText?: boolean;
+  currentShape?: string;
+  onShapeChange?: (type: "triangle" | "circle" | "square") => void;
+  onColorChange?: (color: string) => void;
+  onDelete?: () => void;
+  onDuplicate?: () => void;
+  onOpacityChange?: (opacity: number) => void;
+  onRotationChange?: (rotation: number) => void;
+  onBorderChange?: (options: { width: number; color: string }) => void;
+  currentOpacity?: number;
+  currentRotation?: number;
+  currentBorder?: { width: number; color: string };
+  onFlipHorizontal?: () => void;
+  onFlipVertical?: () => void;
+  onShadowChange?: (hasShadow: boolean) => void;
+  currentShadow?: boolean;
+  currentFlipH?: boolean;
+  currentFlipV?: boolean;
+  currentColor?: string;
 }
 
 const ShapeItem = ({
@@ -77,22 +101,24 @@ const initialLayout: Block[] = [];
 
 const createNewShape = (type: "triangle" | "circle" | "square" | "text", layout: Block[]) => {
   const id = `${type}${layout.length + 1}`;
+  const defaultColor = "#3b82f6"; // Default blue color
   const colors = {
-    triangle: "bg-blue-500",
-    circle: "bg-red-500",
-    square: "bg-green-500",
-    text: "bg-gray-500",
+    triangle: defaultColor,
+    circle: defaultColor,
+    square: defaultColor,
+    text: defaultColor,
   };
 
   return {
     i: id,
-    x: 0, // Start at the top-left
+    x: 0,
     y: 0,
     w: type === "text" ? 2 : 2,
     h: type === "text" ? 1 : 2,
     shape: type,
     color: colors[type],
     maintainRatio: type !== "text",
+    opacity: 100,
     ...(type === "text" && { text: "Edit this text" }),
   };
 };
@@ -156,6 +182,82 @@ export default function TestPage() {
     setLayout([...layout, newTextBox]);
   };
 
+  const handleShapeChange = (blockId: string, type: "triangle" | "circle" | "square") => {
+    setLayout(layout.map((block) =>
+      block.i === blockId ? { ...block, shape: type } : block
+    ));
+  };
+
+  const handleColorChange = (blockId: string, color: string) => {
+    setLayout(layout.map((block) =>
+      block.i === blockId ? { ...block, color } : block
+    ));
+  };
+
+  const handleDelete = (blockId: string) => {
+    setLayout(layout.filter((block) => block.i !== blockId));
+    setActiveShape(null);
+  };
+
+  const handleDuplicate = (blockId: string) => {
+    const blockToDuplicate = layout.find((block) => block.i === blockId);
+    if (blockToDuplicate) {
+      const newBlock = {
+        ...blockToDuplicate,
+        i: `${blockToDuplicate.shape}${layout.length + 1}`,
+        x: blockToDuplicate.x + 1,
+        y: blockToDuplicate.y + 1,
+      };
+      setLayout([...layout, newBlock]);
+    }
+  };
+
+  const handleOpacityChange = (blockId: string, opacity: number) => {
+    setLayout(layout.map((block) =>
+      block.i === blockId ? { ...block, opacity } : block
+    ));
+  };
+
+  const handleRotationChange = (rotation: number) => {
+    if (activeShape !== null) {
+      setLayout(layout.map((block) =>
+        block.i === activeShape ? { ...block, rotation } : block
+      ));
+    }
+  };
+
+  const handleBorderChange = (border: { width: number; color: string }) => {
+    if (activeShape !== null) {
+      setLayout(layout.map((block) =>
+        block.i === activeShape ? { ...block, border } : block
+      ));
+    }
+  };
+
+  const handleFlipH = () => {
+    if (activeShape !== null) {
+      setLayout(layout.map((block) =>
+        block.i === activeShape ? { ...block, flipH: !block.flipH } : block
+      ));
+    }
+  };
+
+  const handleFlipV = () => {
+    if (activeShape !== null) {
+      setLayout(layout.map((block) =>
+        block.i === activeShape ? { ...block, flipV: !block.flipV } : block
+      ));
+    }
+  };
+
+  const handleShadowChange = (shadow: boolean) => {
+    if (activeShape !== null) {
+      setLayout(layout.map((block) =>
+        block.i === activeShape ? { ...block, shadow } : block
+      ));
+    }
+  };
+
   return (
     <div className="flex h-screen w-screen flex-col bg-gray-900" style={{ zIndex: 0 }}>
       <MenuBar
@@ -212,6 +314,24 @@ export default function TestPage() {
               <ShapeWrapper
                 onSelect={() => setActiveShape(block.i)}
                 isText={block.shape === 'text'}
+                currentShape={block.shape}
+                onShapeChange={(type) => handleShapeChange(block.i, type)}
+                onColorChange={(color) => handleColorChange(block.i, color)}
+                onDelete={() => handleDelete(block.i)}
+                onDuplicate={() => handleDuplicate(block.i)}
+                onOpacityChange={(opacity) => handleOpacityChange(block.i, opacity)}
+                onRotationChange={(rotation) => handleRotationChange(rotation)}
+                onBorderChange={handleBorderChange}
+                currentOpacity={block.opacity}
+                currentRotation={block.rotation}
+                currentBorder={block.border}
+                onFlipHorizontal={handleFlipH}
+                onFlipVertical={handleFlipV}
+                onShadowChange={handleShadowChange}
+                currentShadow={block.shadow}
+                currentFlipH={block.flipH}
+                currentFlipV={block.flipV}
+                currentColor={block.color}
               >
                 <ShapeItem
                   type={block.shape}

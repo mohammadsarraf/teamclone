@@ -8,7 +8,11 @@ interface ShapeProps {
 }
 
 const ShapeComponents = ({ type, color }: ShapeProps) => {
-  const shapeClass = `size-full ${color}`;
+  const shapeStyle = {
+    width: '100%',
+    height: '100%',
+    backgroundColor: color,
+  };
 
   const handleSelect = () => {
     console.log("Shape selected");
@@ -19,22 +23,20 @@ const ShapeComponents = ({ type, color }: ShapeProps) => {
       return (
         <div className="size-full">
           <div
-            className={shapeClass}
             style={{
+              ...shapeStyle,
               clipPath: "polygon(50% 0%, 0% 100%, 100% 100%)",
-              width: "100%",
-              height: "100%",
             }}
           />
         </div>
       );
     case "circle":
       return (
-        <div className={`${shapeClass} rounded-full`} />
+        <div style={shapeStyle} className="rounded-full" />
       );
     case "square":
       return (
-        <div className={shapeClass} />
+        <div style={shapeStyle} />
       );
     default:
       return null;

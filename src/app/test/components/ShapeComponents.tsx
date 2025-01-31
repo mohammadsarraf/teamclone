@@ -5,13 +5,31 @@ import ShapeWrapper from "./ShapeWrapper";
 interface ShapeProps {
   type: string;
   color: string;
+  opacity: number;
+  rotation: number;
+  flipH: boolean;
+  flipV: boolean;
 }
 
-const ShapeComponents = ({ type, color }: ShapeProps) => {
+const ShapeComponents = ({ 
+  type, 
+  color, 
+  opacity = 100, 
+  rotation = 0,
+  flipH = false,
+  flipV = false,
+}: ShapeProps) => {
   const shapeStyle = {
     width: '100%',
     height: '100%',
     backgroundColor: color,
+    opacity: opacity / 100,
+    transform: `
+      rotate(${rotation}deg)
+      scaleX(${flipH ? -1 : 1})
+      scaleY(${flipV ? -1 : 1})
+    `,
+    transition: 'transform 0.2s, opacity 0.2s',
   };
 
   const handleSelect = () => {

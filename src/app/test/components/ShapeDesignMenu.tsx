@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { BsTriangle, BsCircle, BsSquare } from "react-icons/bs";
 import { HiOutlineColorSwatch } from "react-icons/hi";
 import { IoMdResize } from "react-icons/io";
@@ -6,52 +6,47 @@ import { MdRotate90DegreesCcw, MdOutlineFlip } from "react-icons/md";
 import { RxBorderWidth, RxShadow } from "react-icons/rx";
 
 interface ShapeDesignMenuProps {
+  selectedColor: string;
+  onColorChange: (color: string) => void;
   currentShape: string;
   onShapeChange: (type: "triangle" | "circle" | "square") => void;
-  onColorChange?: (color: string) => void;
-  onDelete?: () => void;
-  onDuplicate?: () => void;
-  onOpacityChange?: (opacity: number) => void;
-  onRotationChange?: (rotation: number) => void;
-  onBorderChange?: (options: { width: number; color: string }) => void;
-  currentOpacity?: number;
-  currentRotation?: number;
-  currentBorder?: { width: number; color: string };
-  onFlipHorizontal?: () => void;
-  onFlipVertical?: () => void;
-  onShadowChange?: (hasShadow: boolean) => void;
-  currentShadow?: boolean;
-  currentFlipH?: boolean;
-  currentFlipV?: boolean;
-  currentColor?: string;
+  currentOpacity: number;
+  onOpacityChange: (opacity: number) => void;
+  currentRotation: number;
+  onRotationChange: (rotation: number) => void;
+  onFlipHorizontal: () => void;
+  onFlipVertical: () => void;
+  currentFlipH: boolean;
+  currentFlipV: boolean;
+  onDelete: () => void;
+  onDuplicate: () => void;
 }
 
-const ShapeDesignMenu: React.FC<ShapeDesignMenuProps> = ({
+const getSliderBackground = (value: number, max: number) => {
+  const percentage = (value / max) * 100;
+  return `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${percentage}%, #e5e7eb ${percentage}%, #e5e7eb 100%)`;
+};
+
+const ShapeDesignMenu: React.FC<ShapeDesignMenuProps> = ({ 
+  selectedColor, 
+  onColorChange,
   currentShape,
   onShapeChange,
-  onColorChange,
-  onDelete,
-  onDuplicate,
-  onOpacityChange,
-  onRotationChange,
-  onBorderChange,
   currentOpacity = 100,
+  onOpacityChange,
   currentRotation = 0,
-  currentBorder = { width: 0, color: "transparent" },
+  onRotationChange,
   onFlipHorizontal,
   onFlipVertical,
-  onShadowChange,
-  currentShadow = false,
-  currentFlipH = false,
-  currentFlipV = false,
-  currentColor,
+  currentFlipH,
+  currentFlipV,
+  onDelete,
+  onDuplicate,
 }) => {
-  const [activeSection, setActiveSection] = useState<string>("shape");
-
   const shapes = [
-    { type: "triangle" as const, icon: BsTriangle, label: "Triangle" },
-    { type: "circle" as const, icon: BsCircle, label: "Circle" },
-    { type: "square" as const, icon: BsSquare, label: "Square" },
+    { type: "triangle", icon: BsTriangle, label: "Triangle" },
+    { type: "circle", icon: BsCircle, label: "Circle" },
+    { type: "square", icon: BsSquare, label: "Square" },
   ];
 
   const colors = [
@@ -76,12 +71,10 @@ const ShapeDesignMenu: React.FC<ShapeDesignMenuProps> = ({
             return (
               <button
                 key={shape.type}
-                onClick={() => onShapeChange(shape.type)}
-                className={`flex flex-col items-center rounded-lg p-2 transition-colors
-                  ${currentShape === shape.type 
-                    ? 'bg-blue-600 text-white' 
-                    : 'text-gray-700 hover:bg-blue-50'
-                  }`}
+                onClick={() => onShapeChange(shape.type as "triangle" | "circle" | "square")}
+                className={`flex flex-col items-center rounded-lg p-2 text-gray-700 hover:bg-blue-50 ${
+                  currentShape === shape.type ? 'bg-blue-50 ring-1 ring-blue-500' : ''
+                }`}
               >
                 <Icon className="h-6 w-6" />
                 <span className="mt-1 text-xs">{shape.label}</span>
@@ -98,13 +91,11 @@ const ShapeDesignMenu: React.FC<ShapeDesignMenuProps> = ({
           {colors.map((color) => (
             <button
               key={color.value}
-              onClick={() => onColorChange?.(color.value)}
-              className={`size-6 rounded-full transition-transform hover:scale-110 
-                ${currentColor === color.value 
-                  ? 'ring-2 ring-blue-400 ring-offset-2' 
-                  : 'hover:ring-2 hover:ring-blue-400 hover:ring-offset-2'
-                }`}
+              className={`size-6 rounded-full transition-transform hover:scale-110 hover:ring-2 hover:ring-blue-400 hover:ring-offset-2 ${
+                selectedColor === color.value ? 'ring-2 ring-blue-400 ring-offset-2' : ''
+              }`}
               style={{ backgroundColor: color.value }}
+              onClick={() => onColorChange(color.value)}
             />
           ))}
         </div>
@@ -119,10 +110,13 @@ const ShapeDesignMenu: React.FC<ShapeDesignMenuProps> = ({
             min="0"
             max="100"
             value={currentOpacity}
-            onChange={(e) => onOpacityChange?.(Number(e.target.value))}
+            onChange={(e) => onOpacityChange(Number(e.target.value))}
             className="mt-1 h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-gray-200"
             style={{
-              background: `linear-gradient(to right, #3b82f6 ${currentOpacity}%, #e5e7eb ${currentOpacity}%)`
+              background: getSliderBackground(currentOpacity, 100),
+              height: '6px',
+              borderRadius: '4px',
+              WebkitAppearance: 'none',
             }}
           />
         </div>
@@ -142,32 +136,31 @@ const ShapeDesignMenu: React.FC<ShapeDesignMenuProps> = ({
               min="0"
               max="360"
               value={currentRotation}
-              onChange={(e) => onRotationChange?.(Number(e.target.value))}
+              onChange={(e) => onRotationChange(Number(e.target.value))}
               className="mt-1 h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-gray-200"
               style={{
-                background: `linear-gradient(to right, #3b82f6 ${(currentRotation / 360) * 100}%, #e5e7eb ${(currentRotation / 360) * 100}%)`
+                background: getSliderBackground(currentRotation, 360),
+                height: '6px',
+                borderRadius: '4px',
+                WebkitAppearance: 'none',
               }}
             />
           </div>
           <div className="flex gap-2">
             <button 
               onClick={onFlipHorizontal}
-              className={`flex flex-1 items-center justify-center gap-1 rounded-lg border p-2 text-sm transition-colors
-                ${currentFlipH 
-                  ? 'border-blue-500 bg-blue-50 text-blue-600' 
-                  : 'border-gray-200 text-gray-700 hover:border-blue-500 hover:bg-blue-50'
-                }`}
+              className={`flex flex-1 items-center justify-center gap-1 rounded-lg border border-gray-200 p-2 text-sm text-gray-700 hover:border-blue-500 hover:bg-blue-50 ${
+                currentFlipH ? 'bg-blue-50 border-blue-500' : ''
+              }`}
             >
               <MdOutlineFlip className="h-4 w-4" />
               Flip H
             </button>
             <button 
               onClick={onFlipVertical}
-              className={`flex flex-1 items-center justify-center gap-1 rounded-lg border p-2 text-sm transition-colors
-                ${currentFlipV 
-                  ? 'border-blue-500 bg-blue-50 text-blue-600' 
-                  : 'border-gray-200 text-gray-700 hover:border-blue-500 hover:bg-blue-50'
-                }`}
+              className={`flex flex-1 items-center justify-center gap-1 rounded-lg border border-gray-200 p-2 text-sm text-gray-700 hover:border-blue-500 hover:bg-blue-50 ${
+                currentFlipV ? 'bg-blue-50 border-blue-500' : ''
+              }`}
             >
               <MdOutlineFlip className="h-4 w-4 rotate-90" />
               Flip V
@@ -190,14 +183,12 @@ const ShapeDesignMenu: React.FC<ShapeDesignMenuProps> = ({
                 type="number"
                 min="0"
                 max="10"
-                value={currentBorder.width}
-                onChange={(e) => onBorderChange?.({ ...currentBorder, width: Number(e.target.value) })}
+                value={0}
                 className="w-16 rounded bg-gray-100 px-2 py-1 text-sm"
               />
               <input
                 type="color"
-                value={currentBorder.color}
-                onChange={(e) => onBorderChange?.({ ...currentBorder, color: e.target.value })}
+                value="#000000"
                 className="h-6 w-6 cursor-pointer"
               />
             </div>
@@ -210,8 +201,6 @@ const ShapeDesignMenu: React.FC<ShapeDesignMenuProps> = ({
             <label className="relative inline-flex cursor-pointer items-center">
               <input 
                 type="checkbox" 
-                checked={currentShadow}
-                onChange={(e) => onShadowChange?.(e.target.checked)}
                 className="peer sr-only" 
               />
               <div className="peer h-5 w-9 rounded-full bg-gray-200 after:absolute after:start-[2px] after:top-[2px] after:size-4 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"></div>

@@ -53,6 +53,7 @@ const ShapeWrapper: React.FC<ShapeWrapperProps> = ({
   const [menuVisible, setMenuVisible] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const [shapeColor, setShapeColor] = useState(currentColor || '#3b82f6'); // Default blue color
 
   const handleClick = (e: React.MouseEvent) => {
     if (menuRef.current?.contains(e.target as Node)) {
@@ -79,6 +80,11 @@ const ShapeWrapper: React.FC<ShapeWrapperProps> = ({
     if (!e.currentTarget.contains(e.relatedTarget)) {
       setMenuVisible(false);
     }
+  };
+
+  const handleColorChange = (color: string) => {
+    setShapeColor(color);
+    onColorChange?.(color);
   };
 
   return (
@@ -112,7 +118,7 @@ const ShapeWrapper: React.FC<ShapeWrapperProps> = ({
           <ShapeDesignMenu
             currentShape={currentShape || ""}
             onShapeChange={onShapeChange!}
-            onColorChange={onColorChange}
+            onColorChange={handleColorChange}
             onDelete={onDelete}
             onDuplicate={onDuplicate}
             onOpacityChange={onOpacityChange}
@@ -127,7 +133,7 @@ const ShapeWrapper: React.FC<ShapeWrapperProps> = ({
             currentShadow={currentShadow}
             currentFlipH={currentFlipH}
             currentFlipV={currentFlipV}
-            currentColor={currentColor}
+            selectedColor={shapeColor}
           />
           
           {/* Arrow pointer */}

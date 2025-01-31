@@ -11,6 +11,7 @@ import { MenuBar } from "./components/MenuBar";
 import { GridOverlay } from "./components/GridOverlay";
 import { GridContainer } from "./components/GridContainer";
 import ShapeWrapper from "./components/ShapeWrapper";
+import ShapeDesignMenu from "./components/ShapeDesignMenu";
 
 // Dynamically import Zdog components with no SSR
 const ZdogComponents = dynamic(() => import("./components/ZdogComponents"), {
@@ -73,12 +74,20 @@ const ShapeItem = ({
   text,
   onTextChange,
   isActive,
+  opacity,
+  rotation,
+  flipH,
+  flipV,
 }: {
   type: Block["shape"];
   color: string;
   text?: string;
   onTextChange?: (newText: string) => void;
   isActive?: boolean;
+  opacity: number;
+  rotation: number;
+  flipH: boolean;
+  flipV: boolean;
 }) => {
   if (!type) return null;
 
@@ -90,7 +99,14 @@ const ShapeItem = ({
     <Suspense fallback={<div className="size-full bg-gray-700" />}>
       <div className="flex size-full items-center justify-center">
         <div className="size-full">
-          <ShapeComponents type={type} color={color} />
+          <ShapeComponents
+            type={type}
+            color={color}
+            opacity={opacity}
+            rotation={rotation}
+            flipH={flipH}
+            flipV={flipV}
+          />
         </div>
       </div>
     </Suspense>
@@ -130,22 +146,36 @@ export default function TestPage() {
   const [isResizing, setIsResizing] = useState(false);
   const [cols, setCols] = useState(12);
   const [rows, setRows] = useState(12);
+  const [positions, setPositions] = useState<{ [key: string]: { x: number; y: number; w: number; h: number } }>({});
 
   const containerWidth = useWindowSize();
   const unitSize = containerWidth / cols;
 
   const handleLayoutChange = (newLayout: any[]) => {
-    const updatedLayout = newLayout.map((item) => {
-      const existingBlock = layout.find((block) => block.i === item.i)!;
-      return {
-        ...existingBlock,
+    const newPositions = newLayout.reduce((acc, item) => {
+      acc[item.i] = {
         x: item.x,
         y: item.y,
         w: item.w,
         h: item.h,
       };
+      return acc;
+    }, {} as { [key: string]: { x: number; y: number; w: number; h: number } });
+    
+    setPositions(newPositions);
+    
+    setLayout((prevLayout) => {
+      return prevLayout.map((block) => {
+        const pos = newPositions[block.i];
+        if (pos) {
+          return {
+            ...block,
+            ...pos,
+          };
+        }
+        return block;
+      });
     });
-    setLayout(updatedLayout);
   };
 
   const handleResizeStop = (layout: any[], oldItem: any, newItem: any) => {
@@ -183,15 +213,30 @@ export default function TestPage() {
   };
 
   const handleShapeChange = (blockId: string, type: "triangle" | "circle" | "square") => {
-    setLayout(layout.map((block) =>
+    setLayout((prevLayout) => prevLayout.map((block) =>
       block.i === blockId ? { ...block, shape: type } : block
     ));
   };
 
   const handleColorChange = (blockId: string, color: string) => {
-    setLayout(layout.map((block) =>
-      block.i === blockId ? { ...block, color } : block
-    ));
+    setLayout((prevLayout) => {
+      return prevLayout.map((block) => {
+        if (block.i === blockId) {
+          const pos = positions[block.i] || {
+            x: block.x,
+            y: block.y,
+            w: block.w,
+            h: block.h,
+          };
+          return {
+            ...block,
+            ...pos,
+            color,
+          };
+        }
+        return block;
+      });
+    });
   };
 
   const handleDelete = (blockId: string) => {
@@ -213,17 +258,15 @@ export default function TestPage() {
   };
 
   const handleOpacityChange = (blockId: string, opacity: number) => {
-    setLayout(layout.map((block) =>
+    setLayout((prevLayout) => prevLayout.map((block) =>
       block.i === blockId ? { ...block, opacity } : block
     ));
   };
 
-  const handleRotationChange = (rotation: number) => {
-    if (activeShape !== null) {
-      setLayout(layout.map((block) =>
-        block.i === activeShape ? { ...block, rotation } : block
-      ));
-    }
+  const handleRotationChange = (blockId: string, rotation: number) => {
+    setLayout((prevLayout) => prevLayout.map((block) =>
+      block.i === blockId ? { ...block, rotation } : block
+    ));
   };
 
   const handleBorderChange = (border: { width: number; color: string }) => {
@@ -234,20 +277,16 @@ export default function TestPage() {
     }
   };
 
-  const handleFlipH = () => {
-    if (activeShape !== null) {
-      setLayout(layout.map((block) =>
-        block.i === activeShape ? { ...block, flipH: !block.flipH } : block
-      ));
-    }
+  const handleFlipH = (blockId: string) => {
+    setLayout((prevLayout) => prevLayout.map((block) =>
+      block.i === blockId ? { ...block, flipH: !block.flipH } : block
+    ));
   };
 
-  const handleFlipV = () => {
-    if (activeShape !== null) {
-      setLayout(layout.map((block) =>
-        block.i === activeShape ? { ...block, flipV: !block.flipV } : block
-      ));
-    }
+  const handleFlipV = (blockId: string) => {
+    setLayout((prevLayout) => prevLayout.map((block) =>
+      block.i === blockId ? { ...block, flipV: !block.flipV } : block
+    ));
   };
 
   const handleShadowChange = (shadow: boolean) => {
@@ -282,24 +321,32 @@ export default function TestPage() {
         />
 
         <GridContainer
+          key={`grid-${cols}-${rows}`}
           cols={cols}
           rows={rows}
           unitSize={unitSize}
           layout={layout}
           onLayoutChange={handleLayoutChange}
           onResizeStop={(layout, oldItem, newItem) => {
-            handleResizeStop(layout, oldItem, newItem);
+            handleLayoutChange(layout);
             setIsResizing(false);
           }}
           onResizeStart={() => setIsResizing(true)}
           onDragStart={() => setIsDragging(true)}
-          onDragStop={() => setIsDragging(false)}
+          onDragStop={(layout) => {
+            setIsDragging(false);
+            handleLayoutChange(layout);
+          }}
           preventCollision={false}
           allowOverlap={true}
           verticalCompact={false}
           compactType={null}
+          isDraggable={true}
+          isResizable={true}
           resizeHandles={["s", "w", "e", "n", "sw", "nw", "se", "ne"]}
           transformScale={1}
+          margin={[0, 0]}
+          containerPadding={[0, 0]}
         >
           {layout.map((block, index) => (
             <div
@@ -320,17 +367,17 @@ export default function TestPage() {
                 onDelete={() => handleDelete(block.i)}
                 onDuplicate={() => handleDuplicate(block.i)}
                 onOpacityChange={(opacity) => handleOpacityChange(block.i, opacity)}
-                onRotationChange={(rotation) => handleRotationChange(rotation)}
+                onRotationChange={(rotation) => handleRotationChange(block.i, rotation)}
                 onBorderChange={handleBorderChange}
                 currentOpacity={block.opacity}
-                currentRotation={block.rotation}
+                currentRotation={block.rotation || 0}
                 currentBorder={block.border}
-                onFlipHorizontal={handleFlipH}
-                onFlipVertical={handleFlipV}
+                onFlipHorizontal={() => handleFlipH(block.i)}
+                onFlipVertical={() => handleFlipV(block.i)}
                 onShadowChange={handleShadowChange}
                 currentShadow={block.shadow}
-                currentFlipH={block.flipH}
-                currentFlipV={block.flipV}
+                currentFlipH={block.flipH || false}
+                currentFlipV={block.flipV || false}
                 currentColor={block.color}
               >
                 <ShapeItem
@@ -338,6 +385,11 @@ export default function TestPage() {
                   color={block.color}
                   text={block.text}
                   onTextChange={(newText) => handleTextChange(block.i, newText)}
+                  isActive={activeShape === block.i}
+                  opacity={block.opacity}
+                  rotation={block.rotation || 0}
+                  flipH={block.flipH || false}
+                  flipV={block.flipV || false}
                 />
               </ShapeWrapper>
             </div>

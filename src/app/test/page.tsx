@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, Suspense } from "react";
+import React, { useState, Suspense, useEffect } from "react";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import dynamic from "next/dynamic";
@@ -58,6 +58,9 @@ interface ShapeWrapperProps {
   currentFlipH?: boolean;
   currentFlipV?: boolean;
   currentColor?: string;
+  totalShapes: number;
+  index: number;
+  menuVisible?: boolean;
 }
 
 const ShapeItem = ({
@@ -70,6 +73,7 @@ const ShapeItem = ({
   rotation,
   flipH,
   flipV,
+  onStartEdit,
 }: {
   type: Block["shape"];
   color: string;
@@ -80,6 +84,7 @@ const ShapeItem = ({
   rotation: number;
   flipH: boolean;
   flipV: boolean;
+  onStartEdit?: () => void;
 }) => {
   if (!type) return null;
 
@@ -89,6 +94,7 @@ const ShapeItem = ({
         text={text || ""}
         onTextChange={onTextChange!}
         isActive={isActive}
+        onStartEdit={onStartEdit}
       />
     );
   }
@@ -140,7 +146,7 @@ const createNewShape = (
   };
 };
 
-export default function TestPage() {
+const TestPage = () => {
   const [layout, setLayout] = useState<Block[]>(initialLayout);
   const [activeShape, setActiveShape] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -150,9 +156,27 @@ export default function TestPage() {
   const [positions, setPositions] = useState<{
     [key: string]: { x: number; y: number; w: number; h: number };
   }>({});
+  const [activeMenu, setActiveMenu] = useState<string | null>(null);
 
   const containerWidth = useWindowSize();
   const unitSize = containerWidth / cols;
+
+  // Add useEffect for click outside handler
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      // Check if click is outside of any menu and not on a shape
+      if (
+        activeMenu && 
+        !(e.target as HTMLElement).closest('.menu-content') && 
+        !(e.target as HTMLElement).closest('.shape-wrapper')
+      ) {
+        setActiveMenu(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [activeMenu]);
 
   const handleLayoutChange = (newLayout: any[]) => {
     const newPositions = newLayout.reduce(
@@ -320,6 +344,20 @@ export default function TestPage() {
     }
   };
 
+  const handleStartEdit = (blockId: string) => {
+    setActiveShape(blockId);
+  };
+
+  const handleDragStart = () => {
+    setIsDragging(true);
+    setActiveMenu(null); // Close all menus when dragging starts
+  };
+
+  const handleResizeStart = () => {
+    setIsResizing(true);
+    setActiveMenu(null); // Close menu when resizing starts
+  };
+
   return (
     <div
       className="flex h-screen w-screen flex-col bg-gray-900"
@@ -355,10 +393,11 @@ export default function TestPage() {
           onLayoutChange={handleLayoutChange}
           onResizeStop={(layout, oldItem, newItem) => {
             handleLayoutChange(layout);
+            handleResizeStop(layout, oldItem, newItem);
             setIsResizing(false);
           }}
-          onResizeStart={() => setIsResizing(true)}
-          onDragStart={() => setIsDragging(true)}
+          onResizeStart={handleResizeStart}
+          onDragStart={handleDragStart}
           onDragStop={(layout: Layout[]) => {
             setIsDragging(false);
             handleLayoutChange(layout);
@@ -373,31 +412,27 @@ export default function TestPage() {
           transformScale={1}
           margin={[0, 0]}
           containerPadding={[0, 0]}
+          style={{ height: '100%' }}
         >
           {layout.map((block, index) => (
             <div
               key={block.i}
               style={{
-                zIndex: 2 + index,
-                padding: 0,
-                margin: 0,
+                ...block,
                 position: "relative",
               }}
             >
               <ShapeWrapper
-                onSelect={() => setActiveShape(block.i)}
+                onSelect={() => setActiveMenu(block.i)}
+                menuVisible={activeMenu === block.i}
                 isText={block.shape === "text"}
                 currentShape={block.shape}
                 onShapeChange={(type) => handleShapeChange(block.i, type)}
                 onColorChange={(color) => handleColorChange(block.i, color)}
                 onDelete={() => handleDelete(block.i)}
                 onDuplicate={() => handleDuplicate(block.i)}
-                onOpacityChange={(opacity) =>
-                  handleOpacityChange(block.i, opacity)
-                }
-                onRotationChange={(rotation) =>
-                  handleRotationChange(block.i, rotation)
-                }
+                onOpacityChange={(opacity) => handleOpacityChange(block.i, opacity)}
+                onRotationChange={(rotation) => handleRotationChange(block.i, rotation)}
                 onBorderChange={handleBorderChange}
                 currentOpacity={block.opacity}
                 currentRotation={block.rotation || 0}
@@ -409,6 +444,9 @@ export default function TestPage() {
                 currentFlipH={block.flipH || false}
                 currentFlipV={block.flipV || false}
                 currentColor={block.color}
+                totalShapes={layout.length}
+                index={layout.length - index}
+                className="shape-wrapper"
               >
                 <ShapeItem
                   type={block.shape}
@@ -416,6 +454,7 @@ export default function TestPage() {
                   text={block.text}
                   onTextChange={(newText) => handleTextChange(block.i, newText)}
                   isActive={activeShape === block.i}
+                  onStartEdit={() => handleStartEdit(block.i)}
                   opacity={block.opacity}
                   rotation={block.rotation || 0}
                   flipH={block.flipH || false}
@@ -428,4 +467,6 @@ export default function TestPage() {
       </div>
     </div>
   );
-}
+};
+
+export default TestPage;

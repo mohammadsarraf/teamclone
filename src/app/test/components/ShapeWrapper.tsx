@@ -1,5 +1,7 @@
-import React, { useState, useRef } from "react";
-import ShapeDesignMenu from "./ShapeDesignMenu";
+import React, { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
+import TextDesignMenu from "./menus/TextDesignMenu";
+import ShapeDesignMenu from "./menus/ShapeDesignMenu";
 
 interface ShapeWrapperProps {
   children: React.ReactNode;
@@ -24,12 +26,17 @@ interface ShapeWrapperProps {
   currentFlipH?: boolean;
   currentFlipV?: boolean;
   currentColor?: string;
+  totalShapes: number;
+  index: number;
+  menuVisible: boolean;
+  className?: string;
 }
 
 const ShapeWrapper: React.FC<ShapeWrapperProps> = ({
   children,
   isActive,
   onSelect,
+  menuVisible,
   isText,
   currentShape = "",
   onShapeChange,
@@ -49,37 +56,43 @@ const ShapeWrapper: React.FC<ShapeWrapperProps> = ({
   currentFlipH = false,
   currentFlipV = false,
   currentColor = "#3b82f6",
+  totalShapes,
+  index,
+  className = '',
 }) => {
-  const [menuVisible, setMenuVisible] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const [shapeColor, setShapeColor] = useState(currentColor || "#3b82f6"); // Default blue color
+  const [menuPosition, setMenuPosition] = useState({ top: 0, right: 0 });
+  const [shapeColor, setShapeColor] = useState(currentColor || "#3b82f6");
+
+  useEffect(() => {
+    if (menuVisible && contentRef.current) {
+      const rect = contentRef.current.getBoundingClientRect();
+      setMenuPosition({
+        top: rect.top,
+        right: window.innerWidth - rect.right,
+      });
+    }
+  }, [menuVisible]);
 
   const handleClick = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest('[data-no-drag="true"]')) {
+      return;
+    }
+
     if (menuRef.current?.contains(e.target as Node)) {
       return;
     }
 
-    if (contentRef.current?.contains(e.target as Node)) {
-      e.stopPropagation();
-      onSelect?.();
-
-      if (!isText) {
-        setMenuVisible(true);
-      }
-    }
+    onSelect?.();
   };
 
   const handleFocus = () => {
-    if (!isText) {
-      setMenuVisible(true);
-    }
+    // No need to handle focus as menuVisible is controlled from parent
   };
 
   const handleBlur = (e: React.FocusEvent) => {
-    if (!e.currentTarget.contains(e.relatedTarget)) {
-      setMenuVisible(false);
-    }
+    // No need to handle blur as menuVisible is controlled from parent
   };
 
   const handleColorChange = (color: string) => {
@@ -87,66 +100,96 @@ const ShapeWrapper: React.FC<ShapeWrapperProps> = ({
     onColorChange?.(color);
   };
 
+  const handleMouseDown = (e: React.MouseEvent) => {
+    // Only stop propagation if clicking on a no-drag element
+    if ((e.target as HTMLElement).closest('[data-no-drag="true"]')) {
+      e.stopPropagation();
+      return;
+    }
+  };
+
   return (
     <div
-      className="group relative size-full"
+      className={`group relative size-full ${className}`}
       tabIndex={0}
       onFocus={handleFocus}
       onBlur={handleBlur}
       onClick={handleClick}
+      onMouseDown={handleMouseDown}
+      style={{ 
+        zIndex: menuVisible ? 10000 : index,
+      }}
     >
       {/* Content area */}
       <div
         ref={contentRef}
         className={`size-full ${!isText && "cursor-move"}`}
-        onMouseDown={(e) => {
-          if (!isText) {
-            e.stopPropagation();
-          }
-        }}
       >
         {children}
       </div>
 
-      {/* Design Menu */}
-      {menuVisible && !isText && (
+      {/* Selection outline */}
+      <div
+        className={`absolute inset-0 rounded border-2 border-transparent transition-colors pointer-events-none ${
+          menuVisible 
+            ? isText 
+              ? "border-blue-500 bg-gray-800/5" 
+              : "border-blue-500"
+            : "group-hover:border-blue-500/50"
+        }`}
+      />
+
+      {/* Render menu in a portal */}
+      {menuVisible && createPortal(
         <div
           ref={menuRef}
-          className="absolute -right-1 top-0 z-50 translate-x-full"
+          className="fixed z-[99999] menu-content"
+          style={{
+            top: menuPosition.top,
+            right: menuPosition.right,
+            transform: 'translateX(100%)',
+          }}
           onMouseDown={(e) => e.stopPropagation()}
         >
-          <ShapeDesignMenu
-            selectedColor={currentColor}
-            onColorChange={onColorChange || (() => {})}
-            currentShape={currentShape}
-            onShapeChange={onShapeChange || (() => {})}
-            onDelete={onDelete}
-            onDuplicate={onDuplicate}
-            onOpacityChange={onOpacityChange}
-            onRotationChange={onRotationChange}
-            currentOpacity={currentOpacity}
-            currentRotation={currentRotation}
-            onFlipHorizontal={onFlipHorizontal}
-            onFlipVertical={onFlipVertical}
-            currentFlipH={currentFlipH}
-            currentFlipV={currentFlipV}
-            onBorderChange={onBorderChange}
-            currentBorder={currentBorder}
-            onShadowChange={onShadowChange}
-            currentShadow={currentShadow}
-          />
+          {isText ? (
+            <TextDesignMenu
+              selectedColor={currentColor}
+              onColorChange={onColorChange || (() => {})}
+              onDelete={onDelete}
+              onDuplicate={onDuplicate}
+              onOpacityChange={onOpacityChange}
+              currentOpacity={currentOpacity}
+            />
+          ) : (
+            <ShapeDesignMenu
+              selectedColor={currentColor}
+              onColorChange={onColorChange || (() => {})}
+              currentShape={currentShape}
+              onShapeChange={onShapeChange || (() => {})}
+              onDelete={onDelete}
+              onDuplicate={onDuplicate}
+              onOpacityChange={onOpacityChange}
+              onRotationChange={onRotationChange}
+              currentOpacity={currentOpacity}
+              currentRotation={currentRotation}
+              onFlipHorizontal={onFlipHorizontal}
+              onFlipVertical={onFlipVertical}
+              currentFlipH={currentFlipH}
+              currentFlipV={currentFlipV}
+              onBorderChange={onBorderChange}
+              currentBorder={currentBorder}
+              onShadowChange={onShadowChange}
+              currentShadow={currentShadow}
+            />
+          )}
 
           {/* Arrow pointer */}
           <div className="absolute -left-2 top-3 size-4">
             <div className="size-4 rotate-45 bg-[#f8fafc]"></div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
-
-      {/* Selection outline */}
-      <div
-        className={`absolute inset-0 rounded border-2 border-transparent transition-colors ${menuVisible ? "border-blue-500" : "group-hover:border-blue-500/50"}`}
-      />
     </div>
   );
 };

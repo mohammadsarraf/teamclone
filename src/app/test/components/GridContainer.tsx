@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import React from "react";
 import GridLayout, { Layout } from "react-grid-layout";
 import { Block } from "../types";
 
@@ -7,17 +7,19 @@ interface GridContainerProps {
   rows: number;
   unitSize: number;
   layout: Block[];
-  children: ReactNode;
+  children: React.ReactNode;
   onLayoutChange: (layout: Layout[]) => void;
   onResizeStop: (layout: Layout[], oldItem: Layout, newItem: Layout) => void;
   onResizeStart: () => void;
   onDragStart: () => void;
   onDragStop: (layout: Layout[]) => void;
+  style?: React.CSSProperties;
   preventCollision: boolean;
   allowOverlap: boolean;
   verticalCompact: boolean;
   compactType: any;
   resizeHandles: ("s" | "w" | "e" | "n" | "sw" | "nw" | "se" | "ne")[];
+  resizeHandle?: React.ReactNode;
   transformScale: number;
   margin: [number, number];
   containerPadding: [number, number];
@@ -25,29 +27,58 @@ interface GridContainerProps {
   isResizable: boolean;
 }
 
-export const GridContainer = ({
+export const GridContainer: React.FC<GridContainerProps> = ({
   cols,
   rows,
   unitSize,
   layout,
   children,
-  ...props
-}: GridContainerProps) => {
+  onLayoutChange,
+  onResizeStop,
+  onResizeStart,
+  onDragStart,
+  onDragStop,
+  style,
+  preventCollision,
+  allowOverlap,
+  verticalCompact,
+  compactType,
+  resizeHandles,
+  resizeHandle,
+  transformScale,
+  margin,
+  containerPadding,
+  isDraggable,
+  isResizable,
+}) => {
   return (
-    <div
-      className="min-h-full min-w-full"
-      style={{
-        width: `${cols * unitSize}px`,
-        height: `${rows * unitSize}px`,
-      }}
-    >
+    <div className="relative size-full">
       <GridLayout
         className="layout"
         layout={layout}
         cols={cols}
         rowHeight={unitSize}
         width={cols * unitSize}
-        {...props}
+        onLayoutChange={onLayoutChange}
+        onResizeStop={onResizeStop}
+        onResizeStart={onResizeStart}
+        onDragStart={onDragStart}
+        onDragStop={onDragStop}
+        preventCollision={preventCollision}
+        allowOverlap={allowOverlap}
+        verticalCompact={verticalCompact}
+        compactType={compactType}
+        isDraggable={isDraggable}
+        isResizable={isResizable}
+        resizeHandles={resizeHandles}
+        resizeHandle={resizeHandle}
+        transformScale={transformScale}
+        margin={margin}
+        containerPadding={containerPadding}
+        style={{
+          ...style,
+          minHeight: rows * unitSize,
+        }}
       >
         {children}
       </GridLayout>

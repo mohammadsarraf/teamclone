@@ -1,35 +1,10 @@
 import React from "react";
-import { BsTriangle, BsCircle, BsSquare } from "react-icons/bs";
-import { HiOutlineColorSwatch } from "react-icons/hi";
-import { IoMdResize } from "react-icons/io";
 import { MdRotate90DegreesCcw, MdOutlineFlip } from "react-icons/md";
 import { RxBorderWidth, RxShadow } from "react-icons/rx";
-
-interface ShapeDesignMenuProps {
-  selectedColor: string;
-  onColorChange: (color: string) => void;
-  currentShape: string;
-  onShapeChange: (type: "triangle" | "circle" | "square") => void;
-  currentOpacity: number;
-  onOpacityChange: (opacity: number) => void;
-  currentRotation: number;
-  onRotationChange: (rotation: number) => void;
-  onFlipHorizontal: () => void;
-  onFlipVertical: () => void;
-  currentFlipH: boolean;
-  currentFlipV: boolean;
-  onDelete: () => void;
-  onDuplicate: () => void;
-  onBorderChange?: (options: { width: number; color: string }) => void;
-  currentBorder?: { width: number; color: string };
-  onShadowChange?: (hasShadow: boolean) => void;
-  currentShadow?: boolean;
-}
-
-const getSliderBackground = (value: number, max: number) => {
-  const percentage = (value / max) * 100;
-  return `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${percentage}%, #e5e7eb ${percentage}%, #e5e7eb 100%)`;
-};
+import { shapes } from "./constants/shapes";
+import { colors } from "./constants/colors";
+import { getSliderBackground } from "./utils/sliderUtils";
+import { ShapeDesignMenuProps } from "./types";
 
 const ShapeDesignMenu: React.FC<ShapeDesignMenuProps> = ({
   selectedColor,
@@ -51,23 +26,6 @@ const ShapeDesignMenu: React.FC<ShapeDesignMenuProps> = ({
   onShadowChange = () => {},
   currentShadow = false,
 }) => {
-  const shapes = [
-    { type: "triangle", icon: BsTriangle, label: "Triangle" },
-    { type: "circle", icon: BsCircle, label: "Circle" },
-    { type: "square", icon: BsSquare, label: "Square" },
-  ];
-
-  const colors = [
-    { name: "Blue", value: "#3b82f6" },
-    { name: "Red", value: "#ef4444" },
-    { name: "Green", value: "#22c55e" },
-    { name: "Yellow", value: "#eab308" },
-    { name: "Purple", value: "#a855f7" },
-    { name: "Pink", value: "#ec4899" },
-    { name: "Orange", value: "#f97316" },
-    { name: "Teal", value: "#14b8a6" },
-  ];
-
   return (
     <div className="w-72 rounded-lg bg-[#f8fafc] p-3 shadow-xl ring-1 ring-gray-200">
       {/* Shape Selection */}
@@ -93,6 +51,59 @@ const ShapeDesignMenu: React.FC<ShapeDesignMenuProps> = ({
               </button>
             );
           })}
+        </div>
+      </div>
+
+      {/* Transform */}
+      <div className="mb-4 border-b border-gray-200 pb-3">
+        <h3 className="mb-2 font-medium text-gray-800">Transform</h3>
+        
+        {/* Rotation */}
+        <div className="mb-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <MdRotate90DegreesCcw className="text-gray-500" />
+              <span className="text-sm text-gray-600">Rotation</span>
+            </div>
+            <span className="text-sm text-gray-600">{currentRotation}°</span>
+          </div>
+          <input
+            type="range"
+            min="0"
+            max="360"
+            value={currentRotation}
+            onChange={(e) => onRotationChange(Number(e.target.value))}
+            className="mt-1 h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-gray-200"
+            style={{
+              background: getSliderBackground(currentRotation, 360),
+            }}
+          />
+        </div>
+
+        {/* Flip Controls */}
+        <div className="flex gap-2">
+          <button
+            onClick={onFlipHorizontal}
+            className={`flex-1 rounded-lg border border-gray-200 px-3 py-1.5 text-sm ${
+              currentFlipH ? "bg-blue-50 text-blue-600" : "text-gray-600"
+            }`}
+          >
+            <div className="flex items-center justify-center gap-1">
+              <MdOutlineFlip className="rotate-90" />
+              <span>Flip H</span>
+            </div>
+          </button>
+          <button
+            onClick={onFlipVertical}
+            className={`flex-1 rounded-lg border border-gray-200 px-3 py-1.5 text-sm ${
+              currentFlipV ? "bg-blue-50 text-blue-600" : "text-gray-600"
+            }`}
+          >
+            <div className="flex items-center justify-center gap-1">
+              <MdOutlineFlip />
+              <span>Flip V</span>
+            </div>
+          </button>
         </div>
       </div>
 
@@ -128,58 +139,8 @@ const ShapeDesignMenu: React.FC<ShapeDesignMenuProps> = ({
             className="mt-1 h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-gray-200"
             style={{
               background: getSliderBackground(currentOpacity, 100),
-              height: "6px",
-              borderRadius: "4px",
-              WebkitAppearance: "none",
             }}
           />
-        </div>
-      </div>
-
-      {/* Transform */}
-      <div className="mb-4 border-b border-gray-200 pb-3">
-        <h3 className="mb-2 font-medium text-gray-800">Transform</h3>
-        <div className="space-y-3">
-          <div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Rotation</span>
-              <span className="text-sm text-gray-600">{currentRotation}°</span>
-            </div>
-            <input
-              type="range"
-              min="0"
-              max="360"
-              value={currentRotation}
-              onChange={(e) => onRotationChange(Number(e.target.value))}
-              className="mt-1 h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-gray-200"
-              style={{
-                background: getSliderBackground(currentRotation, 360),
-                height: "6px",
-                borderRadius: "4px",
-                WebkitAppearance: "none",
-              }}
-            />
-          </div>
-          <div className="flex gap-2">
-            <button
-              onClick={onFlipHorizontal}
-              className={`flex flex-1 items-center justify-center gap-1 rounded-lg border border-gray-200 p-2 text-sm text-gray-700 hover:border-blue-500 hover:bg-blue-50 ${
-                currentFlipH ? "border-blue-500 bg-blue-50" : ""
-              }`}
-            >
-              <MdOutlineFlip className="size-4" />
-              Flip H
-            </button>
-            <button
-              onClick={onFlipVertical}
-              className={`flex flex-1 items-center justify-center gap-1 rounded-lg border border-gray-200 p-2 text-sm text-gray-700 hover:border-blue-500 hover:bg-blue-50 ${
-                currentFlipV ? "border-blue-500 bg-blue-50" : ""
-              }`}
-            >
-              <MdOutlineFlip className="size-4 rotate-90" />
-              Flip V
-            </button>
-          </div>
         </div>
       </div>
 
@@ -256,4 +217,4 @@ const ShapeDesignMenu: React.FC<ShapeDesignMenuProps> = ({
   );
 };
 
-export default ShapeDesignMenu;
+export default ShapeDesignMenu; 

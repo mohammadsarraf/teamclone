@@ -25,6 +25,7 @@ interface GridContainerProps {
   containerPadding: [number, number];
   isDraggable: boolean;
   isResizable: boolean;
+  draggableHandle?: string;
 }
 
 export const GridContainer: React.FC<GridContainerProps> = ({
@@ -50,6 +51,7 @@ export const GridContainer: React.FC<GridContainerProps> = ({
   containerPadding,
   isDraggable,
   isResizable,
+  draggableHandle,
 }) => {
   return (
     <div className="relative size-full">
@@ -75,6 +77,7 @@ export const GridContainer: React.FC<GridContainerProps> = ({
         transformScale={transformScale}
         margin={margin}
         containerPadding={containerPadding}
+        draggableHandle={draggableHandle}
         style={{
           ...style,
           minHeight: rows * unitSize,

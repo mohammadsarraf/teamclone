@@ -406,6 +406,7 @@ const TestPage = () => {
 
   const handleStartEdit = (blockId: string) => {
     setActiveShape(blockId);
+    setActiveMenu(blockId);
   };
 
   const handleDragStart = () => {
@@ -545,6 +546,7 @@ const TestPage = () => {
           margin={[0, 0]}
           containerPadding={[0, 0]}
           style={{ height: "100%" }}
+          draggableHandle="[data-drag-handle]"
         >
           {layout.map((block, index) => (
             <div

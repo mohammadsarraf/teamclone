@@ -44,10 +44,10 @@ const TextDesignMenu: React.FC<TextDesignMenuProps> = ({
           <select
             value={currentFont}
             onChange={(e) => onFontChange(e.target.value)}
-            className="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none"
+            className="w-full rounded-lg border border-gray-200 bg-white text-gray-500 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none"
           >
             {fonts.map((font) => (
-              <option key={font.value} value={font.value}>
+              <option key={font.value} value={font.value} >
                 {font.name}
               </option>
             ))}
@@ -63,7 +63,7 @@ const TextDesignMenu: React.FC<TextDesignMenuProps> = ({
               type="number"
               value={currentFontSize}
               onChange={(e) => onFontSize(Number(e.target.value))}
-              className="w-16 rounded border border-gray-200 px-2 py-1 text-sm"
+              className="w-16 rounded border border-gray-200 px-2 py-1 text-sm text-gray-500"
               min="8"
               max="72"
             />
@@ -96,7 +96,7 @@ const TextDesignMenu: React.FC<TextDesignMenuProps> = ({
           </button>
         </div>
 
-        {/* Alignment */}
+        {/* Text Alignment */}
         <div className="flex rounded-lg bg-gray-100 p-0.5">
           <button
             onClick={() => onTextAlign('left')}

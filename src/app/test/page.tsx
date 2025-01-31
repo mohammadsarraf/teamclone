@@ -33,6 +33,14 @@ interface Block extends Layout {
   flipH?: boolean;
   flipV?: boolean;
   opacity: number;
+  font?: string;
+  fontSize?: number;
+  textAlign?: 'left' | 'center' | 'right';
+  isBold?: boolean;
+  isItalic?: boolean;
+  isUnderline?: boolean;
+  lineHeight?: number;
+  letterSpacing?: number;
 }
 
 interface ShapeWrapperProps {
@@ -61,6 +69,22 @@ interface ShapeWrapperProps {
   totalShapes: number;
   index: number;
   menuVisible?: boolean;
+  onFontChange?: (font: string) => void;
+  currentFont?: string;
+  onFontSize?: (size: number) => void;
+  currentFontSize?: number;
+  onTextAlign?: (align: 'left' | 'center' | 'right') => void;
+  currentTextAlign?: 'left' | 'center' | 'right';
+  onBold?: () => void;
+  isBold?: boolean;
+  onItalic?: () => void;
+  isItalic?: boolean;
+  onUnderline?: () => void;
+  isUnderline?: boolean;
+  onLineHeight?: (height: number) => void;
+  currentLineHeight?: number;
+  onLetterSpacing?: (spacing: number) => void;
+  currentLetterSpacing?: number;
 }
 
 const ShapeItem = ({
@@ -74,6 +98,14 @@ const ShapeItem = ({
   flipH,
   flipV,
   onStartEdit,
+  font,
+  fontSize,
+  textAlign,
+  isBold,
+  isItalic,
+  isUnderline,
+  lineHeight,
+  letterSpacing,
 }: {
   type: Block["shape"];
   color: string;
@@ -85,6 +117,14 @@ const ShapeItem = ({
   flipH: boolean;
   flipV: boolean;
   onStartEdit?: () => void;
+  font?: string;
+  fontSize?: number;
+  textAlign?: 'left' | 'center' | 'right';
+  isBold?: boolean;
+  isItalic?: boolean;
+  isUnderline?: boolean;
+  lineHeight?: number;
+  letterSpacing?: number;
 }) => {
   if (!type) return null;
 
@@ -95,6 +135,16 @@ const ShapeItem = ({
         onTextChange={onTextChange!}
         isActive={isActive}
         onStartEdit={onStartEdit}
+        font={font}
+        fontSize={fontSize}
+        textAlign={textAlign}
+        isBold={isBold}
+        isItalic={isItalic}
+        isUnderline={isUnderline}
+        lineHeight={lineHeight}
+        letterSpacing={letterSpacing}
+        color={color}
+        opacity={opacity}
       />
     );
   }
@@ -129,7 +179,7 @@ const createNewShape = (
     triangle: defaultColor,
     circle: defaultColor,
     square: defaultColor,
-    text: defaultColor,
+    text: "#FFFFFF", // White color for text
   };
 
   return {
@@ -142,7 +192,17 @@ const createNewShape = (
     color: colors[type],
     maintainRatio: type !== "text",
     opacity: 100,
-    ...(type === "text" && { text: "Edit this text" }),
+    ...(type === "text" && {
+      text: "Edit this text",
+      font: "Inter",
+      fontSize: 16,
+      textAlign: "center" as const,
+      isBold: false,
+      isItalic: false,
+      isUnderline: false,
+      lineHeight: 1.5,
+      letterSpacing: 0,
+    }),
   };
 };
 
@@ -358,6 +418,70 @@ const TestPage = () => {
     setActiveMenu(null); // Close menu when resizing starts
   };
 
+  const handleFontChange = (blockId: string, font: string) => {
+    setLayout((prevLayout) =>
+      prevLayout.map((block) =>
+        block.i === blockId ? { ...block, font } : block
+      ),
+    );
+  };
+
+  const handleFontSizeChange = (blockId: string, fontSize: number) => {
+    setLayout((prevLayout) =>
+      prevLayout.map((block) =>
+        block.i === blockId ? { ...block, fontSize } : block
+      ),
+    );
+  };
+
+  const handleTextAlignChange = (blockId: string, textAlign: 'left' | 'center' | 'right') => {
+    setLayout((prevLayout) =>
+      prevLayout.map((block) =>
+        block.i === blockId ? { ...block, textAlign } : block
+      ),
+    );
+  };
+
+  const handleBoldChange = (blockId: string) => {
+    setLayout((prevLayout) =>
+      prevLayout.map((block) =>
+        block.i === blockId ? { ...block, isBold: !block.isBold } : block
+      ),
+    );
+  };
+
+  const handleItalicChange = (blockId: string) => {
+    setLayout((prevLayout) =>
+      prevLayout.map((block) =>
+        block.i === blockId ? { ...block, isItalic: !block.isItalic } : block
+      ),
+    );
+  };
+
+  const handleUnderlineChange = (blockId: string) => {
+    setLayout((prevLayout) =>
+      prevLayout.map((block) =>
+        block.i === blockId ? { ...block, isUnderline: !block.isUnderline } : block
+      ),
+    );
+  };
+
+  const handleLineHeightChange = (blockId: string, lineHeight: number) => {
+    setLayout((prevLayout) =>
+      prevLayout.map((block) =>
+        block.i === blockId ? { ...block, lineHeight } : block
+      ),
+    );
+  };
+
+  const handleLetterSpacingChange = (blockId: string, letterSpacing: number) => {
+    setLayout((prevLayout) =>
+      prevLayout.map((block) =>
+        block.i === blockId ? { ...block, letterSpacing } : block
+      ),
+    );
+  };
+
   return (
     <div
       className="flex h-screen w-screen flex-col bg-gray-900"
@@ -447,6 +571,22 @@ const TestPage = () => {
                 totalShapes={layout.length}
                 index={layout.length - index}
                 className="shape-wrapper"
+                onFontChange={(font) => handleFontChange(block.i, font)}
+                currentFont={block.font}
+                onFontSize={(size) => handleFontSizeChange(block.i, size)}
+                currentFontSize={block.fontSize}
+                onTextAlign={(align) => handleTextAlignChange(block.i, align)}
+                currentTextAlign={block.textAlign}
+                onBold={() => handleBoldChange(block.i)}
+                isBold={block.isBold}
+                onItalic={() => handleItalicChange(block.i)}
+                isItalic={block.isItalic}
+                onUnderline={() => handleUnderlineChange(block.i)}
+                isUnderline={block.isUnderline}
+                onLineHeight={(height) => handleLineHeightChange(block.i, height)}
+                currentLineHeight={block.lineHeight}
+                onLetterSpacing={(spacing) => handleLetterSpacingChange(block.i, spacing)}
+                currentLetterSpacing={block.letterSpacing}
               >
                 <ShapeItem
                   type={block.shape}
@@ -459,6 +599,14 @@ const TestPage = () => {
                   rotation={block.rotation || 0}
                   flipH={block.flipH || false}
                   flipV={block.flipV || false}
+                  font={block.font}
+                  fontSize={block.fontSize}
+                  textAlign={block.textAlign}
+                  isBold={block.isBold}
+                  isItalic={block.isItalic}
+                  isUnderline={block.isUnderline}
+                  lineHeight={block.lineHeight}
+                  letterSpacing={block.letterSpacing}
                 />
               </ShapeWrapper>
             </div>

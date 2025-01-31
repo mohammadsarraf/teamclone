@@ -30,6 +30,22 @@ interface ShapeWrapperProps {
   index: number;
   menuVisible: boolean;
   className?: string;
+  onFontChange?: (font: string) => void;
+  currentFont?: string;
+  onFontSize?: (size: number) => void;
+  currentFontSize?: number;
+  onTextAlign?: (align: 'left' | 'center' | 'right') => void;
+  currentTextAlign?: 'left' | 'center' | 'right';
+  onBold?: () => void;
+  isBold?: boolean;
+  onItalic?: () => void;
+  isItalic?: boolean;
+  onUnderline?: () => void;
+  isUnderline?: boolean;
+  onLineHeight?: (height: number) => void;
+  currentLineHeight?: number;
+  onLetterSpacing?: (spacing: number) => void;
+  currentLetterSpacing?: number;
 }
 
 const ShapeWrapper: React.FC<ShapeWrapperProps> = ({
@@ -59,6 +75,22 @@ const ShapeWrapper: React.FC<ShapeWrapperProps> = ({
   totalShapes,
   index,
   className = '',
+  onFontChange,
+  currentFont,
+  onFontSize,
+  currentFontSize,
+  onTextAlign,
+  currentTextAlign,
+  onBold,
+  isBold,
+  onItalic,
+  isItalic,
+  onUnderline,
+  isUnderline,
+  onLineHeight,
+  currentLineHeight,
+  onLetterSpacing,
+  currentLetterSpacing,
 }) => {
   const menuRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -159,6 +191,22 @@ const ShapeWrapper: React.FC<ShapeWrapperProps> = ({
               onDuplicate={onDuplicate}
               onOpacityChange={onOpacityChange}
               currentOpacity={currentOpacity}
+              onFontChange={onFontChange}
+              currentFont={currentFont}
+              onFontSize={onFontSize}
+              currentFontSize={currentFontSize}
+              onTextAlign={onTextAlign}
+              currentTextAlign={currentTextAlign}
+              onBold={onBold}
+              isBold={isBold}
+              onItalic={onItalic}
+              isItalic={isItalic}
+              onUnderline={onUnderline}
+              isUnderline={isUnderline}
+              onLineHeight={onLineHeight}
+              currentLineHeight={currentLineHeight}
+              onLetterSpacing={onLetterSpacing}
+              currentLetterSpacing={currentLetterSpacing}
             />
           ) : (
             <ShapeDesignMenu

@@ -35,11 +35,11 @@ interface TestPageProps {
   initialRows?: number;
 }
 
-const TestPage = ({ 
-  className = "", 
+const TestPage = ({
+  className = "",
   containerClassName = "",
   initialCols = 36,
-  initialRows = 12
+  initialRows = 12,
 }: TestPageProps) => {
   const [layout, setLayout] = useState<Block[]>(initialLayout);
   const [activeShape, setActiveShape] = useState<string | null>(null);
@@ -168,8 +168,12 @@ const TestPage = ({
                 menuVisible={activeMenu === block.i}
                 isText={block.shape === "text"}
                 currentShape={block.shape}
-                onShapeChange={(type) => shapeManager.handleShapeChange(block.i, type)}
-                onColorChange={(color) => shapeManager.handleColorChange(block.i, color)}
+                onShapeChange={(type) =>
+                  shapeManager.handleShapeChange(block.i, type)
+                }
+                onColorChange={(color) =>
+                  shapeManager.handleColorChange(block.i, color)
+                }
                 onDelete={() => shapeManager.handleDelete(block.i)}
                 onDuplicate={() => shapeManager.handleDuplicate(block.i)}
                 onOpacityChange={(opacity) =>
@@ -192,11 +196,17 @@ const TestPage = ({
                 totalShapes={layout.length}
                 index={layout.length - index}
                 className="shape-wrapper"
-                onFontChange={(font) => shapeManager.handleFontChange(block.i, font)}
+                onFontChange={(font) =>
+                  shapeManager.handleFontChange(block.i, font)
+                }
                 currentFont={block.font}
-                onFontSize={(size) => shapeManager.handleFontSizeChange(block.i, size)}
+                onFontSize={(size) =>
+                  shapeManager.handleFontSizeChange(block.i, size)
+                }
                 currentFontSize={block.fontSize}
-                onTextAlign={(align) => shapeManager.handleTextAlignChange(block.i, align)}
+                onTextAlign={(align) =>
+                  shapeManager.handleTextAlignChange(block.i, align)
+                }
                 currentTextAlign={block.textAlign}
                 onBold={() => shapeManager.handleBoldChange(block.i)}
                 isBold={block.isBold}
@@ -213,14 +223,18 @@ const TestPage = ({
                 }
                 currentLetterSpacing={block.letterSpacing}
                 onEnterPress={() => shapeManager.handleEnterPress(block.i)}
-                onHeightChange={(height) => shapeManager.handleHeightChange(block.i, height)}
+                onHeightChange={(height) =>
+                  shapeManager.handleHeightChange(block.i, height)
+                }
                 unitSize={unitSize}
               >
                 <ShapeItem
                   type={block.shape}
                   color={block.color}
                   text={block.text}
-                  onTextChange={(newText) => shapeManager.handleTextChange(block.i, newText)}
+                  onTextChange={(newText) =>
+                    shapeManager.handleTextChange(block.i, newText)
+                  }
                   isActive={activeShape === block.i}
                   onStartEdit={() => handleStartEdit(block.i)}
                   opacity={block.opacity}

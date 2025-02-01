@@ -14,7 +14,9 @@ export class ShapeManager {
   constructor(
     layout: Block[],
     setLayout: (layout: Block[]) => void,
-    positions: { [key: string]: { x: number; y: number; w: number; h: number } },
+    positions: {
+      [key: string]: { x: number; y: number; w: number; h: number };
+    },
     setPositions: (positions: {
       [key: string]: { x: number; y: number; w: number; h: number };
     }) => void,
@@ -83,7 +85,10 @@ export class ShapeManager {
     );
   };
 
-  handleShapeChange = (blockId: string, type: "triangle" | "circle" | "square") => {
+  handleShapeChange = (
+    blockId: string,
+    type: "triangle" | "circle" | "square",
+  ) => {
     this.setLayout((prevLayout) =>
       prevLayout.map((block) =>
         block.i === blockId ? { ...block, shape: type } : block,
@@ -259,9 +264,7 @@ export class ShapeManager {
     );
   };
 
-  createNewShape = (
-    type: "triangle" | "circle" | "square" | "text",
-  ) => {
+  createNewShape = (type: "triangle" | "circle" | "square" | "text") => {
     const id = `${type}${this.layout.length + 1}`;
     const defaultColor = "#3b82f6";
     const colors = {

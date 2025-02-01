@@ -14,8 +14,8 @@ const FooterContent = () => {
           Edit Footer
         </button>
       ) : (
-        <div className="flex h-full w-full">
-          <TestPage 
+        <div className="flex size-full">
+          <TestPage
             className="w-full"
             containerClassName="px-4"
             initialCols={36}

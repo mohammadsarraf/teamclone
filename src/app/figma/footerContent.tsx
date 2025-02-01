@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Test, { TestPageProps } from "../test/page";
+import Test, { TestPageProps } from "../test/TestPage";
 import { useWindowSize } from "../test/hooks/useWindowSize";
 import { MdOutlineStyle } from "react-icons/md";
 

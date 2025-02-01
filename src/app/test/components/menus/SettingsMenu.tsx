@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface SettingsMenuProps {
   cols: number;
@@ -32,7 +32,7 @@ export const SettingsMenu = ({
           {/* Grid Settings */}
           <div className="space-y-3">
             <h4 className="font-medium text-gray-700">Grid</h4>
-            
+
             {/* Columns */}
             <div>
               <label className="mb-1 block text-sm text-gray-600">
@@ -67,4 +67,4 @@ export const SettingsMenu = ({
       </div>
     </div>
   );
-}; 
+};

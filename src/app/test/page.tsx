@@ -164,14 +164,17 @@ const TestPage = ({
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      if (!target.closest('.add-block-menu') && !target.closest('.edit-bar-button')) {
+      if (
+        !target.closest(".add-block-menu") &&
+        !target.closest(".edit-bar-button")
+      ) {
         setIsMenuVisible(false);
         setShowShapesSubmenu(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleAddBlock = (text: string, type?: string) => {
@@ -192,7 +195,7 @@ const TestPage = ({
           unitSize={unitSize}
         />
 
-        <div 
+        <div
           className="relative size-full"
           onMouseEnter={() => setShowEditBar(true)}
           onMouseLeave={() => !isEditing && setShowEditBar(false)}
@@ -288,7 +291,9 @@ const TestPage = ({
                   isBold={block.isBold}
                   onItalic={() => shapeManager.handleItalicChange(block.i)}
                   isItalic={block.isItalic}
-                  onUnderline={() => shapeManager.handleUnderlineChange(block.i)}
+                  onUnderline={() =>
+                    shapeManager.handleUnderlineChange(block.i)
+                  }
                   isUnderline={block.isUnderline}
                   onLineHeight={(height) =>
                     shapeManager.handleLineHeightChange(block.i, height)
@@ -336,7 +341,7 @@ const TestPage = ({
             ))}
           </GridContainer>
 
-          <EditBar 
+          <EditBar
             isEditing={isEditing}
             showEditBar={showEditBar}
             handleEditClick={handleEditClick}

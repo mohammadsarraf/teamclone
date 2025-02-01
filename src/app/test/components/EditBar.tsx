@@ -1,7 +1,7 @@
-import React from 'react';
+import React from "react";
 import { MdAdd, MdEdit, MdSettings, MdStyle } from "react-icons/md";
 import AddBlock from "../../figma/addBlock";
-import { SettingsMenu } from './menus/SettingsMenu';
+import { SettingsMenu } from "./menus/SettingsMenu";
 
 interface EditBarProps {
   isEditing: boolean;
@@ -35,15 +35,15 @@ export const EditBar = ({
   const handleAddBlockClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     event.stopPropagation();
-    
+
     const button = event.currentTarget;
     const rect = button.getBoundingClientRect();
-    
+
     setMenuPosition({
       x: rect.left - 192,
-      y: rect.top - 320
+      y: rect.top - 320,
     });
-    
+
     setIsMenuVisible((prev) => !prev);
   };
 
@@ -57,9 +57,9 @@ export const EditBar = ({
   return (
     <>
       {/* Bottom Edit Bar */}
-      <div 
+      <div
         className={`fixed bottom-5 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-lg bg-gray-900 p-2 text-white shadow-xl ${
-          showEditBar ? 'opacity-100' : 'opacity-0'
+          showEditBar ? "opacity-100" : "opacity-0"
         } transition-opacity duration-200`}
         style={{ zIndex: 1000 }}
       >
@@ -67,7 +67,7 @@ export const EditBar = ({
           type="button"
           onClick={handleAddBlockClick}
           className="edit-bar-button pointer-events-auto flex items-center gap-2 rounded px-3 py-1.5 text-sm transition-colors hover:bg-gray-700 active:bg-gray-600"
-          style={{ cursor: 'pointer' }}
+          style={{ cursor: "pointer" }}
         >
           <MdAdd className="text-lg" />
           Add Block
@@ -77,18 +77,18 @@ export const EditBar = ({
           type="button"
           onClick={handleEditClick}
           className={`edit-bar-button pointer-events-auto flex items-center gap-2 rounded px-3 py-1.5 text-sm transition-colors ${
-            isEditing ? 'bg-blue-500 hover:bg-blue-600' : 'hover:bg-gray-700'
+            isEditing ? "bg-blue-500 hover:bg-blue-600" : "hover:bg-gray-700"
           } active:bg-gray-600`}
-          style={{ cursor: 'pointer' }}
+          style={{ cursor: "pointer" }}
         >
           <MdEdit className="text-lg" />
-          {isEditing ? 'Done' : 'Edit'}
+          {isEditing ? "Done" : "Edit"}
         </button>
         <button
           type="button"
           onClick={handleDesignClick}
           className="edit-bar-button pointer-events-auto flex items-center gap-2 rounded px-3 py-1.5 text-sm transition-colors hover:bg-gray-700 active:bg-gray-600"
-          style={{ cursor: 'pointer' }}
+          style={{ cursor: "pointer" }}
         >
           <MdStyle className="text-lg" />
           Design
@@ -97,7 +97,7 @@ export const EditBar = ({
           type="button"
           onClick={handleSettingsClick}
           className="edit-bar-button pointer-events-auto flex items-center gap-2 rounded px-3 py-1.5 text-sm transition-colors hover:bg-gray-700 active:bg-gray-600"
-          style={{ cursor: 'pointer' }}
+          style={{ cursor: "pointer" }}
         >
           <MdSettings className="text-lg" />
           Settings
@@ -106,13 +106,13 @@ export const EditBar = ({
 
       {/* Add Block Menu */}
       {isMenuVisible && (
-        <div 
+        <div
           className="fixed bottom-10"
           style={{
             zIndex: 1001,
           }}
         >
-          <AddBlock 
+          <AddBlock
             handleClose={() => setIsMenuVisible(false)}
             handleAddBlock={handleAddBlock}
           />
@@ -121,11 +121,8 @@ export const EditBar = ({
 
       {/* Settings Menu */}
       {isSettingsVisible && (
-        <div 
-          className="fixed bottom-20 right-10"
-          style={{ zIndex: 1001 }}
-        >
-          <SettingsMenu 
+        <div className="fixed bottom-20 right-10" style={{ zIndex: 1001 }}>
+          <SettingsMenu
             cols={cols}
             rows={rows}
             onColsChange={onColsChange}
@@ -136,4 +133,4 @@ export const EditBar = ({
       )}
     </>
   );
-}; 
+};

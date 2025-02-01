@@ -9,7 +9,7 @@ const FooterContent = () => {
   const containerWidth = useWindowSize();
   const [gridHeight, setGridHeight] = useState(450);
   const [currentRows, setCurrentRows] = useState(10);
-  
+
   const initialCols = 36;
   const initialRows = 10;
   const unitSize = containerWidth / initialCols;
@@ -30,7 +30,7 @@ const FooterContent = () => {
   };
 
   return (
-    <div 
+    <div
       className="group relative z-20 flex bg-gradient-to-b from-gray-900 to-black text-white shadow-xl transition-all duration-300"
       style={{ height: `${gridHeight}px` }}
       onMouseEnter={() => setIsFooterHovered(true)}

@@ -28,7 +28,7 @@ const ShapeDesignMenu: React.FC<ShapeDesignMenuProps> = ({
 }) => {
   return (
     <div className="menu-content w-[300px] rounded-xl bg-white shadow-xl">
-      <div className="max-h-[20rem] overflow-y-auto p-4">
+      <div className="max-h-80 overflow-y-auto p-4">
         {/* Menu Header */}
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-lg font-semibold">Design</h3>
@@ -60,7 +60,9 @@ const ShapeDesignMenu: React.FC<ShapeDesignMenuProps> = ({
                   <button
                     key={shape.type}
                     onClick={() =>
-                      onShapeChange(shape.type as "triangle" | "circle" | "square")
+                      onShapeChange(
+                        shape.type as "triangle" | "circle" | "square",
+                      )
                     }
                     className={`flex flex-col items-center rounded-lg p-2 text-gray-700 hover:bg-blue-50 ${
                       currentShape === shape.type
@@ -87,7 +89,9 @@ const ShapeDesignMenu: React.FC<ShapeDesignMenuProps> = ({
                   <MdRotate90DegreesCcw className="text-gray-500" />
                   <span className="text-sm text-gray-600">Rotation</span>
                 </div>
-                <span className="text-sm text-gray-600">{currentRotation}°</span>
+                <span className="text-sm text-gray-600">
+                  {currentRotation}°
+                </span>
               </div>
               <input
                 type="range"

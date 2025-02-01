@@ -76,10 +76,10 @@ export class ShapeManager {
         }
         return item;
       });
-      
-      this.setLayout((prevLayout: Block[]) => 
+
+      this.setLayout((prevLayout: Block[]) =>
         prevLayout.map((block) => {
-          const updatedItem = updatedLayout.find(item => item.i === block.i);
+          const updatedItem = updatedLayout.find((item) => item.i === block.i);
           if (updatedItem) {
             return {
               ...block,
@@ -90,7 +90,7 @@ export class ShapeManager {
             };
           }
           return block;
-        })
+        }),
       );
     }
   };

@@ -23,12 +23,12 @@ export default function Page() {
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-gray-600">
       {!isEditing && <Sidebar />}
-      <main className={`relative grow ${isEditing ? 'p-0' : 'p-6'}`}>
+      <main className={`relative grow ${isEditing ? "p-0" : "p-6"}`}>
         {/* Windows-like container */}
-        <div 
+        <div
           className={`flex flex-col overflow-hidden rounded-lg border border-gray-700 bg-gray-800 shadow-2xl transition-all duration-300
-            ${isEditing ? 'fixed inset-0 z-[100] rounded-none border-none' : 'h-full'}
-            ${viewMode === "mobile" ? "max-w-[375px] mx-auto" : ""}`}
+            ${isEditing ? "fixed inset-0 z-[100] rounded-none border-none" : "h-full"}
+            ${viewMode === "mobile" ? "mx-auto max-w-[375px]" : ""}`}
         >
           {/* Combined Window Title Bar and TopMenu */}
           <div className="flex h-12 items-center justify-between bg-gray-900 px-4">
@@ -94,9 +94,7 @@ export default function Page() {
               isDesignMenuVisible={isDesignMenuVisible}
               setIsDesignMenuVisible={setIsDesignMenuVisible}
             />
-            <section className="grow">
-              {/* Main content area */}
-            </section>
+            <section className="grow">{/* Main content area */}</section>
             <FooterContent />
           </div>
         </div>

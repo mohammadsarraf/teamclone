@@ -84,7 +84,9 @@ export default function AddBlock({
               </div>
 
               <div>
-                <h3 className="mb-2 border-b px-4 text-lg font-bold">Advanced</h3>
+                <h3 className="mb-2 border-b px-4 text-lg font-bold">
+                  Advanced
+                </h3>
                 <div className="grid grid-cols-2 gap-4">
                   {/* ... buttons ... */}
                 </div>

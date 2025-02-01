@@ -264,4 +264,6 @@ const TestPage = ({
   );
 };
 
-export default TestPage;
+export default function Test() {
+  return <TestPage className="w-full" />;
+}

@@ -3,7 +3,7 @@ import { Block } from "./types";
 
 export class ShapeManager {
   layout: Block[];
-  setLayout: (layout: Block[]) => void;
+  setLayout: (layout: Block[] | ((prevLayout: Block[]) => Block[])) => void;
   positions: { [key: string]: { x: number; y: number; w: number; h: number } };
   setPositions: (positions: {
     [key: string]: { x: number; y: number; w: number; h: number };
@@ -13,7 +13,7 @@ export class ShapeManager {
 
   constructor(
     layout: Block[],
-    setLayout: (layout: Block[]) => void,
+    setLayout: (layout: Block[] | ((prevLayout: Block[]) => Block[])) => void,
     positions: {
       [key: string]: { x: number; y: number; w: number; h: number };
     },
@@ -47,7 +47,7 @@ export class ShapeManager {
 
     this.setPositions(newPositions);
 
-    this.setLayout((prevLayout) => {
+    this.setLayout((prevLayout: Block[]) => {
       return prevLayout.map((block) => {
         const pos = newPositions[block.i];
         if (pos) {
@@ -62,7 +62,7 @@ export class ShapeManager {
   };
 
   handleResizeStop = (layout: Layout[], oldItem: Layout, newItem: Layout) => {
-    const block = layout.find((item) => item.i === newItem.i);
+    const block = this.layout.find((item) => item.i === newItem.i);
     if (block?.maintainRatio) {
       const updatedLayout = layout.map((item) => {
         if (item.i === newItem.i) {
@@ -73,12 +73,12 @@ export class ShapeManager {
         }
         return item;
       });
-      this.setLayout(updatedLayout);
+      this.setLayout(updatedLayout as Block[]);
     }
   };
 
   handleTextChange = (blockId: string, newText: string) => {
-    this.setLayout((prevLayout) =>
+    this.setLayout((prevLayout: Block[]) =>
       prevLayout.map((block) =>
         block.i === blockId ? { ...block, text: newText } : block,
       ),
@@ -89,7 +89,7 @@ export class ShapeManager {
     blockId: string,
     type: "triangle" | "circle" | "square",
   ) => {
-    this.setLayout((prevLayout) =>
+    this.setLayout((prevLayout: Block[]) =>
       prevLayout.map((block) =>
         block.i === blockId ? { ...block, shape: type } : block,
       ),
@@ -97,7 +97,7 @@ export class ShapeManager {
   };
 
   handleColorChange = (blockId: string, color: string) => {
-    this.setLayout((prevLayout) => {
+    this.setLayout((prevLayout: Block[]) => {
       return prevLayout.map((block) => {
         if (block.i === blockId) {
           const pos = this.positions[block.i] || {
@@ -136,7 +136,7 @@ export class ShapeManager {
   };
 
   handleOpacityChange = (blockId: string, opacity: number) => {
-    this.setLayout((prevLayout) =>
+    this.setLayout((prevLayout: Block[]) =>
       prevLayout.map((block) =>
         block.i === blockId ? { ...block, opacity } : block,
       ),
@@ -144,7 +144,7 @@ export class ShapeManager {
   };
 
   handleRotationChange = (blockId: string, rotation: number) => {
-    this.setLayout((prevLayout) =>
+    this.setLayout((prevLayout: Block[]) =>
       prevLayout.map((block) =>
         block.i === blockId ? { ...block, rotation } : block,
       ),
@@ -162,7 +162,7 @@ export class ShapeManager {
   };
 
   handleFlipH = (blockId: string) => {
-    this.setLayout((prevLayout) =>
+    this.setLayout((prevLayout: Block[]) =>
       prevLayout.map((block) =>
         block.i === blockId ? { ...block, flipH: !block.flipH } : block,
       ),
@@ -170,7 +170,7 @@ export class ShapeManager {
   };
 
   handleFlipV = (blockId: string) => {
-    this.setLayout((prevLayout) =>
+    this.setLayout((prevLayout: Block[]) =>
       prevLayout.map((block) =>
         block.i === blockId ? { ...block, flipV: !block.flipV } : block,
       ),
@@ -188,7 +188,7 @@ export class ShapeManager {
   };
 
   handleFontChange = (blockId: string, font: string) => {
-    this.setLayout((prevLayout) =>
+    this.setLayout((prevLayout: Block[]) =>
       prevLayout.map((block) =>
         block.i === blockId ? { ...block, font } : block,
       ),
@@ -196,7 +196,7 @@ export class ShapeManager {
   };
 
   handleFontSizeChange = (blockId: string, fontSize: number) => {
-    this.setLayout((prevLayout) =>
+    this.setLayout((prevLayout: Block[]) =>
       prevLayout.map((block) =>
         block.i === blockId ? { ...block, fontSize } : block,
       ),
@@ -207,7 +207,7 @@ export class ShapeManager {
     blockId: string,
     textAlign: "left" | "center" | "right",
   ) => {
-    this.setLayout((prevLayout) =>
+    this.setLayout((prevLayout: Block[]) =>
       prevLayout.map((block) =>
         block.i === blockId ? { ...block, textAlign } : block,
       ),
@@ -215,7 +215,7 @@ export class ShapeManager {
   };
 
   handleBoldChange = (blockId: string) => {
-    this.setLayout((prevLayout) =>
+    this.setLayout((prevLayout: Block[]) =>
       prevLayout.map((block) =>
         block.i === blockId ? { ...block, isBold: !block.isBold } : block,
       ),
@@ -223,7 +223,7 @@ export class ShapeManager {
   };
 
   handleItalicChange = (blockId: string) => {
-    this.setLayout((prevLayout) =>
+    this.setLayout((prevLayout: Block[]) =>
       prevLayout.map((block) =>
         block.i === blockId ? { ...block, isItalic: !block.isItalic } : block,
       ),
@@ -231,7 +231,7 @@ export class ShapeManager {
   };
 
   handleUnderlineChange = (blockId: string) => {
-    this.setLayout((prevLayout) =>
+    this.setLayout((prevLayout: Block[]) =>
       prevLayout.map((block) =>
         block.i === blockId
           ? { ...block, isUnderline: !block.isUnderline }
@@ -241,7 +241,7 @@ export class ShapeManager {
   };
 
   handleLineHeightChange = (blockId: string, lineHeight: number) => {
-    this.setLayout((prevLayout) =>
+    this.setLayout((prevLayout: Block[]) =>
       prevLayout.map((block) =>
         block.i === blockId ? { ...block, lineHeight } : block,
       ),
@@ -249,7 +249,7 @@ export class ShapeManager {
   };
 
   handleLetterSpacingChange = (blockId: string, letterSpacing: number) => {
-    this.setLayout((prevLayout) =>
+    this.setLayout((prevLayout: Block[]) =>
       prevLayout.map((block) =>
         block.i === blockId ? { ...block, letterSpacing } : block,
       ),
@@ -257,7 +257,7 @@ export class ShapeManager {
   };
 
   handleHeightChange = (blockId: string, height: number) => {
-    this.setLayout((prevLayout) =>
+    this.setLayout((prevLayout: Block[]) =>
       prevLayout.map((block) =>
         block.i === blockId ? { ...block, h: height } : block,
       ),

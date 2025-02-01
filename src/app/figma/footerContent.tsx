@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import TestPage from "../test/page";
+import Test from "../test/page";
 
 const FooterContent = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -15,11 +16,11 @@ const FooterContent = () => {
         </button>
       ) : (
         <div className="flex size-full">
-          <TestPage
-            className="w-full"
-            containerClassName="px-4"
-            initialCols={36}
-            initialRows={12}
+          <Test
+          // className="w-full"
+          // containerClassName="px-4"
+          // initialCols={36}
+          // initialRows={12}
           />
         </div>
       )}

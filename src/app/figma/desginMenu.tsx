@@ -218,19 +218,23 @@ export default function DesignMenu({
               Height
             </label>
             <span className="text-sm font-medium text-gray-700">
-              {height.toFixed(2)} vw
+              {height.toFixed(1)}
             </span>
           </div>
           <input
             type="range"
-            min="2"
-            max="12"
-            step="0.01"
+            min="1"
+            max="10"
+            step="0.1"
             value={height}
-            onChange={(e) => setHeight(Number(e.target.value))}
+            onChange={(e) => {
+              const newHeight = Number(e.target.value);
+              setHeight(newHeight);
+              onHeightChange(newHeight);
+            }}
             className="h-1 w-full cursor-pointer appearance-none rounded-lg bg-gray-200"
             style={{
-              background: `linear-gradient(to right, black ${((height - 2) / (12 - 2)) * 100}%, #e5e7eb ${((height - 2) / (12 - 2)) * 100}%)`,
+              background: `linear-gradient(to right, black ${((height - 1) / 9) * 100}%, #e5e7eb ${((height - 1) / 9) * 100}%)`,
             }}
           />
         </div>

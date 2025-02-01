@@ -13,6 +13,7 @@ interface ToolbarProps {
   onHeightChange: (height: number) => void;
   onBgColorChange: (color: string) => void;
   onbgColorChange?: (color: string) => void;
+  onClose: () => void;
 }
 
 export default function Toolbar({
@@ -24,6 +25,7 @@ export default function Toolbar({
   initialWidth = "full",
   onHeightChange,
   onBgColorChange,
+  onClose,
 }: ToolbarProps) {
   const [activeMenu, setActiveMenu] = useState("design");
   const [layoutOption, setLayoutOption] = useState(initialLayoutOption);
@@ -133,23 +135,30 @@ export default function Toolbar({
 
   return (
     <div className="relative flex h-full flex-col">
-      <div
-        className={`absolute right-0 top-full mt-2 flex h-96 w-80 flex-col  rounded-lg bg-white p-4 shadow-lg`}
-      >
-        <div className="mb-4 flex gap-4 border-b border-gray-300 text-black">
+      <div className="mb-4 flex items-center justify-between border-b border-gray-300 p-3">
+        <div className="flex gap-4 text-black">
           <button
-            className={` px-4 py-2  ${activeMenu === "design" ? "border-b-2 border-blue-400" : ""}`}
+            className={`px-4 py-2 ${activeMenu === "design" ? "border-b-2 border-blue-400" : ""}`}
             onClick={() => setActiveMenu("design")}
           >
             Design
           </button>
           <button
-            className={` px-4 py-2 ${activeMenu === "color" ? "border-b-2 border-blue-400" : ""}`}
+            className={`px-4 py-2 ${activeMenu === "color" ? "border-b-2 border-blue-400" : ""}`}
             onClick={() => setActiveMenu("color")}
           >
             Color
           </button>
         </div>
+        <button
+          onClick={onClose}
+          className="text-xl text-gray-400 hover:text-gray-600"
+        >
+          ×
+        </button>
+      </div>
+
+      <div className="h-[400px] overflow-y-auto pr-2">
         {activeMenu === "design" && (
           <DesignMenu
             onOptionChange={onOptionChange}
@@ -166,31 +175,44 @@ export default function Toolbar({
         {activeMenu === "color" && (
           <ColorMenu
             onColorChange={(color: string) => {
-              setBgColor(color); // Update the local state
-              onBgColorChange(color); // Notify the parent
+              setBgColor(color);
+              onBgColorChange(color);
             }}
           />
         )}
       </div>
+
       {showDropdown && (
-        <ul
-          className="absolute right-0 z-10 mt-2 w-80 rounded bg-white shadow-md"
-          style={{ top: "calc(100% + 8px)" }}
-        >
-          {layoutOptions.map((option) => (
-            <li
-              key={option.name}
-              className={`flex cursor-pointer items-center gap-2 px-4 py-2 hover:bg-gray-200 ${layoutOption === option.name ? "bg-gray-300" : ""}`}
-              onClick={() => {
-                setLayoutOption(option.name);
-                setShowDropdown(false);
-                onOptionChange(option.name); // Call the callback function
-              }}
-            >
-              {option.layout}
-            </li>
-          ))}
-        </ul>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="w-[90%] max-w-2xl rounded-lg bg-white p-4 shadow-xl">
+            <div className="mb-4 flex items-center justify-between border-b pb-2">
+              <h3 className="text-lg font-medium">Choose Layout</h3>
+              <button
+                onClick={() => setShowDropdown(false)}
+                className="text-xl text-gray-400 hover:text-gray-600"
+              >
+                ×
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              {layoutOptions.map((option) => (
+                <button
+                  key={option.name}
+                  className={`flex cursor-pointer flex-col gap-2 rounded-lg p-4 hover:bg-gray-100 
+                    ${layoutOption === option.name ? "bg-blue-50 ring-2 ring-blue-500" : ""}`}
+                  onClick={() => {
+                    setLayoutOption(option.name);
+                    setShowDropdown(false);
+                    onOptionChange(option.name);
+                  }}
+                >
+                  {option.layout}
+                  <span className="text-sm text-gray-600">{option.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

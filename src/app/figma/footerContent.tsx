@@ -1,3 +1,4 @@
+import React from "react";
 import { useState } from "react";
 import AddBlock from "./addBlock";
 import Grid from "./Grid"; // Import the Grid component
@@ -16,9 +17,76 @@ interface Block {
   color: string;
   italic: string;
   textAlign: string;
+  type: string;
 }
 
-export default function FooterContent() {
+// Edit Menu Component
+const EditMenu = ({
+  onAdd,
+  isEditing,
+}: {
+  onAdd: () => void;
+  isEditing: boolean;
+}) => {
+  return (
+    <div className="absolute -top-14 flex w-full justify-between px-4">
+      <button
+        onClick={onAdd}
+        className="rounded-md bg-blue-600 px-4 py-2 text-white shadow-lg transition-all hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+      >
+        Add Block
+      </button>
+      <div className="rounded-md bg-gray-800 px-4 py-2 text-white shadow-lg">
+        <p>Edit Section</p>
+      </div>
+    </div>
+  );
+};
+
+// Edit Button Component
+const EditButton = ({ onClick }: { onClick: () => void }) => {
+  return (
+    <button
+      onClick={onClick}
+      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-md bg-blue-600 px-6 py-3 text-white opacity-0 shadow-lg transition-all hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 group-hover:opacity-100"
+    >
+      Edit Footer
+    </button>
+  );
+};
+
+const GridLayout = () => {
+  return (
+    <div className="grid grid-cols-3 gap-4 p-4">
+      <div className="flex flex-wrap gap-2">
+        {[...Array(6)].map((_, index) => (
+          <div
+            key={index}
+            className="size-8 rounded bg-gray-700 transition-colors hover:bg-gray-600"
+          />
+        ))}
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {[...Array(6)].map((_, index) => (
+          <div
+            key={index}
+            className="size-8 rounded bg-gray-700 transition-colors hover:bg-gray-600"
+          />
+        ))}
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {[...Array(6)].map((_, index) => (
+          <div
+            key={index}
+            className="size-8 rounded bg-gray-700 transition-colors hover:bg-gray-600"
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const FooterContent = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [layout, setLayout] = useState<Block[]>([]);
@@ -40,7 +108,7 @@ export default function FooterContent() {
     setIsEditing(false);
   };
 
-  const handleAddBlock = (blockText: string) => {
+  const handleAddBlock = (blockText: string, type: string = "text") => {
     const newBlock: Block = {
       i: `block-${layout.length + 1}`,
       x: (layout.length * 2) % 12,
@@ -48,10 +116,11 @@ export default function FooterContent() {
       w: 4,
       h: 2,
       text: blockText,
-      fontSize: "",
+      fontSize: "text-base",
       color: "text-white",
       italic: "non-italic",
       textAlign: "text-left",
+      type: type,
     };
     setLayout([...layout, newBlock]);
     setIsAdding(false);
@@ -101,49 +170,35 @@ export default function FooterContent() {
   };
 
   return (
-    <footer className="group relative flex h-80 flex-col bg-black text-white shadow-md">
-      <Grid
-        layout={layout}
-        activeBlock={activeBlock}
-        isEditing={isEditing}
-        handleBlockClick={handleBlockClick}
-        handleTextChange={handleTextChange}
-        handleLayoutChange={handleLayoutChange}
-        handleColorChange={handleColorChange}
-        handleHeadingClick={handleHeadingClick}
-        handleAlignClick={handleAlignClick}
-      />
-      {!isEditing && (
-        <button
-          onClick={handleEditClick}
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded bg-white px-4 py-2 text-blue-600 opacity-0 shadow-md transition-opacity hover:bg-gray-100 focus:outline-none group-hover:opacity-100"
-        >
-          Edit Footer
-        </button>
-      )}
-
-      {isEditing && !isAdding && (
-        <>
-          <div className="absolute -top-14 left-4">
-            <button
-              onClick={handleAddClick}
-              className="rounded bg-white px-4 py-2 text-blue-600 shadow-md hover:bg-gray-100"
-            >
-              Add Block
-            </button>
-          </div>
-          <div className="absolute -top-14 right-4 rounded bg-white px-4 py-2 text-blue-600 shadow-md">
-            <p>Edit Section</p>
-          </div>
-        </>
-      )}
-
-      {isAdding && (
-        <AddBlock
-          handleClose={handleCloseAddMenu}
-          handleAddBlock={handleAddBlock}
+    <footer className="group relative flex h-80 flex-col bg-gradient-to-b from-gray-900 to-black text-white shadow-xl">
+      <div className="relative size-full">
+        <Grid
+          layout={layout}
+          activeBlock={activeBlock}
+          isEditing={isEditing}
+          handleBlockClick={handleBlockClick}
+          handleTextChange={handleTextChange}
+          handleLayoutChange={handleLayoutChange}
+          handleColorChange={handleColorChange}
+          handleHeadingClick={handleHeadingClick}
+          handleAlignClick={handleAlignClick}
         />
-      )}
+
+        {!isEditing && <EditButton onClick={handleEditClick} />}
+
+        {isEditing && !isAdding && (
+          <EditMenu onAdd={handleAddClick} isEditing={isEditing} />
+        )}
+
+        {isAdding && (
+          <AddBlock
+            handleClose={handleCloseAddMenu}
+            handleAddBlock={handleAddBlock}
+          />
+        )}
+      </div>
     </footer>
   );
-}
+};
+
+export default FooterContent;

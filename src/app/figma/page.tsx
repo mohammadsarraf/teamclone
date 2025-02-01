@@ -35,7 +35,7 @@ export default function Page() {
           )}
           <div className="flex min-h-0 grow flex-col overflow-auto">
             <div
-              className={`flex min-h-0 flex-col transition-all duration-300 ${
+              className={`flex min-h-0 flex-col ${
                 viewMode === "mobile" ? "w-[375px]" : "w-full"
               }`}
             >
@@ -49,10 +49,12 @@ export default function Page() {
                 isDesignMenuVisible={isDesignMenuVisible}
                 setIsDesignMenuVisible={setIsDesignMenuVisible}
               />
-              <section className="flex-1">
-                {/* Section content goes here */}
-              </section>
+              <section className="grow">
               <FooterContent />
+              </section>
+              <div className="flex-shrink-0">
+                <FooterContent />
+              </div>
             </div>
           </div>
         </div>

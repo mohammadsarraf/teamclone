@@ -94,7 +94,7 @@ export default function HeaderContent({
   };
 
   return (
-    <div className="relative">
+    <div className="relative z-30">
       {/* Header Content */}
       <header
         className={`relative flex items-center justify-between ${bgColor} px-6 transition-all duration-300`}

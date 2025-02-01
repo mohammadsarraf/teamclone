@@ -85,6 +85,9 @@ interface ShapeWrapperProps {
   currentLineHeight?: number;
   onLetterSpacing?: (spacing: number) => void;
   currentLetterSpacing?: number;
+  onEnterPress?: () => void;
+  onHeightChange?: (height: number) => void;
+  unitSize: number;
 }
 
 const ShapeItem = ({
@@ -106,6 +109,9 @@ const ShapeItem = ({
   isUnderline,
   lineHeight,
   letterSpacing,
+  onEnterPress,
+  onHeightChange,
+  unitSize,
 }: {
   type: Block["shape"];
   color: string;
@@ -125,6 +131,9 @@ const ShapeItem = ({
   isUnderline?: boolean;
   lineHeight?: number;
   letterSpacing?: number;
+  onEnterPress?: () => void;
+  onHeightChange?: (height: number) => void;
+  unitSize: number;
 }) => {
   if (!type) return null;
 
@@ -135,6 +144,7 @@ const ShapeItem = ({
         onTextChange={onTextChange!}
         isActive={isActive}
         onStartEdit={onStartEdit}
+        onEnterPress={onEnterPress}
         font={font}
         fontSize={fontSize}
         textAlign={textAlign}
@@ -145,6 +155,8 @@ const ShapeItem = ({
         letterSpacing={letterSpacing}
         color={color}
         opacity={opacity}
+        unitSize={unitSize}
+        onHeightChange={onHeightChange}
       />
     );
   }
@@ -174,29 +186,29 @@ const createNewShape = (
   layout: Block[],
 ) => {
   const id = `${type}${layout.length + 1}`;
-  const defaultColor = "#3b82f6"; // Default blue color
+  const defaultColor = "#3b82f6";
   const colors = {
     triangle: defaultColor,
     circle: defaultColor,
     square: defaultColor,
-    text: "#FFFFFF", // White color for text
+    text: "#FFFFFF",
   };
 
   return {
     i: id,
     x: 0,
     y: 0,
-    w: type === "text" ? 2 : 2,
+    w: type === "text" ? 8 : 2,
     h: type === "text" ? 1 : 2,
     shape: type,
     color: colors[type],
     maintainRatio: type !== "text",
     opacity: 100,
     ...(type === "text" && {
-      text: "Edit this text",
+      text: "",
       font: "Inter",
       fontSize: 16,
-      textAlign: "center" as const,
+      textAlign: "left" as const,
       isBold: false,
       isItalic: false,
       isUnderline: false,
@@ -211,8 +223,8 @@ const TestPage = () => {
   const [activeShape, setActiveShape] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
-  const [cols, setCols] = useState(12);
-  const [rows, setRows] = useState(12);
+  const [cols, setCols] = useState(36);
+  const [rows, setRows] = useState(36);
   const [positions, setPositions] = useState<{
     [key: string]: { x: number; y: number; w: number; h: number };
   }>({});
@@ -491,6 +503,26 @@ const TestPage = () => {
     );
   };
 
+  const handleEnterPress = (blockId: string) => {
+    // Create a new text box below the current one
+    const currentBlock = layout.find((block) => block.i === blockId);
+    if (currentBlock) {
+      const newTextBox = createNewShape("text", layout);
+      // Position it below the current text box
+      newTextBox.x = currentBlock.x;
+      newTextBox.y = currentBlock.y + 1; // Place it one unit below
+      setLayout([...layout, newTextBox]);
+    }
+  };
+
+  const handleHeightChange = (blockId: string, height: number) => {
+    setLayout((prevLayout) =>
+      prevLayout.map((block) =>
+        block.i === blockId ? { ...block, h: height } : block,
+      ),
+    );
+  };
+
   return (
     <div
       className="flex h-screen w-screen flex-col bg-gray-900"
@@ -607,6 +639,9 @@ const TestPage = () => {
                   handleLetterSpacingChange(block.i, spacing)
                 }
                 currentLetterSpacing={block.letterSpacing}
+                onEnterPress={() => handleEnterPress(block.i)}
+                onHeightChange={(height) => handleHeightChange(block.i, height)}
+                unitSize={unitSize}
               >
                 <ShapeItem
                   type={block.shape}
@@ -627,6 +662,11 @@ const TestPage = () => {
                   isUnderline={block.isUnderline}
                   lineHeight={block.lineHeight}
                   letterSpacing={block.letterSpacing}
+                  onEnterPress={() => handleEnterPress(block.i)}
+                  onHeightChange={(height) =>
+                    handleHeightChange(block.i, height)
+                  }
+                  unitSize={unitSize}
                 />
               </ShapeWrapper>
             </div>

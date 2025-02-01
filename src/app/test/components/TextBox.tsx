@@ -2,15 +2,33 @@
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import TextStyle from "@tiptap/extension-text-style";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { RiEdit2Line, RiDragMove2Fill } from "react-icons/ri";
 import TextAlign from "@tiptap/extension-text-align";
+import { Extension } from "@tiptap/core";
+import Placeholder from "@tiptap/extension-placeholder";
+
+// Modify the SingleLine extension
+const createSingleLineExtension = (onEnter: () => void) => {
+  return Extension.create({
+    name: "singleLine",
+    addKeyboardShortcuts() {
+      return {
+        Enter: () => {
+          onEnter();
+          return true;
+        },
+      };
+    },
+  });
+};
 
 interface TextBoxProps {
   text: string;
   onTextChange: (newText: string) => void;
   isActive?: boolean;
   onStartEdit?: () => void;
+  onEnterPress?: () => void;
   font?: string;
   fontSize?: number;
   textAlign?: "left" | "center" | "right";
@@ -21,6 +39,8 @@ interface TextBoxProps {
   letterSpacing?: number;
   color?: string;
   opacity?: number;
+  unitSize?: number;
+  onHeightChange?: (height: number) => void;
 }
 
 const TextBox = ({
@@ -28,6 +48,7 @@ const TextBox = ({
   onTextChange,
   isActive,
   onStartEdit,
+  onEnterPress = () => {},
   font = "Inter",
   fontSize = 16,
   textAlign = "left",
@@ -38,19 +59,26 @@ const TextBox = ({
   letterSpacing = 0,
   color = "#000000",
   opacity = 100,
+  unitSize = 30,
+  onHeightChange,
 }: TextBoxProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [contentHeight, setContentHeight] = useState(1);
 
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        // Disable features we don't need
+        // Allow line breaks but disable other features
         heading: false,
         bulletList: false,
         orderedList: false,
         blockquote: false,
         codeBlock: false,
         horizontalRule: false,
+        hardBreak: {
+          keepMarks: true,
+          HTMLAttributes: {},
+        }, // Configure hardBreak properly
       }),
       TextStyle,
       TextAlign.configure({
@@ -58,11 +86,31 @@ const TextBox = ({
         alignments: ["left", "center", "right"],
         defaultAlignment: "left",
       }),
+      Placeholder.configure({
+        placeholder: "Type something...",
+        emptyEditorClass: "is-editor-empty",
+      }),
     ],
     content: text,
     editable: true,
     onUpdate: ({ editor }) => {
       onTextChange(editor.getText());
+
+      if (containerRef.current) {
+        const editorElement = editor.view.dom;
+        const scrollHeight = editorElement.scrollHeight;
+
+        // Use unitSize instead of container height for grid calculation
+        const requiredGridUnits = Math.max(
+          1,
+          Math.ceil(scrollHeight / unitSize),
+        );
+
+        if (requiredGridUnits !== contentHeight) {
+          setContentHeight(requiredGridUnits);
+          onHeightChange?.(requiredGridUnits);
+        }
+      }
     },
     editorProps: {
       attributes: {
@@ -89,9 +137,9 @@ const TextBox = ({
   };
 
   return (
-    <div className="group relative size-full bg-gray-800" ref={containerRef}>
+    <div className="group relative size-full" ref={containerRef}>
       {/* Main content area with border */}
-      <div className="absolute inset-0 rounded-lg border border-gray-700 transition-colors hover:border-gray-600">
+      <div className="absolute inset-0 flex rounded-lg transition-colors ">
         {/* Control buttons - Outside the box */}
         <div className="absolute -right-10 top-0 z-50 flex flex-col gap-2">
           {/* Edit Button */}
@@ -116,8 +164,8 @@ const TextBox = ({
           </div>
         </div>
 
-        {/* Text Editor */}
-        <div className="size-full cursor-default">
+        {/* Text Editor Container */}
+        <div className="flex-1">
           <EditorContent
             editor={editor}
             className="size-full cursor-text"
@@ -129,9 +177,11 @@ const TextBox = ({
 
       <style jsx global>{`
         .ProseMirror {
-          height: 100%;
+          height: auto;
+          min-height: 100%;
           width: 100%;
-          padding: 12px;
+          max-width: 100%;
+          padding: 8px 12px;
           outline: none;
           display: block;
           font-family: ${font};
@@ -143,26 +193,38 @@ const TextBox = ({
           letter-spacing: ${letterSpacing}px;
           color: ${color};
           opacity: ${opacity / 100};
-          overflow-y: auto;
+          overflow: visible; /* Changed from auto to visible */
+          word-wrap: break-word;
+          white-space: pre-wrap;
         }
         .ProseMirror p {
           margin: 0;
           min-height: 1em;
           text-align: ${textAlign};
+          width: 100%;
+          max-width: 100%;
+          word-break: break-word;
         }
-        .ProseMirror::-webkit-scrollbar {
-          width: 4px;
+        .ProseMirror p.is-empty::before {
+          color: #9ca3af;
+          content: attr(data-placeholder);
+          float: left;
+          height: 0;
+          pointer-events: none;
+          font-style: italic;
         }
-        .ProseMirror::-webkit-scrollbar-track {
-          background: transparent;
+        .ProseMirror-focused p.is-empty::before {
+          opacity: 0.5;
         }
-        .ProseMirror::-webkit-scrollbar-thumb {
-          background-color: rgba(155, 155, 155, 0.3);
-          border-radius: 2px;
+        .ProseMirror.is-editor-empty:first-child::before {
+          color: #9ca3af;
+          content: "Type something...";
+          float: left;
+          height: 0;
+          pointer-events: none;
+          font-style: italic;
         }
-        .ProseMirror::-webkit-scrollbar-thumb:hover {
-          background-color: rgba(155, 155, 155, 0.5);
-        }
+        /* Remove scrollbar styles since we don't need them anymore */
       `}</style>
     </div>
   );

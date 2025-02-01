@@ -46,6 +46,9 @@ interface ShapeWrapperProps {
   currentLineHeight?: number;
   onLetterSpacing?: (spacing: number) => void;
   currentLetterSpacing?: number;
+  onEnterPress?: () => void;
+  onHeightChange?: (height: number) => void;
+  unitSize: number;
 }
 
 const ShapeWrapper: React.FC<ShapeWrapperProps> = ({
@@ -91,6 +94,9 @@ const ShapeWrapper: React.FC<ShapeWrapperProps> = ({
   currentLineHeight,
   onLetterSpacing,
   currentLetterSpacing,
+  onEnterPress,
+  onHeightChange,
+  unitSize,
 }) => {
   const menuRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -142,15 +148,11 @@ const ShapeWrapper: React.FC<ShapeWrapperProps> = ({
 
   return (
     <div
-      className={`group relative size-full ${className}`}
-      tabIndex={0}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
+      ref={contentRef}
+      className={`relative size-full ${className}`}
       onClick={handleClick}
       onMouseDown={handleMouseDown}
-      style={{
-        zIndex: menuVisible ? 10000 : index,
-      }}
+      data-drag-handle={!isText}
     >
       {/* Content area */}
       <div ref={contentRef} className={`size-full ${!isText && "cursor-move"}`}>

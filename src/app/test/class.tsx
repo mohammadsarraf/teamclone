@@ -53,7 +53,10 @@ export class ShapeManager {
         if (pos) {
           return {
             ...block,
-            ...pos,
+            x: pos.x,
+            y: pos.y,
+            w: pos.w,
+            h: pos.h,
           };
         }
         return block;
@@ -73,7 +76,22 @@ export class ShapeManager {
         }
         return item;
       });
-      this.setLayout(updatedLayout as Block[]);
+      
+      this.setLayout((prevLayout: Block[]) => 
+        prevLayout.map((block) => {
+          const updatedItem = updatedLayout.find(item => item.i === block.i);
+          if (updatedItem) {
+            return {
+              ...block,
+              x: updatedItem.x,
+              y: updatedItem.y,
+              w: updatedItem.w,
+              h: updatedItem.h,
+            };
+          }
+          return block;
+        })
+      );
     }
   };
 
@@ -108,7 +126,10 @@ export class ShapeManager {
           };
           return {
             ...block,
-            ...pos,
+            x: pos.x,
+            y: pos.y,
+            w: pos.w,
+            h: pos.h,
             color,
           };
         }

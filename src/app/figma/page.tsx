@@ -33,9 +33,9 @@ export default function Page() {
               setViewMode={setViewMode}
             />
           )}
-          <div className="flex grow justify-center p-6">
+          <div className="flex min-h-0 grow flex-col overflow-auto">
             <div
-              className={`flex h-full flex-col overflow-hidden transition-all duration-300 ${
+              className={`flex min-h-0 flex-col transition-all duration-300 ${
                 viewMode === "mobile" ? "w-[375px]" : "w-full"
               }`}
             >

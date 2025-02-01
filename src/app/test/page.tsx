@@ -27,12 +27,13 @@ const TextBox = dynamic(() => import("./components/TextBox"), { ssr: false });
 
 const initialLayout: Block[] = [];
 
-// Modify TestPage to accept props for customization
-interface TestPageProps {
+// Make sure to export the interface
+export interface TestPageProps {
   className?: string;
   containerClassName?: string;
   initialCols?: number;
   initialRows?: number;
+  onHeightChange?: (height: number) => void;
 }
 
 const TestPage = ({
@@ -40,17 +41,18 @@ const TestPage = ({
   containerClassName = "",
   initialCols = 36,
   initialRows = 12,
+  onHeightChange,
 }: TestPageProps) => {
   const [layout, setLayout] = useState<Block[]>(initialLayout);
   const [activeShape, setActiveShape] = useState<string | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [isResizing, setIsResizing] = useState(false);
-  const [cols, setCols] = useState(initialCols);
-  const [rows, setRows] = useState(initialRows);
   const [positions, setPositions] = useState<{
     [key: string]: { x: number; y: number; w: number; h: number };
   }>({});
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
+  const [isResizing, setIsResizing] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [cols, setCols] = useState(initialCols);
+  const [rows, setRows] = useState(initialRows);
 
   const containerWidth = useWindowSize();
   const unitSize = containerWidth / cols;
@@ -85,6 +87,19 @@ const TestPage = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [activeMenu]);
 
+  // Calculate and notify parent of actual grid height
+  useEffect(() => {
+    const gridHeight = rows * unitSize;
+    onHeightChange?.(gridHeight);
+  }, [rows, unitSize, onHeightChange]);
+
+  // Handle row changes from MenuBar
+  const handleRowsChange = (newRows: number) => {
+    setRows(newRows);
+    const newHeight = newRows * unitSize;
+    onHeightChange?.(newHeight);
+  };
+
   const handleStartEdit = (blockId: string) => {
     setActiveShape(blockId);
     setActiveMenu(blockId);
@@ -106,7 +121,7 @@ const TestPage = ({
         cols={cols}
         rows={rows}
         setCols={setCols}
-        setRows={setRows}
+        setRows={handleRowsChange}
         onReset={() => {
           localStorage.removeItem("shapeLayout");
           setLayout([]);
@@ -134,8 +149,8 @@ const TestPage = ({
             shapeManager.handleResizeStop(layout, oldItem, newItem);
             setIsResizing(false);
           }}
-          onResizeStart={handleResizeStart}
-          onDragStart={handleDragStart}
+          onResizeStart={() => setIsResizing(true)}
+          onDragStart={() => setIsDragging(true)}
           onDragStop={(layout: Layout[]) => {
             setIsDragging(false);
             shapeManager.handleLayoutChange(layout);
@@ -146,6 +161,7 @@ const TestPage = ({
           compactType={null}
           isDraggable={true}
           isResizable={true}
+          isResizing={isResizing}
           resizeHandles={["s", "w", "e", "n", "sw", "nw", "se", "ne"]}
           transformScale={1}
           margin={[0, 0]}
@@ -264,6 +280,9 @@ const TestPage = ({
   );
 };
 
-export default function Test() {
-  return <TestPage className="w-full" />;
-}
+// Export both the interface and the component
+const Test = (props: TestPageProps) => {
+  return <TestPage {...props} />;
+};
+
+export default Test;

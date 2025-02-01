@@ -26,6 +26,7 @@ interface GridContainerProps {
   isDraggable: boolean;
   isResizable: boolean;
   draggableHandle?: string;
+  isResizing: boolean;
 }
 
 export const GridContainer: React.FC<GridContainerProps> = ({
@@ -52,6 +53,7 @@ export const GridContainer: React.FC<GridContainerProps> = ({
   isDraggable,
   isResizable,
   draggableHandle,
+  isResizing,
 }) => {
   return (
     <div className="relative size-full">
@@ -62,7 +64,11 @@ export const GridContainer: React.FC<GridContainerProps> = ({
         rowHeight={unitSize}
         width={cols * unitSize}
         onLayoutChange={onLayoutChange}
-        onResizeStop={onResizeStop}
+        onResizeStop={(layout, oldItem, newItem, placeholder, e, element) => {
+          if (!isResizing) {
+            onResizeStop(layout, oldItem, newItem);
+          }
+        }}
         onResizeStart={onResizeStart}
         onDragStart={onDragStart}
         onDragStop={onDragStop}

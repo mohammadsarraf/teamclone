@@ -46,7 +46,10 @@ export const MenuBar: React.FC<MenuBarProps> = ({
               <input
                 type="number"
                 value={rows}
-                onChange={(e) => setRows(Number(e.target.value))}
+                onChange={(e) => {
+                  const newRows = Math.max(1, Number(e.target.value));
+                  setRows(newRows);
+                }}
                 min="1"
                 max="50"
                 className="w-16 rounded bg-gray-700 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"

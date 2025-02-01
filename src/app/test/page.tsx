@@ -11,6 +11,11 @@ import ShapeItem from "./components/ShapeItem";
 import { Layout } from "react-grid-layout";
 import { ShapeManager } from "./class";
 import { Block } from "./types";
+import { AiOutlineSearch } from "react-icons/ai";
+import { RiText } from "react-icons/ri";
+import { FaShapes } from "react-icons/fa6";
+import { MdAdd, MdEdit, MdSettings, MdStyle } from "react-icons/md";
+import { EditBar } from "./components/EditBar";
 
 // Dynamically import Zdog components with no SSR
 const ZdogComponents = dynamic(() => import("./components/ZdogComponents"), {
@@ -55,6 +60,9 @@ const TestPage = ({
   const [cols, setCols] = useState(initialCols);
   const [rows, setRows] = useState(initialRows);
   const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const [showShapesSubmenu, setShowShapesSubmenu] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [showEditBar, setShowEditBar] = useState(false);
 
   const containerWidth = useWindowSize();
   const unitSize = containerWidth / cols;
@@ -117,114 +125,65 @@ const TestPage = ({
     setActiveMenu(null);
   };
 
+  // Function to handle shape addition
+  const handleAddShape = (type: "triangle" | "circle" | "square") => {
+    shapeManager.addShape(type);
+    setIsMenuVisible(false);
+    setShowShapesSubmenu(false);
+  };
+
+  // Function to handle text addition
+  const handleAddText = () => {
+    shapeManager.addTextBox();
+    setIsMenuVisible(false);
+  };
+
+  // Function to handle edit mode
+  const handleEditClick = () => {
+    setIsEditing(!isEditing);
+    if (isEditing) {
+      // If we're exiting edit mode, close any open menus
+      setIsMenuVisible(false);
+      setShowShapesSubmenu(false);
+      setActiveMenu(null);
+    }
+  };
+
+  // Function to handle design click
+  const handleDesignClick = () => {
+    // Add your design menu logic here
+    console.log("Design clicked");
+  };
+
+  // Function to handle settings click
+  const handleSettingsClick = () => {
+    // Remove console.log and leave it empty since we're handling the UI in EditBar
+  };
+
+  // Function to handle clicking outside menus
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.add-block-menu') && !target.closest('.edit-bar-button')) {
+        setIsMenuVisible(false);
+        setShowShapesSubmenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleAddBlock = (text: string, type?: string) => {
+    if (type) {
+      handleAddShape(type as "triangle" | "circle" | "square");
+    } else {
+      handleAddText();
+    }
+  };
+
   return (
     <div className={`flex h-full flex-col ${className}`}>
-      {/* Only show menu button when showMenuButton is true */}
-      {showMenuButton && (
-        <>
-          <button
-            onClick={() => setIsMenuVisible(!isMenuVisible)}
-            className="absolute right-4 top-4 z-10 rounded-full bg-gray-800 p-2 text-white shadow-lg transition-all hover:bg-gray-700"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              {isMenuVisible ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16m-7 6h7"
-                />
-              )}
-            </svg>
-          </button>
-
-          {/* Floating menu */}
-          {isMenuVisible && (
-            <div className="absolute right-4 top-16 z-10 rounded-lg bg-gray-800 p-4 shadow-xl">
-              <div className="flex flex-col gap-4">
-                <div className="flex items-center justify-between gap-4">
-                  <button
-                    onClick={() => {
-                      localStorage.removeItem("shapeLayout");
-                      setLayout([]);
-                    }}
-                    className="rounded bg-red-500 px-3 py-1.5 text-sm text-white transition-colors hover:bg-red-600"
-                  >
-                    Reset Layout
-                  </button>
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center space-x-1">
-                      <label className="text-sm text-white">Cols:</label>
-                      <input
-                        type="number"
-                        value={cols}
-                        onChange={(e) => setCols(Number(e.target.value))}
-                        min="1"
-                        max="50"
-                        className="w-16 rounded bg-gray-700 px-2 py-1 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <label className="text-sm text-white">Rows:</label>
-                      <input
-                        type="number"
-                        value={rows}
-                        onChange={(e) => {
-                          const newRows = Math.max(1, Number(e.target.value));
-                          handleRowsChange(newRows);
-                        }}
-                        min="1"
-                        max="50"
-                        className="w-16 rounded bg-gray-700 px-2 py-1 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    onClick={() => shapeManager.addShape("triangle")}
-                    className="rounded bg-blue-500 px-3 py-1 text-white hover:bg-blue-600"
-                  >
-                    Add Triangle
-                  </button>
-                  <button
-                    onClick={() => shapeManager.addShape("circle")}
-                    className="rounded bg-red-500 px-3 py-1 text-white hover:bg-red-600"
-                  >
-                    Add Circle
-                  </button>
-                  <button
-                    onClick={() => shapeManager.addShape("square")}
-                    className="rounded bg-green-500 px-3 py-1 text-white hover:bg-green-600"
-                  >
-                    Add Square
-                  </button>
-                  <button
-                    onClick={shapeManager.addTextBox}
-                    className="rounded bg-gray-500 px-3 py-1 text-white hover:bg-gray-600"
-                  >
-                    Add Text
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </>
-      )}
-
       <div className={`relative flex-1 ${containerClassName}`}>
         <GridOverlay
           show={isDragging || isResizing}
@@ -233,144 +192,163 @@ const TestPage = ({
           unitSize={unitSize}
         />
 
-        <GridContainer
-          key={`grid-${cols}-${rows}`}
-          cols={cols}
-          rows={rows}
-          unitSize={unitSize}
-          layout={layout}
-          onLayoutChange={shapeManager.handleLayoutChange}
-          onResizeStop={(layout, oldItem, newItem) => {
-            shapeManager.handleLayoutChange(layout);
-            shapeManager.handleResizeStop(layout, oldItem, newItem);
-            setIsResizing(false);
-          }}
-          onResizeStart={() => setIsResizing(true)}
-          onDragStart={() => setIsDragging(true)}
-          onDragStop={(layout: Layout[]) => {
-            setIsDragging(false);
-            shapeManager.handleLayoutChange(layout);
-          }}
-          preventCollision={false}
-          allowOverlap={true}
-          verticalCompact={false}
-          compactType={null}
-          isDraggable={true}
-          isResizable={true}
-          isResizing={isResizing}
-          resizeHandles={["s", "w", "e", "n", "sw", "nw", "se", "ne"]}
-          transformScale={1}
-          margin={[0, 0]}
-          containerPadding={[0, 0]}
-          style={{ height: "100%", width: "100%" }}
-          draggableHandle="[data-drag-handle]"
+        <div 
+          className="relative size-full"
+          onMouseEnter={() => setShowEditBar(true)}
+          onMouseLeave={() => !isEditing && setShowEditBar(false)}
         >
-          {layout.map((block, index) => (
-            <div
-              key={block.i}
-              style={{
-                position: "relative",
-                width: block.w,
-                height: block.h,
-                transform: `translate(${block.x}px, ${block.y}px)`,
-              }}
-            >
-              <ShapeWrapper
-                onSelect={() => setActiveMenu(block.i)}
-                menuVisible={activeMenu === block.i}
-                isText={block.shape === "text"}
-                currentShape={block.shape}
-                onShapeChange={(type) =>
-                  shapeManager.handleShapeChange(block.i, type)
-                }
-                onColorChange={(color) =>
-                  shapeManager.handleColorChange(block.i, color)
-                }
-                onDelete={() => shapeManager.handleDelete(block.i)}
-                onDuplicate={() => shapeManager.handleDuplicate(block.i)}
-                onOpacityChange={(opacity) =>
-                  shapeManager.handleOpacityChange(block.i, opacity)
-                }
-                onRotationChange={(rotation) =>
-                  shapeManager.handleRotationChange(block.i, rotation)
-                }
-                onBorderChange={shapeManager.handleBorderChange}
-                currentOpacity={block.opacity}
-                currentRotation={block.rotation || 0}
-                currentBorder={block.border}
-                onFlipHorizontal={() => shapeManager.handleFlipH(block.i)}
-                onFlipVertical={() => shapeManager.handleFlipV(block.i)}
-                onShadowChange={shapeManager.handleShadowChange}
-                currentShadow={block.shadow}
-                currentFlipH={block.flipH || false}
-                currentFlipV={block.flipV || false}
-                currentColor={block.color}
-                totalShapes={layout.length}
-                index={layout.length - index}
-                className="shape-wrapper"
-                onFontChange={(font) =>
-                  shapeManager.handleFontChange(block.i, font)
-                }
-                currentFont={block.font}
-                onFontSize={(size) =>
-                  shapeManager.handleFontSizeChange(block.i, size)
-                }
-                currentFontSize={block.fontSize}
-                onTextAlign={(align) =>
-                  shapeManager.handleTextAlignChange(block.i, align)
-                }
-                currentTextAlign={block.textAlign}
-                onBold={() => shapeManager.handleBoldChange(block.i)}
-                isBold={block.isBold}
-                onItalic={() => shapeManager.handleItalicChange(block.i)}
-                isItalic={block.isItalic}
-                onUnderline={() => shapeManager.handleUnderlineChange(block.i)}
-                isUnderline={block.isUnderline}
-                onLineHeight={(height) =>
-                  shapeManager.handleLineHeightChange(block.i, height)
-                }
-                currentLineHeight={block.lineHeight}
-                onLetterSpacing={(spacing) =>
-                  shapeManager.handleLetterSpacingChange(block.i, spacing)
-                }
-                currentLetterSpacing={block.letterSpacing}
-                onEnterPress={() => shapeManager.handleEnterPress(block.i)}
-                onHeightChange={(height) =>
-                  shapeManager.handleHeightChange(block.i, height)
-                }
-                unitSize={unitSize}
+          <GridContainer
+            key={`grid-${cols}-${rows}`}
+            cols={cols}
+            rows={rows}
+            unitSize={unitSize}
+            layout={layout}
+            onLayoutChange={shapeManager.handleLayoutChange}
+            onResizeStop={(layout, oldItem, newItem) => {
+              shapeManager.handleLayoutChange(layout);
+              shapeManager.handleResizeStop(layout, oldItem, newItem);
+              setIsResizing(false);
+            }}
+            onResizeStart={() => setIsResizing(true)}
+            onDragStart={() => setIsDragging(true)}
+            onDragStop={(layout: Layout[]) => {
+              setIsDragging(false);
+              shapeManager.handleLayoutChange(layout);
+            }}
+            preventCollision={false}
+            allowOverlap={true}
+            verticalCompact={false}
+            compactType={null}
+            isDraggable={true}
+            isResizable={true}
+            isResizing={isResizing}
+            resizeHandles={["s", "w", "e", "n", "sw", "nw", "se", "ne"]}
+            transformScale={1}
+            margin={[0, 0]}
+            containerPadding={[0, 0]}
+            style={{ height: "100%", width: "100%" }}
+            draggableHandle="[data-drag-handle]"
+          >
+            {layout.map((block, index) => (
+              <div
+                key={block.i}
+                style={{
+                  position: "relative",
+                  width: block.w,
+                  height: block.h,
+                  transform: `translate(${block.x}px, ${block.y}px)`,
+                }}
               >
-                <ShapeItem
-                  type={block.shape}
-                  color={block.color}
-                  text={block.text}
-                  onTextChange={(newText) =>
-                    shapeManager.handleTextChange(block.i, newText)
+                <ShapeWrapper
+                  onSelect={() => setActiveMenu(block.i)}
+                  menuVisible={activeMenu === block.i}
+                  isText={block.shape === "text"}
+                  currentShape={block.shape}
+                  onShapeChange={(type) =>
+                    shapeManager.handleShapeChange(block.i, type)
                   }
-                  isActive={activeShape === block.i}
-                  onStartEdit={() => handleStartEdit(block.i)}
-                  opacity={block.opacity}
-                  rotation={block.rotation || 0}
-                  flipH={block.flipH || false}
-                  flipV={block.flipV || false}
-                  font={block.font}
-                  fontSize={block.fontSize}
-                  textAlign={block.textAlign}
+                  onColorChange={(color) =>
+                    shapeManager.handleColorChange(block.i, color)
+                  }
+                  onDelete={() => shapeManager.handleDelete(block.i)}
+                  onDuplicate={() => shapeManager.handleDuplicate(block.i)}
+                  onOpacityChange={(opacity) =>
+                    shapeManager.handleOpacityChange(block.i, opacity)
+                  }
+                  onRotationChange={(rotation) =>
+                    shapeManager.handleRotationChange(block.i, rotation)
+                  }
+                  onBorderChange={shapeManager.handleBorderChange}
+                  currentOpacity={block.opacity}
+                  currentRotation={block.rotation || 0}
+                  currentBorder={block.border}
+                  onFlipHorizontal={() => shapeManager.handleFlipH(block.i)}
+                  onFlipVertical={() => shapeManager.handleFlipV(block.i)}
+                  onShadowChange={shapeManager.handleShadowChange}
+                  currentShadow={block.shadow}
+                  currentFlipH={block.flipH || false}
+                  currentFlipV={block.flipV || false}
+                  currentColor={block.color}
+                  totalShapes={layout.length}
+                  index={layout.length - index}
+                  className="shape-wrapper"
+                  onFontChange={(font) =>
+                    shapeManager.handleFontChange(block.i, font)
+                  }
+                  currentFont={block.font}
+                  onFontSize={(size) =>
+                    shapeManager.handleFontSizeChange(block.i, size)
+                  }
+                  currentFontSize={block.fontSize}
+                  onTextAlign={(align) =>
+                    shapeManager.handleTextAlignChange(block.i, align)
+                  }
+                  currentTextAlign={block.textAlign}
+                  onBold={() => shapeManager.handleBoldChange(block.i)}
                   isBold={block.isBold}
+                  onItalic={() => shapeManager.handleItalicChange(block.i)}
                   isItalic={block.isItalic}
+                  onUnderline={() => shapeManager.handleUnderlineChange(block.i)}
                   isUnderline={block.isUnderline}
-                  lineHeight={block.lineHeight}
-                  letterSpacing={block.letterSpacing}
+                  onLineHeight={(height) =>
+                    shapeManager.handleLineHeightChange(block.i, height)
+                  }
+                  currentLineHeight={block.lineHeight}
+                  onLetterSpacing={(spacing) =>
+                    shapeManager.handleLetterSpacingChange(block.i, spacing)
+                  }
+                  currentLetterSpacing={block.letterSpacing}
                   onEnterPress={() => shapeManager.handleEnterPress(block.i)}
                   onHeightChange={(height) =>
                     shapeManager.handleHeightChange(block.i, height)
                   }
                   unitSize={unitSize}
-                />
-              </ShapeWrapper>
-            </div>
-          ))}
-        </GridContainer>
+                >
+                  <ShapeItem
+                    type={block.shape}
+                    color={block.color}
+                    text={block.text}
+                    onTextChange={(newText) =>
+                      shapeManager.handleTextChange(block.i, newText)
+                    }
+                    isActive={activeShape === block.i}
+                    onStartEdit={() => handleStartEdit(block.i)}
+                    opacity={block.opacity}
+                    rotation={block.rotation || 0}
+                    flipH={block.flipH || false}
+                    flipV={block.flipV || false}
+                    font={block.font}
+                    fontSize={block.fontSize}
+                    textAlign={block.textAlign}
+                    isBold={block.isBold}
+                    isItalic={block.isItalic}
+                    isUnderline={block.isUnderline}
+                    lineHeight={block.lineHeight}
+                    letterSpacing={block.letterSpacing}
+                    onEnterPress={() => shapeManager.handleEnterPress(block.i)}
+                    onHeightChange={(height) =>
+                      shapeManager.handleHeightChange(block.i, height)
+                    }
+                    unitSize={unitSize}
+                  />
+                </ShapeWrapper>
+              </div>
+            ))}
+          </GridContainer>
+
+          <EditBar 
+            isEditing={isEditing}
+            showEditBar={showEditBar}
+            handleEditClick={handleEditClick}
+            handleDesignClick={handleDesignClick}
+            onSettingsClick={handleSettingsClick}
+            handleAddBlock={handleAddBlock}
+            cols={cols}
+            rows={rows}
+            onColsChange={setCols}
+            onRowsChange={handleRowsChange}
+          />
+        </div>
       </div>
     </div>
   );

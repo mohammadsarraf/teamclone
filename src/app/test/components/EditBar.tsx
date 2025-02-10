@@ -62,7 +62,7 @@ export const EditBar = ({
     <>
       {/* Bottom Edit Bar */}
       <div
-        className={`fixed bottom-5 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-lg bg-gray-900 p-2 text-white shadow-xl ${
+        className={`absolute bottom-0 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-lg bg-blue-900 p-2 text-white shadow-xl ${
           showEditBar ? "opacity-100" : "opacity-0"
         } transition-opacity duration-200`}
         style={{ zIndex: 1000 }}
@@ -130,7 +130,7 @@ export const EditBar = ({
         <div
           className="fixed bottom-10"
           style={{
-            zIndex: 1001,
+            zIndex: 2000,
           }}
         >
           <AddBlock
@@ -142,7 +142,10 @@ export const EditBar = ({
 
       {/* Settings Menu */}
       {isSettingsVisible && (
-        <div className="fixed bottom-20 right-10" style={{ zIndex: 1001 }}>
+        <div 
+          className="fixed bottom-20 right-10" 
+          style={{ zIndex: 2000 }}
+        >
           <SettingsMenu
             cols={cols}
             rows={rows}

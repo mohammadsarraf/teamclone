@@ -126,35 +126,6 @@ const MainContent = () => {
             </button>
           </div>
         )}
-
-        {/* Edit Tools - Position at bottom but with higher z-index */}
-        {isEditing && (
-          <div 
-            className="absolute inset-x-0 bottom-4 flex items-center justify-center"
-            style={{ zIndex: 1000 }} // Higher z-index to stay above footer
-          >
-            <div className="flex gap-2 rounded-lg bg-gray-900/90 p-2 shadow-xl">
-              <button
-                onClick={handleCancelEditing}
-                className="rounded-md bg-white px-4 py-2 text-sm font-medium text-gray-900 shadow-lg hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveChanges}
-                className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-lg hover:bg-blue-700"
-              >
-                Save Changes
-              </button>
-              <button
-                onClick={handleResetMain}
-                className="rounded-md bg-red-500 px-4 py-2 text-sm font-medium text-white shadow-lg hover:bg-red-600"
-              >
-                Reset Main
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

@@ -40,6 +40,7 @@ export interface TestPageProps {
   onHeightChange?: (height: number) => void;
   showMenuButton?: boolean;
   stateKey: string;
+  editBarPosition?: "fixed" | "relative";
 }
 
 const TestPage = ({
@@ -50,6 +51,7 @@ const TestPage = ({
   onHeightChange,
   showMenuButton = true,
   stateKey,
+  editBarPosition = "fixed",
 }: TestPageProps) => {
   const [layout, setLayout] = useState<Block[]>(initialLayout);
   const [activeShape, setActiveShape] = useState<string | null>(null);
@@ -228,8 +230,8 @@ const TestPage = ({
   };
 
   return (
-    <div className={`flex h-full flex-col ${className}`}>
-      <div className={`relative flex-1 ${containerClassName}`}>
+    <div className="relative size-full">
+      <div className={`relative size-full ${className}`}>
         <GridOverlay
           show={isDragging || isResizing}
           cols={cols}
@@ -383,20 +385,23 @@ const TestPage = ({
             ))}
           </GridContainer>
 
-          <EditBar
-            isEditing={isEditing}
-            showEditBar={showMenuButton}
-            handleEditClick={handleEditClick}
-            handleDesignClick={handleDesignClick}
-            onSettingsClick={handleSettingsClick}
-            handleAddBlock={handleAddBlock}
-            handleSaveChanges={handleSaveChanges}
-            handleResetChanges={handleResetChanges}
-            cols={cols}
-            rows={rows}
-            onColsChange={setCols}
-            onRowsChange={handleRowsChange}
-          />
+          <div className="relative">
+            <EditBar
+              isEditing={isEditing}
+              showEditBar={showMenuButton}
+              handleEditClick={handleEditClick}
+              handleDesignClick={handleDesignClick}
+              onSettingsClick={handleSettingsClick}
+              handleAddBlock={handleAddBlock}
+              handleSaveChanges={handleSaveChanges}
+              handleResetChanges={handleResetChanges}
+              cols={cols}
+              rows={rows}
+              onColsChange={setCols}
+              onRowsChange={handleRowsChange}
+              stateKey={stateKey}
+            />
+          </div>
         </div>
       </div>
     </div>

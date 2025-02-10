@@ -104,9 +104,10 @@ export default function Page() {
               isDesignMenuVisible={isDesignMenuVisible}
               setIsDesignMenuVisible={setIsDesignMenuVisible}
             />
-            <section className="grow"></section>
-            {/* <MainContent /> */}
-            <FooterContent />
+            <section className="grow">
+              <FooterContent stateKey="Main" />
+            </section>
+            <FooterContent stateKey="footer" />
           </div>
         </div>
       </main>

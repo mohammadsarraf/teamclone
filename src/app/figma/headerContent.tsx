@@ -163,7 +163,7 @@ export default function HeaderContent({
   };
 
   return (
-    <div className="relative z-30">
+    <div className="relative" style={{ zIndex: isHeaderEditing ? 50 : 0 }}>
       {/* Header Content */}
       <header
         className={`relative flex items-center justify-between ${bgColor} px-6 transition-all duration-300`}
@@ -174,7 +174,7 @@ export default function HeaderContent({
         {layouts[selectedLayout](elements)}
 
         {/* Edit Overlay */}
-        {isHeaderHovered && !isHeaderEditing && (
+        {!isHeaderEditing && isHeaderHovered && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/20">
             <button
               className="flex items-center gap-2 rounded-md bg-white px-4 py-2 text-sm font-medium text-gray-900 shadow-lg hover:bg-gray-50"
@@ -250,7 +250,7 @@ export default function HeaderContent({
 
       {/* Design Menu */}
       {isDesignMenuVisible && (
-        <div className="absolute right-0 top-full z-50 mt-4 w-80">
+        <div className="absolute right-0 top-full z-[2000] mt-4 w-80">
           <div className="rounded-lg bg-white shadow-xl">
             <Toolbar
               onOptionChange={handleLayoutSelection}
@@ -266,7 +266,7 @@ export default function HeaderContent({
 
       {/* Elements Menu */}
       {isElementMenuVisible && (
-        <div className="absolute right-0 top-full z-50 mt-4 w-80">
+        <div className="absolute right-0 top-full z-[2000] mt-4 w-80">
           <div className="rounded-lg bg-white p-4 shadow-xl">
             <div className="mb-4 flex items-center justify-between border-b pb-2">
               <h3 className="text-sm font-medium text-gray-900">Add Elements</h3>

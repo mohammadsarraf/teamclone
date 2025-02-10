@@ -39,6 +39,7 @@ export interface TestPageProps {
   initialRows?: number;
   onHeightChange?: (height: number) => void;
   showMenuButton?: boolean;
+  stateKey: string;
 }
 
 const TestPage = ({
@@ -48,6 +49,7 @@ const TestPage = ({
   initialRows = 12,
   onHeightChange,
   showMenuButton = true,
+  stateKey,
 }: TestPageProps) => {
   const [layout, setLayout] = useState<Block[]>(initialLayout);
   const [activeShape, setActiveShape] = useState<string | null>(null);
@@ -80,6 +82,23 @@ const TestPage = ({
       ),
     [layout, positions, activeShape],
   );
+
+  // Load saved state on component mount
+  useEffect(() => {
+    const savedState = localStorage.getItem(`${stateKey}State`);
+    if (savedState) {
+      try {
+        const state = JSON.parse(savedState);
+        if (state.layout) setLayout(state.layout);
+        if (state.positions) setPositions(state.positions);
+        if (state.cols) setCols(state.cols);
+        if (state.rows) setRows(state.rows);
+      } catch (error) {
+        console.error(`Error loading ${stateKey} state:`, error);
+        localStorage.removeItem(`${stateKey}State`);
+      }
+    }
+  }, [stateKey]);
 
   // Add useEffect for click outside handler
   useEffect(() => {
@@ -141,23 +160,20 @@ const TestPage = ({
   // Function to handle edit mode
   const handleEditClick = () => {
     setIsEditing(!isEditing);
-    if (isEditing) {
-      // If we're exiting edit mode, close any open menus
-      setIsMenuVisible(false);
-      setShowShapesSubmenu(false);
-      setActiveMenu(null);
-    }
+    // Close menu when toggling edit mode
+    setActiveMenu(null);
   };
 
   // Function to handle design click
   const handleDesignClick = () => {
-    // Add your design menu logic here
-    console.log("Design clicked");
+    setShowEditBar(!showEditBar);
+    // Close menu when toggling design mode
+    setActiveMenu(null);
   };
 
   // Function to handle settings click
   const handleSettingsClick = () => {
-    // Remove console.log and leave it empty since we're handling the UI in EditBar
+    setActiveMenu(activeMenu === "settings" ? null : "settings");
   };
 
   // Function to handle clicking outside menus
@@ -179,10 +195,36 @@ const TestPage = ({
 
   const handleAddBlock = (text: string, type?: string) => {
     if (type) {
-      handleAddShape(type as "triangle" | "circle" | "square");
+      shapeManager.addShape(type as "triangle" | "circle" | "square");
     } else {
-      handleAddText();
+      shapeManager.addTextBox();
     }
+    // Close menu after adding block
+    setActiveMenu(null);
+  };
+
+  const handleSaveChanges = () => {
+    // Save state to localStorage
+    const state = {
+      layout,
+      positions,
+      cols,
+      rows,
+    };
+    localStorage.setItem(`${stateKey}State`, JSON.stringify(state));
+    // Close menu after saving
+    setActiveMenu(null);
+  };
+
+  const handleResetChanges = () => {
+    // Clear localStorage and reset to initial state
+    localStorage.removeItem(`${stateKey}State`);
+    setLayout(initialLayout);
+    setPositions({});
+    setCols(initialCols);
+    setRows(initialRows);
+    // Close menu after resetting
+    setActiveMenu(null);
   };
 
   return (
@@ -343,11 +385,13 @@ const TestPage = ({
 
           <EditBar
             isEditing={isEditing}
-            showEditBar={showEditBar}
+            showEditBar={showMenuButton}
             handleEditClick={handleEditClick}
             handleDesignClick={handleDesignClick}
             onSettingsClick={handleSettingsClick}
             handleAddBlock={handleAddBlock}
+            handleSaveChanges={handleSaveChanges}
+            handleResetChanges={handleResetChanges}
             cols={cols}
             rows={rows}
             onColsChange={setCols}

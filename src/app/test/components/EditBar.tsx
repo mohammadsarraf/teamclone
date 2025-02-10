@@ -1,5 +1,5 @@
 import React from "react";
-import { MdAdd, MdEdit, MdSettings, MdStyle } from "react-icons/md";
+import { MdAdd, MdEdit, MdSettings, MdStyle, MdSave, MdRestartAlt } from "react-icons/md";
 import AddBlock from "../../figma/addBlock";
 import { SettingsMenu } from "./menus/SettingsMenu";
 
@@ -10,6 +10,8 @@ interface EditBarProps {
   handleDesignClick: () => void;
   onSettingsClick?: () => void;
   handleAddBlock: (text: string, type?: string) => void;
+  handleSaveChanges?: () => void;
+  handleResetChanges?: () => void;
   cols: number;
   rows: number;
   onColsChange: (cols: number) => void;
@@ -23,6 +25,8 @@ export const EditBar = ({
   handleDesignClick,
   onSettingsClick = () => {},
   handleAddBlock,
+  handleSaveChanges = () => {},
+  handleResetChanges = () => {},
   cols,
   rows,
   onColsChange,
@@ -101,6 +105,23 @@ export const EditBar = ({
         >
           <MdSettings className="text-lg" />
           Settings
+        </button>
+        <div className="h-4 w-px bg-gray-700"></div>
+        <button
+          type="button"
+          onClick={handleSaveChanges}
+          className="edit-bar-button pointer-events-auto flex items-center gap-2 rounded px-3 py-1.5 text-sm text-green-400 transition-colors hover:bg-gray-700 active:bg-gray-600"
+        >
+          <MdSave className="text-lg" />
+          Save
+        </button>
+        <button
+          type="button"
+          onClick={handleResetChanges}
+          className="edit-bar-button pointer-events-auto flex items-center gap-2 rounded px-3 py-1.5 text-sm text-red-400 transition-colors hover:bg-gray-700 active:bg-gray-600"
+        >
+          <MdRestartAlt className="text-lg" />
+          Reset
         </button>
       </div>
 

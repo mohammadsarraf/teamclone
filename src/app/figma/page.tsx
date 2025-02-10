@@ -1,8 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import HeaderContent from "./headerContent";
 import FooterContent from "./footerContent";
+import MainContent from "./mainContent";
 
 export default function Page() {
   const [isEditing, setIsEditing] = useState(true);
@@ -11,6 +12,15 @@ export default function Page() {
   const [viewMode, setViewMode] = useState<"desktop" | "mobile">("desktop");
   const [selectedLayout, setSelectedLayout] = useState("Option 1");
   const [bgColor, setBgColor] = useState("bg-black");
+
+  useEffect(() => {
+    const savedHeader = localStorage.getItem('headerState');
+    if (savedHeader) {
+      const parsedState = JSON.parse(savedHeader);
+      setSelectedLayout(parsedState.selectedLayout);
+      setBgColor(parsedState.bgColor);
+    }
+  }, []);
 
   const handleColorChange = (color: string) => {
     setBgColor(color);
@@ -94,7 +104,8 @@ export default function Page() {
               isDesignMenuVisible={isDesignMenuVisible}
               setIsDesignMenuVisible={setIsDesignMenuVisible}
             />
-            <section className="grow">{/* Main content area */}</section>
+            <section className="grow"></section>
+            {/* <MainContent /> */}
             <FooterContent />
           </div>
         </div>

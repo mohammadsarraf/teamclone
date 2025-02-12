@@ -22,7 +22,9 @@ const FooterContent = ({ stateKey }: FooterContentProps) => {
   const [isFooterHovered, setIsFooterHovered] = useState(false);
   const containerWidth = useWindowSize();
   const [gridHeight, setGridHeight] = useState(DEFAULT_FOOTER_STATE.gridHeight);
-  const [currentRows, setCurrentRows] = useState(DEFAULT_FOOTER_STATE.currentRows);
+  const [currentRows, setCurrentRows] = useState(
+    DEFAULT_FOOTER_STATE.currentRows,
+  );
 
   // Add state for saving/canceling changes
   const [savedState, setSavedState] = useState<FooterState>({
@@ -66,7 +68,10 @@ const FooterContent = ({ stateKey }: FooterContentProps) => {
     };
 
     // Save to localStorage with unique key
-    localStorage.setItem(`footerState_${stateKey}`, JSON.stringify(footerState));
+    localStorage.setItem(
+      `footerState_${stateKey}`,
+      JSON.stringify(footerState),
+    );
 
     // Update saved state for cancel functionality
     setSavedState(footerState);
@@ -88,7 +93,10 @@ const FooterContent = ({ stateKey }: FooterContentProps) => {
     setCurrentRows(DEFAULT_FOOTER_STATE.currentRows);
 
     // Save default state to localStorage with unique key
-    localStorage.setItem(`footerState_${stateKey}`, JSON.stringify(DEFAULT_FOOTER_STATE));
+    localStorage.setItem(
+      `footerState_${stateKey}`,
+      JSON.stringify(DEFAULT_FOOTER_STATE),
+    );
 
     // Update saved state
     setSavedState(DEFAULT_FOOTER_STATE);
@@ -111,16 +119,16 @@ const FooterContent = ({ stateKey }: FooterContentProps) => {
   return (
     <div
       className="group relative flex bg-gradient-to-b from-gray-900 to-black text-white shadow-xl transition-all duration-300"
-      style={{ 
+      style={{
         height: `${gridHeight}px`,
         // Add z-index when editing to ensure menus are visible
-        zIndex: isEditing ? 50 : 0 
+        zIndex: isEditing ? 50 : 0,
       }}
       onMouseEnter={() => setIsFooterHovered(true)}
       onMouseLeave={() => setIsFooterHovered(false)}
     >
       <Test {...testProps} />
-      
+
       {/* Edit Overlay */}
       {!isEditing && isFooterHovered && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/20">

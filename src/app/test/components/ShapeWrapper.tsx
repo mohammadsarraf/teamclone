@@ -155,14 +155,12 @@ const ShapeWrapper: React.FC<ShapeWrapperProps> = ({
       data-drag-handle={!isText}
     >
       {/* Content area */}
-      <div className={`size-full ${!isText && "cursor-move"}`}>
-        {children}
-      </div>
+      <div className={`size-full ${!isText && "cursor-move"}`}>{children}</div>
 
       {/* Selection outline */}
       <div
         className={`pointer-events-none absolute inset-0 rounded border-2 transition-colors ${
-          menuVisible 
+          menuVisible
             ? "border-blue-500 shadow-lg" // Show blue border when menu is visible
             : "border-transparent" // Otherwise transparent border
         }`}

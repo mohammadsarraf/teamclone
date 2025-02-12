@@ -71,7 +71,7 @@ export default function HeaderContent({
 
   // Load saved state on component mount
   useEffect(() => {
-    const savedHeader = localStorage.getItem('headerState');
+    const savedHeader = localStorage.getItem("headerState");
     if (savedHeader) {
       const parsedState = JSON.parse(savedHeader) as HeaderState;
       setElements(parsedState.elements);
@@ -117,7 +117,7 @@ export default function HeaderContent({
     };
 
     // Save to localStorage
-    localStorage.setItem('headerState', JSON.stringify(headerState));
+    localStorage.setItem("headerState", JSON.stringify(headerState));
 
     // Update saved state for cancel functionality
     setSavedState({
@@ -148,7 +148,7 @@ export default function HeaderContent({
     handleColorChange(DEFAULT_HEADER_STATE.bgColor);
 
     // Save default state to localStorage
-    localStorage.setItem('headerState', JSON.stringify(DEFAULT_HEADER_STATE));
+    localStorage.setItem("headerState", JSON.stringify(DEFAULT_HEADER_STATE));
 
     // Update saved state
     setSavedState({
@@ -269,7 +269,9 @@ export default function HeaderContent({
         <div className="absolute right-0 top-full z-[2000] mt-4 w-80">
           <div className="rounded-lg bg-white p-4 shadow-xl">
             <div className="mb-4 flex items-center justify-between border-b pb-2">
-              <h3 className="text-sm font-medium text-gray-900">Add Elements</h3>
+              <h3 className="text-sm font-medium text-gray-900">
+                Add Elements
+              </h3>
               <button
                 onClick={() => setIsElementMenuVisible(false)}
                 className="text-gray-400 hover:text-gray-600"
@@ -279,19 +281,22 @@ export default function HeaderContent({
             </div>
             <ElementToolbar
               elements={elements}
-              onElementChange={(elementType, value) => {
+              onElementChange={(elementType: keyof HeaderElements, value: boolean) => {
                 handleElementChange(elementType, value);
                 // Auto-save when elements change
                 const headerState: HeaderState = {
                   elements: {
                     ...elements,
-                    [elementType]: value
+                    [elementType]: value,
                   },
                   headerHeight,
                   selectedLayout,
                   bgColor,
                 };
-                localStorage.setItem('headerState', JSON.stringify(headerState));
+                localStorage.setItem(
+                  "headerState",
+                  JSON.stringify(headerState),
+                );
               }}
             />
           </div>

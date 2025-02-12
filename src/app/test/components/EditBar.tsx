@@ -1,5 +1,12 @@
 import React from "react";
-import { MdAdd, MdEdit, MdSettings, MdStyle, MdSave, MdRestartAlt } from "react-icons/md";
+import {
+  MdAdd,
+  MdEdit,
+  MdSettings,
+  MdStyle,
+  MdSave,
+  MdRestartAlt,
+} from "react-icons/md";
 import AddBlock from "../../figma/addBlock";
 import { SettingsMenu } from "./menus/SettingsMenu";
 
@@ -142,10 +149,7 @@ export const EditBar = ({
 
       {/* Settings Menu */}
       {isSettingsVisible && (
-        <div 
-          className="fixed bottom-20 right-10" 
-          style={{ zIndex: 2000 }}
-        >
+        <div className="fixed bottom-20 right-10" style={{ zIndex: 2000 }}>
           <SettingsMenu
             cols={cols}
             rows={rows}

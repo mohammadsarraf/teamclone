@@ -18,7 +18,9 @@ const MainContent = () => {
   const [isMainHovered, setIsMainHovered] = useState(false);
   const containerWidth = useWindowSize();
   const [gridHeight, setGridHeight] = useState(DEFAULT_MAIN_STATE.gridHeight);
-  const [currentRows, setCurrentRows] = useState(DEFAULT_MAIN_STATE.currentRows);
+  const [currentRows, setCurrentRows] = useState(
+    DEFAULT_MAIN_STATE.currentRows,
+  );
 
   // Add state for saving/canceling changes
   const [savedState, setSavedState] = useState<MainState>({
@@ -32,7 +34,7 @@ const MainContent = () => {
 
   // Load saved state on component mount
   useEffect(() => {
-    const savedMain = localStorage.getItem('mainState');
+    const savedMain = localStorage.getItem("mainState");
     if (savedMain) {
       const parsedState = JSON.parse(savedMain) as MainState;
       setGridHeight(parsedState.gridHeight);
@@ -62,7 +64,7 @@ const MainContent = () => {
     };
 
     // Save to localStorage
-    localStorage.setItem('mainState', JSON.stringify(mainState));
+    localStorage.setItem("mainState", JSON.stringify(mainState));
 
     // Update saved state for cancel functionality
     setSavedState(mainState);
@@ -84,7 +86,7 @@ const MainContent = () => {
     setCurrentRows(DEFAULT_MAIN_STATE.currentRows);
 
     // Save default state to localStorage
-    localStorage.setItem('mainState', JSON.stringify(DEFAULT_MAIN_STATE));
+    localStorage.setItem("mainState", JSON.stringify(DEFAULT_MAIN_STATE));
 
     // Update saved state
     setSavedState(DEFAULT_MAIN_STATE);
@@ -100,7 +102,7 @@ const MainContent = () => {
     initialRows: initialRows,
     onHeightChange: handleRowsChange,
     showMenuButton: isEditing,
-    stateKey: "main"
+    stateKey: "main",
   };
 
   return (
@@ -113,7 +115,7 @@ const MainContent = () => {
       {/* Add a wrapper div to contain the Test component and its EditBar */}
       <div className="relative flex w-full">
         <Test {...testProps} />
-        
+
         {/* Edit Overlay */}
         {!isEditing && isMainHovered && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/20">
@@ -131,4 +133,4 @@ const MainContent = () => {
   );
 };
 
-export default MainContent; 
+export default MainContent;

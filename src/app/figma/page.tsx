@@ -14,7 +14,7 @@ export default function Page() {
   const [bgColor, setBgColor] = useState("bg-black");
 
   useEffect(() => {
-    const savedHeader = localStorage.getItem('headerState');
+    const savedHeader = localStorage.getItem("headerState");
     if (savedHeader) {
       const parsedState = JSON.parse(savedHeader);
       setSelectedLayout(parsedState.selectedLayout);

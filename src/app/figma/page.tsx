@@ -6,7 +6,7 @@ import FooterContent from "./footerContent";
 import MainContent from "./mainContent";
 
 export default function Page() {
-  const [isEditing, setIsEditing] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
   const [isDesignMenuVisible, setIsDesignMenuVisible] = useState(false);
   const [isElementMenuVisible, setIsElementMenuVisible] = useState(false);
   const [viewMode, setViewMode] = useState<"desktop" | "mobile">("desktop");

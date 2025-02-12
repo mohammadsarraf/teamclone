@@ -23,6 +23,7 @@ interface EditBarProps {
   rows: number;
   onColsChange: (cols: number) => void;
   onRowsChange: (rows: number) => void;
+  stateKey: string;
 }
 
 export const EditBar = ({
@@ -38,6 +39,7 @@ export const EditBar = ({
   rows,
   onColsChange,
   onRowsChange,
+  stateKey,
 }: EditBarProps) => {
   const [isMenuVisible, setIsMenuVisible] = React.useState(false);
   const [isSettingsVisible, setIsSettingsVisible] = React.useState(false);

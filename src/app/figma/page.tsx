@@ -49,8 +49,15 @@ export default function Page() {
                 <div className="size-3 rounded-full bg-yellow-500"></div>
                 <div className="size-3 rounded-full bg-green-500"></div>
               </div>
-              {/* Edit Button */}
-              {!isEditing && (
+              {/* Edit/Exit Button */}
+              {isEditing ? (
+                <button
+                  onClick={() => setIsEditing(false)}
+                  className="flex items-center space-x-2 rounded bg-red-600 px-3 py-1.5 text-white hover:bg-red-700"
+                >
+                  <span className="text-sm">Exit Editor</span>
+                </button>
+              ) : (
                 <button
                   onClick={() => setIsEditing(true)}
                   className="flex items-center space-x-2 rounded bg-blue-600 px-3 py-1.5 text-white hover:bg-blue-700"

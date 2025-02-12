@@ -33,86 +33,92 @@ export default function AddBlock({
   handleClose,
   handleAddBlock,
 }: AddBlockProps) {
-  const [showShapesMenu, setShowShapesMenu] = useState(false);
+  const [showShapesSubmenu, setShowShapesSubmenu] = useState(false);
 
-  const handleShapesClick = () => {
-    setShowShapesMenu(true);
+  const handleBlockSelection = (text: string, type?: string) => {
+    handleAddBlock(text, type);
+    handleClose(); // Close the menu after selection
   };
 
   return (
-    <div className="absolute -top-[30rem] left-80 size-96 -translate-x-1/2 overflow-auto rounded-xl bg-white p-4 text-black">
-      {!showShapesMenu ? (
+    <div className="w-96 rounded-xl bg-white p-4 shadow-2xl">
+      {!showShapesSubmenu ? (
         <>
-          {/* Original Menu */}
-          <button
-            onClick={handleClose}
-            className="absolute right-2 top-2 text-red-600 hover:text-red-800"
-          >
-            ✕
-          </button>
-
-          <div className="mb-4 flex items-center gap-2 rounded border px-2 py-1">
-            <AiOutlineSearch size={20} className="text-gray-600" />
-            <input
-              type="text"
-              placeholder="Search..."
-              className="grow text-sm text-gray-800 outline-none"
-            />
-          </div>
-
-          <h3 className="mb-2 border-b px-4 text-lg font-bold">Basic</h3>
-          <div className="grid grid-cols-2 gap-4">
+          {/* Main Menu */}
+          <div className="flex max-h-[400px] flex-col overflow-y-auto">
             <button
-              onClick={() => handleAddBlock("Text Block")}
-              className="justify-left flex items-center rounded bg-white px-4 py-2 text-black transition-all hover:bg-blue-400"
+              onClick={handleClose}
+              className="absolute right-2 top-2 text-gray-400 hover:text-gray-600"
             >
-              <RiText
-                className="mr-4 flex items-center text-blue-600"
-                size={20}
-              />
-              <span className="text-black">Text</span>
+              ✕
             </button>
-            {/* ... other buttons ... */}
-            <button
-              onClick={handleShapesClick}
-              className="justify-left flex items-center rounded bg-white px-4 py-2 text-black transition-all hover:bg-blue-400"
-            >
-              <FaShapes
-                className="mr-4 flex items-center text-blue-600"
-                size={20}
+
+            <div className="mb-4 flex items-center gap-2 rounded border px-2 py-1">
+              <AiOutlineSearch size={20} className="text-gray-600" />
+              <input
+                type="text"
+                placeholder="Search..."
+                className="grow text-sm text-gray-800 outline-none"
               />
-              <span className="text-black">Shape</span>
-            </button>
-            {/* ... rest of the buttons ... */}
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <h3 className="mb-2 border-b px-4 text-lg font-bold">Basic</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <button
+                    onClick={() => handleBlockSelection("Text Block")}
+                    className="justify-left flex items-center rounded bg-white px-4 py-2 text-black transition-all hover:bg-blue-400"
+                  >
+                    <RiText
+                      className="mr-4 flex items-center text-blue-600"
+                      size={20}
+                    />
+                    <span className="text-black">Text</span>
+                  </button>
+                  {/* ... other buttons ... */}
+                  <button
+                    onClick={() => handleBlockSelection("", "triangle")}
+                    className="justify-left flex items-center rounded bg-white px-4 py-2 text-black transition-all hover:bg-blue-400"
+                  >
+                    <div className="mr-4 size-5 border-x-8 border-b-[12px] border-x-transparent border-b-blue-600" />
+                    <span className="text-black">Triangle</span>
+                  </button>
+                  {/* ... rest of the buttons ... */}
+                </div>
+              </div>
+
+              <div>
+                <h3 className="mb-2 border-b px-4 text-lg font-bold">
+                  Advanced
+                </h3>
+                <div className="grid grid-cols-2 gap-4">
+                  {/* ... buttons ... */}
+                </div>
+              </div>
+            </div>
           </div>
         </>
       ) : (
         // Shapes Sub-menu
-        <div className="p-4">
+        <div className="max-h-[400px] overflow-y-auto">
           <div className="mb-4 flex items-center justify-between">
             <button
-              onClick={() => setShowShapesMenu(false)}
+              onClick={() => setShowShapesSubmenu(false)}
               className="text-blue-600 hover:text-blue-800"
             >
               ← Back
             </button>
             <button
               onClick={handleClose}
-              className="text-red-600 hover:text-red-800"
+              className="text-gray-400 hover:text-gray-600"
             >
               ✕
             </button>
           </div>
           <h3 className="mb-4 text-lg font-bold">Shapes</h3>
           <div className="grid grid-cols-2 gap-4">
-            <button
-              onClick={() => handleAddBlock("", "triangle")}
-              className="justify-left flex items-center rounded bg-white px-4 py-2 text-black transition-all hover:bg-blue-400"
-            >
-              <div className="mr-4 size-5 border-x-8 border-b-[12px] border-x-transparent border-b-blue-600" />
-              <span className="text-black">Triangle</span>
-            </button>
-            {/* Add more shape options here */}
+            {/* ... shape buttons ... */}
           </div>
         </div>
       )}

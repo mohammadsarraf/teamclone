@@ -1,203 +1,147 @@
-import React from "react";
-import { useState } from "react";
-import AddBlock from "./addBlock";
-import Grid from "./Grid"; // Import the Grid component
-import "react-grid-layout/css/styles.css";
-import "react-resizable/css/styles.css";
-import ActiveBlock from "./activeBlock";
+import React, { useState, useEffect } from "react";
+import Test, { TestPageProps } from "../test/TestPage";
+import { useWindowSize } from "../test/hooks/useWindowSize";
+import { MdOutlineStyle } from "react-icons/md";
 
-interface Block {
-  i: string;
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-  text: string;
-  fontSize: string;
-  color: string;
-  italic: string;
-  textAlign: string;
-  type: string;
+interface FooterState {
+  gridHeight: number;
+  currentRows: number;
 }
 
-// Edit Menu Component
-const EditMenu = ({
-  onAdd,
-  isEditing,
-}: {
-  onAdd: () => void;
-  isEditing: boolean;
-}) => {
-  return (
-    <div className="absolute -top-14 flex w-full justify-between px-4">
-      <button
-        onClick={onAdd}
-        className="rounded-md bg-blue-600 px-4 py-2 text-white shadow-lg transition-all hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-      >
-        Add Block
-      </button>
-      <div className="rounded-md bg-gray-800 px-4 py-2 text-white shadow-lg">
-        <p>Edit Section</p>
-      </div>
-    </div>
-  );
+interface FooterContentProps {
+  stateKey: string; // Add this prop to distinguish between instances
+}
+
+const DEFAULT_FOOTER_STATE: FooterState = {
+  gridHeight: 450,
+  currentRows: 10,
 };
 
-// Edit Button Component
-const EditButton = ({ onClick }: { onClick: () => void }) => {
-  return (
-    <button
-      onClick={onClick}
-      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-md bg-blue-600 px-6 py-3 text-white opacity-0 shadow-lg transition-all hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 group-hover:opacity-100"
-    >
-      Edit Footer
-    </button>
-  );
-};
-
-const GridLayout = () => {
-  return (
-    <div className="grid grid-cols-3 gap-4 p-4">
-      <div className="flex flex-wrap gap-2">
-        {[...Array(6)].map((_, index) => (
-          <div
-            key={index}
-            className="size-8 rounded bg-gray-700 transition-colors hover:bg-gray-600"
-          />
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {[...Array(6)].map((_, index) => (
-          <div
-            key={index}
-            className="size-8 rounded bg-gray-700 transition-colors hover:bg-gray-600"
-          />
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {[...Array(6)].map((_, index) => (
-          <div
-            key={index}
-            className="size-8 rounded bg-gray-700 transition-colors hover:bg-gray-600"
-          />
-        ))}
-      </div>
-    </div>
-  );
-};
-
-const FooterContent = () => {
+const FooterContent = ({ stateKey }: FooterContentProps) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [isAdding, setIsAdding] = useState(false);
-  const [layout, setLayout] = useState<Block[]>([]);
-  const [activeBlock, setActiveBlock] = useState<string | null>(null);
+  const [isFooterHovered, setIsFooterHovered] = useState(false);
+  const containerWidth = useWindowSize();
+  const [gridHeight, setGridHeight] = useState(DEFAULT_FOOTER_STATE.gridHeight);
+  const [currentRows, setCurrentRows] = useState(
+    DEFAULT_FOOTER_STATE.currentRows,
+  );
 
-  const handleColorChange = (color: string) => {
-    if (activeBlock) {
-      const newLayout = layout.map((block) =>
-        block.i === activeBlock ? { ...block, color } : block,
-      );
-      setLayout(newLayout);
+  // Add state for saving/canceling changes
+  const [savedState, setSavedState] = useState<FooterState>({
+    gridHeight,
+    currentRows,
+  });
+
+  const initialCols = 36;
+  const initialRows = 10;
+  const unitSize = containerWidth / initialCols;
+
+  // Load saved state on component mount - use unique key for each instance
+  useEffect(() => {
+    const savedFooter = localStorage.getItem(`footerState_${stateKey}`);
+    if (savedFooter) {
+      const parsedState = JSON.parse(savedFooter) as FooterState;
+      setGridHeight(parsedState.gridHeight);
+      setCurrentRows(parsedState.currentRows);
     }
+  }, [stateKey]);
+
+  const handleRowsChange = (newHeight: number) => {
+    const newRows = Math.round(newHeight / unitSize);
+    setCurrentRows(newRows);
+    setGridHeight(newHeight);
   };
 
-  const handleEditClick = () => setIsEditing(true);
-  const handleAddClick = () => setIsAdding(true);
-  const handleCloseAddMenu = () => {
-    setIsAdding(false);
-    setIsEditing(false);
-  };
-
-  const handleAddBlock = (blockText: string, type: string = "text") => {
-    const newBlock: Block = {
-      i: `block-${layout.length + 1}`,
-      x: (layout.length * 2) % 12,
-      y: Infinity,
-      w: 4,
-      h: 2,
-      text: blockText,
-      fontSize: "text-base",
-      color: "text-white",
-      italic: "non-italic",
-      textAlign: "text-left",
-      type: type,
-    };
-    setLayout([...layout, newBlock]);
-    setIsAdding(false);
-  };
-
-  const handleTextChange = (
-    index: number,
-    event: React.ChangeEvent<HTMLInputElement> | any,
-  ) => {
-    const newLayout = [...layout];
-    newLayout[index] = {
-      ...newLayout[index],
-      text: event.target.value,
-    };
-    setLayout(newLayout);
-  };
-
-  const handleLayoutChange = (newLayout: any[]) => {
-    const updatedLayout = newLayout.map((item) => ({
-      ...item,
-      ...layout.find((block) => block.i === item.i),
-    }));
-    setLayout(updatedLayout);
-  };
-
-  const handleBlockClick = (blockId: string) => {
-    setActiveBlock(blockId);
+  const handleStartEditing = () => {
+    setSavedState({
+      gridHeight,
+      currentRows,
+    });
     setIsEditing(true);
   };
 
-  const handleHeadingClick = (size: string) => {
-    if (activeBlock) {
-      const newLayout = layout.map((block) =>
-        block.i === activeBlock ? { ...block, fontSize: size } : block,
-      );
-      setLayout(newLayout);
-    }
+  const handleSaveChanges = () => {
+    // Create state object to save
+    const footerState: FooterState = {
+      gridHeight,
+      currentRows,
+    };
+
+    // Save to localStorage with unique key
+    localStorage.setItem(
+      `footerState_${stateKey}`,
+      JSON.stringify(footerState),
+    );
+
+    // Update saved state for cancel functionality
+    setSavedState(footerState);
+
+    // Close editing mode
+    setIsEditing(false);
   };
 
-  const handleAlignClick = (align: string) => {
-    if (activeBlock) {
-      const newLayout = layout.map((block) =>
-        block.i === activeBlock ? { ...block, textAlign: align } : block,
-      );
-      setLayout(newLayout);
-    }
+  const handleCancelEditing = () => {
+    // Restore the previous saved state
+    setGridHeight(savedState.gridHeight);
+    setCurrentRows(savedState.currentRows);
+    setIsEditing(false);
+  };
+
+  const handleResetFooter = () => {
+    // Reset to default state
+    setGridHeight(DEFAULT_FOOTER_STATE.gridHeight);
+    setCurrentRows(DEFAULT_FOOTER_STATE.currentRows);
+
+    // Save default state to localStorage with unique key
+    localStorage.setItem(
+      `footerState_${stateKey}`,
+      JSON.stringify(DEFAULT_FOOTER_STATE),
+    );
+
+    // Update saved state
+    setSavedState(DEFAULT_FOOTER_STATE);
+
+    // Close editing mode
+    setIsEditing(false);
+  };
+
+  const testProps: TestPageProps = {
+    className: "w-full",
+    containerClassName: "",
+    initialCols: initialCols,
+    initialRows: initialRows,
+    onHeightChange: handleRowsChange,
+    showMenuButton: isEditing,
+    stateKey: `footer_${stateKey}`, // Pass unique key to TestPage
+    editBarPosition: "relative", // Add this prop
   };
 
   return (
-    <footer className="group relative flex h-80 flex-col bg-gradient-to-b from-gray-900 to-black text-white shadow-xl">
-      <div className="relative size-full">
-        <Grid
-          layout={layout}
-          activeBlock={activeBlock}
-          isEditing={isEditing}
-          handleBlockClick={handleBlockClick}
-          handleTextChange={handleTextChange}
-          handleLayoutChange={handleLayoutChange}
-          handleColorChange={handleColorChange}
-          handleHeadingClick={handleHeadingClick}
-          handleAlignClick={handleAlignClick}
-        />
+    <div
+      className="group relative flex bg-gradient-to-b from-gray-900 to-black text-white shadow-xl transition-all duration-300"
+      style={{
+        height: `${gridHeight}px`,
+        // Add z-index when editing to ensure menus are visible
+        zIndex: isEditing ? 50 : 0,
+      }}
+      onMouseEnter={() => setIsFooterHovered(true)}
+      onMouseLeave={() => setIsFooterHovered(false)}
+    >
+      <Test {...testProps} />
 
-        {!isEditing && <EditButton onClick={handleEditClick} />}
-
-        {isEditing && !isAdding && (
-          <EditMenu onAdd={handleAddClick} isEditing={isEditing} />
-        )}
-
-        {isAdding && (
-          <AddBlock
-            handleClose={handleCloseAddMenu}
-            handleAddBlock={handleAddBlock}
-          />
-        )}
-      </div>
-    </footer>
+      {/* Edit Overlay */}
+      {!isEditing && isFooterHovered && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+          <button
+            onClick={handleStartEditing}
+            className="flex items-center gap-2 rounded-md bg-white px-4 py-2 text-sm font-medium text-gray-900 shadow-lg hover:bg-gray-50"
+          >
+            <MdOutlineStyle className="text-lg" />
+            Edit Footer {stateKey}
+          </button>
+        </div>
+      )}
+    </div>
   );
 };
 

@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { HiOutlineDesktopComputer, HiPlus } from "react-icons/hi";
 import { MdOutlineStyle } from "react-icons/md";
 import { layouts } from "./class";
-import ElementToolbar from "./elementMenu";
 import Toolbar from "./Toolbar";
+import ElementToolbar from "./elementMenu";
 
 interface HeaderContentProps {
   selectedLayout: string;
@@ -22,6 +22,26 @@ interface HeaderElements {
   isCart: boolean;
   isAccount: boolean;
 }
+
+interface HeaderState {
+  elements: HeaderElements;
+  headerHeight: number;
+  selectedLayout: string;
+  bgColor: string;
+}
+
+// First, let's define the default state as a constant at the top of the file
+const DEFAULT_HEADER_STATE: HeaderState = {
+  elements: {
+    isButton: false,
+    isSocial: false,
+    isCart: false,
+    isAccount: false,
+  },
+  headerHeight: 80,
+  selectedLayout: "Option 1",
+  bgColor: "bg-black",
+};
 
 export default function HeaderContent({
   selectedLayout,
@@ -48,6 +68,18 @@ export default function HeaderContent({
     elements,
     headerHeight,
   });
+
+  // Load saved state on component mount
+  useEffect(() => {
+    const savedHeader = localStorage.getItem("headerState");
+    if (savedHeader) {
+      const parsedState = JSON.parse(savedHeader) as HeaderState;
+      setElements(parsedState.elements);
+      setHeaderHeight(parsedState.headerHeight);
+      handleLayoutSelection(parsedState.selectedLayout);
+      handleColorChange(parsedState.bgColor);
+    }
+  }, []);
 
   const handleElementChange = (
     elementType: keyof HeaderElements,
@@ -76,16 +108,31 @@ export default function HeaderContent({
   };
 
   const handleSaveChanges = () => {
+    // Create state object to save
+    const headerState: HeaderState = {
+      elements,
+      headerHeight,
+      selectedLayout,
+      bgColor,
+    };
+
+    // Save to localStorage
+    localStorage.setItem("headerState", JSON.stringify(headerState));
+
+    // Update saved state for cancel functionality
     setSavedState({
       elements,
       headerHeight,
     });
+
+    // Close menus
     setIsHeaderEditing(false);
     setIsDesignMenuVisible(false);
     setIsElementMenuVisible(false);
   };
 
   const handleCancelEditing = () => {
+    // Restore the previous saved state
     setElements(savedState.elements);
     setHeaderHeight(savedState.headerHeight);
     setIsHeaderEditing(false);
@@ -93,8 +140,30 @@ export default function HeaderContent({
     setIsElementMenuVisible(false);
   };
 
+  const handleResetHeader = () => {
+    // Reset all states to default
+    setElements(DEFAULT_HEADER_STATE.elements);
+    setHeaderHeight(DEFAULT_HEADER_STATE.headerHeight);
+    handleLayoutSelection(DEFAULT_HEADER_STATE.selectedLayout);
+    handleColorChange(DEFAULT_HEADER_STATE.bgColor);
+
+    // Save default state to localStorage
+    localStorage.setItem("headerState", JSON.stringify(DEFAULT_HEADER_STATE));
+
+    // Update saved state
+    setSavedState({
+      elements: DEFAULT_HEADER_STATE.elements,
+      headerHeight: DEFAULT_HEADER_STATE.headerHeight,
+    });
+
+    // Close menus
+    setIsHeaderEditing(false);
+    setIsDesignMenuVisible(false);
+    setIsElementMenuVisible(false);
+  };
+
   return (
-    <div className="relative">
+    <div className="relative" style={{ zIndex: isHeaderEditing ? 50 : 0 }}>
       {/* Header Content */}
       <header
         className={`relative flex items-center justify-between ${bgColor} px-6 transition-all duration-300`}
@@ -105,7 +174,7 @@ export default function HeaderContent({
         {layouts[selectedLayout](elements)}
 
         {/* Edit Overlay */}
-        {isHeaderHovered && !isHeaderEditing && (
+        {!isHeaderEditing && isHeaderHovered && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/20">
             <button
               className="flex items-center gap-2 rounded-md bg-white px-4 py-2 text-sm font-medium text-gray-900 shadow-lg hover:bg-gray-50"
@@ -155,7 +224,7 @@ export default function HeaderContent({
             Add Elements
           </button>
 
-          {/* Save/Cancel Buttons */}
+          {/* Save/Cancel/Reset Buttons */}
           <div className="ml-4 flex gap-2">
             <button
               onClick={handleCancelEditing}
@@ -169,13 +238,19 @@ export default function HeaderContent({
             >
               Save Changes
             </button>
+            <button
+              onClick={handleResetHeader}
+              className="rounded-md bg-red-500 px-4 py-2 text-sm font-medium text-white shadow-lg hover:bg-red-600"
+            >
+              Reset Header
+            </button>
           </div>
         </div>
       )}
 
       {/* Design Menu */}
       {isDesignMenuVisible && (
-        <div className="absolute right-0 top-full z-50 mt-4 w-80">
+        <div className="absolute right-0 top-full z-[2000] mt-4 w-80">
           <div className="rounded-lg bg-white shadow-xl">
             <Toolbar
               onOptionChange={handleLayoutSelection}
@@ -191,7 +266,7 @@ export default function HeaderContent({
 
       {/* Elements Menu */}
       {isElementMenuVisible && (
-        <div className="absolute right-0 top-full z-50 mt-4 w-80">
+        <div className="absolute right-0 top-full z-[2000] mt-4 w-80">
           <div className="rounded-lg bg-white p-4 shadow-xl">
             <div className="mb-4 flex items-center justify-between border-b pb-2">
               <h3 className="text-sm font-medium text-gray-900">
@@ -204,10 +279,26 @@ export default function HeaderContent({
                 ×
               </button>
             </div>
-            {/* <ElementToolbar
+            <ElementToolbar
               elements={elements}
-              onElementChange={handleElementChange}
-            /> */}
+              onElementChange={(elementType: keyof HeaderElements, value: boolean) => {
+                handleElementChange(elementType, value);
+                // Auto-save when elements change
+                const headerState: HeaderState = {
+                  elements: {
+                    ...elements,
+                    [elementType]: value,
+                  },
+                  headerHeight,
+                  selectedLayout,
+                  bgColor,
+                };
+                localStorage.setItem(
+                  "headerState",
+                  JSON.stringify(headerState),
+                );
+              }}
+            />
           </div>
         </div>
       )}

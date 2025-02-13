@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { HiOutlineDesktopComputer, HiPlus } from "react-icons/hi";
-import { MdOutlineStyle } from "react-icons/md";
+import { MdOutlineStyle, MdUndo, MdRedo } from "react-icons/md";
 import { layouts } from "./class";
 import Toolbar from "./Toolbar";
 import ElementToolbar from "./elementMenu";
@@ -28,6 +28,12 @@ interface HeaderState {
   headerHeight: number;
   selectedLayout: string;
   bgColor: string;
+}
+
+interface HistoryState {
+  past: HeaderState[];
+  present: HeaderState;
+  future: HeaderState[];
 }
 
 // First, let's define the default state as a constant at the top of the file
@@ -71,50 +77,67 @@ export default function HeaderContent({
 
   const menuRef = useRef<HTMLDivElement>(null);
 
+  // Add history state
+  const [history, setHistory] = useState<HistoryState>({
+    past: [],
+    present: {
+      elements,
+      headerHeight,
+      selectedLayout,
+      bgColor,
+    },
+    future: [],
+  });
+
+  // Add local state to track layout and color
+  const [localLayout, setLocalLayout] = useState(selectedLayout);
+  const [localColor, setLocalColor] = useState(bgColor);
+
+  // Update local state when parent props change
+  useEffect(() => {
+    setLocalLayout(selectedLayout);
+    setLocalColor(bgColor);
+  }, [selectedLayout, bgColor]);
+
   // Load saved state on component mount
   useEffect(() => {
     const savedHeader = localStorage.getItem("headerState");
     if (savedHeader) {
-      const parsedState = JSON.parse(savedHeader) as HeaderState;
-      setElements(parsedState.elements);
-      setHeaderHeight(
-        parsedState.headerHeight || DEFAULT_HEADER_STATE.headerHeight,
-      );
-      handleLayoutSelection(parsedState.selectedLayout);
-      handleColorChange(parsedState.bgColor);
-    }
-  }, []);
+      try {
+        const parsedState = JSON.parse(savedHeader) as HeaderState;
+        
+        // Batch all state updates together
+        const batchUpdate = () => {
+          setElements(parsedState.elements);
+          setHeaderHeight(parsedState.headerHeight || DEFAULT_HEADER_STATE.headerHeight);
+          // Instead of calling handlers directly, update the local state
+          setHistory({
+            past: [],
+            present: {
+              ...parsedState,
+              selectedLayout: parsedState.selectedLayout || selectedLayout,
+              bgColor: parsedState.bgColor || bgColor,
+            },
+            future: [],
+          });
+        };
 
-  // Add click outside handler
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        if (isDesignMenuVisible || isElementMenuVisible) {
-          setIsDesignMenuVisible(false);
-          setIsElementMenuVisible(false);
-        }
+        // Execute state updates in next tick
+        setTimeout(batchUpdate, 0);
+      } catch (err) {
+        console.error('Error loading header state:', err);
       }
     }
+  }, []); // Empty dependency array since we only want this to run once
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isDesignMenuVisible, isElementMenuVisible]);
-
-  // Add useEffect to manage body scroll
-  useEffect(() => {
-    // When either menu is open, prevent body scroll
-    if (isDesignMenuVisible || isElementMenuVisible) {
-      document.body.style.overflow = "hidden";
-    } else {
-      // When menus are closed, restore body scroll
-      document.body.style.overflow = "auto";
-    }
-
-    // Cleanup function to ensure scroll is restored when component unmounts
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, [isDesignMenuVisible, isElementMenuVisible]);
+  // Update history when state changes
+  const updateHistory = (newState: HeaderState) => {
+    setHistory(prev => ({
+      past: [...prev.past, prev.present],
+      present: newState,
+      future: [],
+    }));
+  };
 
   const handleElementChange = (
     elementType: keyof HeaderElements,
@@ -203,18 +226,136 @@ export default function HeaderContent({
     return ((headerHeight - 100) / 100) * 9 + 1;
   };
 
+  // Update history when state changes
+  useEffect(() => {
+    const currentState = {
+      elements,
+      headerHeight,
+      selectedLayout,
+      bgColor,
+    };
+    
+    if (JSON.stringify(currentState) !== JSON.stringify(history.present)) {
+      updateHistory(currentState);
+    }
+  }, [elements, headerHeight, selectedLayout, bgColor]);
+
+  // Modify handleUndo
+  const handleUndo = () => {
+    setHistory(prev => {
+      if (prev.past.length === 0) return prev;
+      
+      const newPast = prev.past.slice(0, -1);
+      const newPresent = prev.past[prev.past.length - 1];
+      
+      // Update local states instead of calling parent handlers
+      setElements(newPresent.elements);
+      setHeaderHeight(newPresent.headerHeight);
+      setLocalLayout(newPresent.selectedLayout);
+      setLocalColor(newPresent.bgColor);
+
+      return {
+        past: newPast,
+        present: newPresent,
+        future: [prev.present, ...prev.future],
+      };
+    });
+  };
+
+  // Modify handleRedo similarly
+  const handleRedo = () => {
+    setHistory(prev => {
+      if (prev.future.length === 0) return prev;
+      
+      const newFuture = prev.future.slice(1);
+      const newPresent = prev.future[0];
+      
+      // Update local states instead of calling parent handlers
+      setElements(newPresent.elements);
+      setHeaderHeight(newPresent.headerHeight);
+      setLocalLayout(newPresent.selectedLayout);
+      setLocalColor(newPresent.bgColor);
+
+      return {
+        past: [...prev.past, prev.present],
+        present: newPresent,
+        future: newFuture,
+      };
+    });
+  };
+
+  // Add effect to sync local state with parent
+  useEffect(() => {
+    if (localLayout !== selectedLayout) {
+      handleLayoutSelection(localLayout);
+    }
+    if (localColor !== bgColor) {
+      handleColorChange(localColor);
+    }
+  }, [localLayout, localColor]);
+
+  // Add click outside handler
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        if (isDesignMenuVisible || isElementMenuVisible) {
+          setIsDesignMenuVisible(false);
+          setIsElementMenuVisible(false);
+        }
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isDesignMenuVisible, isElementMenuVisible]);
+
+  // Add useEffect to manage body scroll
+  useEffect(() => {
+    // When either menu is open, prevent body scroll
+    if (isDesignMenuVisible || isElementMenuVisible) {
+      document.body.style.overflow = "hidden";
+    } else {
+      // When menus are closed, restore body scroll
+      document.body.style.overflow = "auto";
+    }
+
+    // Cleanup function to ensure scroll is restored when component unmounts
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isDesignMenuVisible, isElementMenuVisible]);
+
+  // First, add keyboard shortcuts
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (isHeaderEditing) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+          e.preventDefault();
+          if (e.shiftKey) {
+            handleRedo();
+          } else {
+            handleUndo();
+          }
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [isHeaderEditing]);
+
   return (
     <div className="relative">
       {/* Header Container */}
       <div
-        className={`relative flex items-center justify-between transition-all duration-300 ${bgColor}`}
+        className={`relative flex items-center justify-between transition-all duration-300 ${localColor}`}
         style={{ height: `${Math.max(headerHeight, 100)}px` }}
         onMouseEnter={() => setIsHeaderHovered(true)}
         onMouseLeave={() => setIsHeaderHovered(false)}
       >
         {/* Main header content */}
         <div className="relative flex w-full items-center justify-between px-6">
-          {layouts[selectedLayout]({
+          {layouts[localLayout]({
             isButton: elements.isButton,
             isSocial: elements.isSocial,
             isCart: elements.isCart,
@@ -244,6 +385,25 @@ export default function HeaderContent({
       {isHeaderEditing && !isDesignMenuVisible && !isElementMenuVisible && (
         <div className="absolute bottom-0 left-1/2 z-[1001] -translate-x-1/2 translate-y-1/2">
           <div className="flex items-center gap-2 rounded-md bg-white px-2 py-1.5 shadow-lg">
+            {/* Undo/Redo buttons */}
+            <button
+              onClick={handleUndo}
+              disabled={history.past.length === 0}
+              className="flex items-center gap-2 rounded px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+            >
+              <MdUndo className="text-lg text-blue-600" />
+              Undo
+            </button>
+            <div className="h-4 w-px bg-gray-200" />
+            <button
+              onClick={handleRedo}
+              disabled={history.future.length === 0}
+              className="flex items-center gap-2 rounded px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+            >
+              <MdRedo className="text-lg text-blue-600" />
+              Redo
+            </button>
+            <div className="h-4 w-px bg-gray-200" />
             <button
               onClick={() => {
                 setIsDesignMenuVisible(true);

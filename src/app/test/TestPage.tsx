@@ -41,6 +41,8 @@ export interface TestPageProps {
   showMenuButton?: boolean;
   stateKey: string;
   editBarPosition?: "fixed" | "relative";
+  editBarOffset?: number;
+  onClose?: () => void;
 }
 
 const TestPage = ({
@@ -51,7 +53,9 @@ const TestPage = ({
   onHeightChange,
   showMenuButton = true,
   stateKey,
-  editBarPosition = "fixed",
+  editBarPosition = "relative",
+  editBarOffset = 0,
+  onClose,
 }: TestPageProps) => {
   const [layout, setLayout] = useState<Block[]>(initialLayout);
   const [activeShape, setActiveShape] = useState<string | null>(null);
@@ -400,6 +404,9 @@ const TestPage = ({
               onColsChange={setCols}
               onRowsChange={handleRowsChange}
               stateKey={stateKey}
+              position={editBarPosition}
+              offset={editBarOffset}
+              onClose={onClose}
             />
           </div>
         </div>

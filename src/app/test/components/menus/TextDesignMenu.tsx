@@ -44,7 +44,7 @@ const TextDesignMenu: React.FC<TextDesignMenuProps> = ({
       <div className="max-h-80 overflow-y-auto">
         {/* Menu Header */}
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-lg font-semibold">Text Design</h3>
+          <h3 className="text-black">Text Design</h3>
           <div className="flex items-center gap-2">
             <button
               onClick={onDuplicate}

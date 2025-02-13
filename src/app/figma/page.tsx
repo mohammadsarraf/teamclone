@@ -12,6 +12,7 @@ export default function Page() {
   const [viewMode, setViewMode] = useState<"desktop" | "mobile">("desktop");
   const [selectedLayout, setSelectedLayout] = useState("Option 1");
   const [bgColor, setBgColor] = useState("bg-black");
+  const [isContentLoaded, setIsContentLoaded] = useState(false);
 
   useEffect(() => {
     const savedHeader = localStorage.getItem("headerState");
@@ -20,6 +21,7 @@ export default function Page() {
       setSelectedLayout(parsedState.selectedLayout);
       setBgColor(parsedState.bgColor);
     }
+    setIsContentLoaded(true);
   }, []);
 
   const handleColorChange = (color: string) => {
@@ -41,7 +43,7 @@ export default function Page() {
             ${viewMode === "mobile" ? "mx-auto max-w-[375px]" : ""}`}
         >
           {/* Window Title Bar - Fixed at top */}
-          <div className="flex h-12 shrink-0 items-center justify-between rounded-t-xl bg-gray-900 px-4">
+          <div className="flex h-12 shrink-0 items-center justify-between bg-gray-900 px-4 rounded-t-xl">
             <div className="flex items-center space-x-4">
               {/* Window Controls */}
               <div className="flex items-center space-x-2">
@@ -99,10 +101,14 @@ export default function Page() {
             )}
           </div>
 
-          {/* Website Content - Scrollable */}
-          <div className="flex-1 overflow-y-auto">
-            {/* Website Container */}
-            <div className="flex flex-col">
+          {/* Scrollable Content Area */}
+          <div 
+            className="min-h-0 flex-1 overflow-y-auto scroll-smooth" 
+            id="content-container"
+            style={{ visibility: isContentLoaded ? 'visible' : 'hidden' }}
+          >
+            {/* Header */}
+            <div className="z-10 bg-gray-800">
               <HeaderContent
                 selectedLayout={selectedLayout}
                 bgColor={bgColor}
@@ -113,10 +119,16 @@ export default function Page() {
                 isDesignMenuVisible={isDesignMenuVisible}
                 setIsDesignMenuVisible={setIsDesignMenuVisible}
               />
+            </div>
+
+            {/* Main Content Area */}
+            <div className="flex flex-col">
               <div className="flex-1">
                 <FooterContent stateKey="Main" />
               </div>
-              <FooterContent stateKey="footer" />
+                <div className="flex-1">
+                <FooterContent stateKey="Footer" />
+              </div>
             </div>
           </div>
         </div>

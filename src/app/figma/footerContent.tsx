@@ -6,6 +6,8 @@ import { MdOutlineStyle } from "react-icons/md";
 interface FooterState {
   gridHeight: number;
   currentRows: number;
+  layout: Layout[];  // Add layout state
+  activeBlock: string | null;  // Track active block
 }
 
 interface FooterContentProps {
@@ -15,6 +17,8 @@ interface FooterContentProps {
 const DEFAULT_FOOTER_STATE: FooterState = {
   gridHeight: 450,
   currentRows: 10,
+  layout: [],
+  activeBlock: null,
 };
 
 const FooterContent = ({ stateKey }: FooterContentProps) => {
@@ -26,58 +30,97 @@ const FooterContent = ({ stateKey }: FooterContentProps) => {
     DEFAULT_FOOTER_STATE.currentRows,
   );
 
+  // Add loading and error states
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   // Add state for saving/canceling changes
   const [savedState, setSavedState] = useState<FooterState>({
     gridHeight,
     currentRows,
+    layout: DEFAULT_FOOTER_STATE.layout,
+    activeBlock: DEFAULT_FOOTER_STATE.activeBlock,
   });
+
+  // 3. Add unsaved changes warning
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const initialCols = 36;
   const initialRows = 10;
   const unitSize = containerWidth / initialCols;
 
-  // Load saved state on component mount - use unique key for each instance
   useEffect(() => {
-    const savedFooter = localStorage.getItem(`footerState_${stateKey}`);
-    if (savedFooter) {
-      const parsedState = JSON.parse(savedFooter) as FooterState;
-      setGridHeight(parsedState.gridHeight);
-      setCurrentRows(parsedState.currentRows);
-    }
+    const loadSavedState = async () => {
+      try {
+        const savedFooter = localStorage.getItem(`footerState_${stateKey}`);
+        if (savedFooter) {
+          const parsedState = JSON.parse(savedFooter) as FooterState;
+          
+          // Set initial state synchronously to prevent layout jumps
+          setGridHeight(parsedState.gridHeight);
+          setCurrentRows(parsedState.currentRows);
+          setSavedState(parsedState);
+        }
+      } catch (err) {
+        setError('Failed to load saved state');
+        console.error('Error loading footer state:', err);
+      } finally {
+        // Use RAF to ensure smooth transition
+        requestAnimationFrame(() => {
+          setIsLoading(false);
+        });
+      }
+    };
+
+    loadSavedState();
   }, [stateKey]);
+
+  // 5. Add autosave functionality
+  useEffect(() => {
+    if (hasUnsavedChanges) {
+      const timeoutId = setTimeout(() => {
+        handleSaveChanges();
+      }, 2000); // Autosave after 2 seconds of no changes
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [gridHeight, currentRows]); // Add other tracked states
 
   const handleRowsChange = (newHeight: number) => {
     const newRows = Math.round(newHeight / unitSize);
     setCurrentRows(newRows);
     setGridHeight(newHeight);
+    setHasUnsavedChanges(true);
   };
 
   const handleStartEditing = () => {
     setSavedState({
       gridHeight,
       currentRows,
+      layout: savedState.layout,
+      activeBlock: savedState.activeBlock,
     });
     setIsEditing(true);
   };
 
   const handleSaveChanges = () => {
-    // Create state object to save
-    const footerState: FooterState = {
+    const newState: FooterState = {
       gridHeight,
       currentRows,
+      layout: DEFAULT_FOOTER_STATE.layout,
+      activeBlock: DEFAULT_FOOTER_STATE.activeBlock,
     };
 
-    // Save to localStorage with unique key
-    localStorage.setItem(
-      `footerState_${stateKey}`,
-      JSON.stringify(footerState),
-    );
-
-    // Update saved state for cancel functionality
-    setSavedState(footerState);
-
-    // Close editing mode
-    setIsEditing(false);
+    // Save state without triggering a scroll
+    requestAnimationFrame(() => {
+      try {
+        localStorage.setItem(`footerState_${stateKey}`, JSON.stringify(newState));
+        setSavedState(newState);
+        setHasUnsavedChanges(false);
+      } catch (err) {
+        console.error('Error saving state:', err);
+      }
+    });
   };
 
   const handleCancelEditing = () => {
@@ -87,23 +130,76 @@ const FooterContent = ({ stateKey }: FooterContentProps) => {
     setIsEditing(false);
   };
 
+  // 6. Add confirmation dialog before resetting
   const handleResetFooter = () => {
-    // Reset to default state
-    setGridHeight(DEFAULT_FOOTER_STATE.gridHeight);
-    setCurrentRows(DEFAULT_FOOTER_STATE.currentRows);
+    if (window.confirm('Are you sure you want to reset? All changes will be lost.')) {
+      try {
+        setGridHeight(DEFAULT_FOOTER_STATE.gridHeight);
+        setCurrentRows(DEFAULT_FOOTER_STATE.currentRows);
+        
+        // Save default state to localStorage with unique key
+        localStorage.setItem(
+          `footerState_${stateKey}`,
+          JSON.stringify(DEFAULT_FOOTER_STATE),
+        );
 
-    // Save default state to localStorage with unique key
-    localStorage.setItem(
-      `footerState_${stateKey}`,
-      JSON.stringify(DEFAULT_FOOTER_STATE),
-    );
+        // Update saved state
+        setSavedState(DEFAULT_FOOTER_STATE);
+        setHasUnsavedChanges(false);
+        setIsEditing(false);
+        setError(null); // Clear any previous errors
+      } catch (err) {
+        setError('Failed to reset footer');
+        console.error('Error resetting footer state:', err);
+      }
+    }
+  };
 
-    // Update saved state
-    setSavedState(DEFAULT_FOOTER_STATE);
-
-    // Close editing mode
+  const handleClose = () => {
     setIsEditing(false);
   };
+
+  // 7. Add undo/redo functionality
+  const [history, setHistory] = useState<FooterState[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+
+  const handleUndo = () => {
+    if (historyIndex > 0) {
+      setHistoryIndex(historyIndex - 1);
+      const previousState = history[historyIndex - 1];
+      setGridHeight(previousState.gridHeight);
+      setCurrentRows(previousState.currentRows);
+    }
+  };
+
+  // 8. Add keyboard shortcuts
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (isEditing) {
+        if (e.key === 'Escape') {
+          handleCancelEditing();
+        } else if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+          e.preventDefault();
+          handleSaveChanges();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [isEditing]);
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges]);
 
   const testProps: TestPageProps = {
     className: "w-full",
@@ -112,8 +208,10 @@ const FooterContent = ({ stateKey }: FooterContentProps) => {
     initialRows: initialRows,
     onHeightChange: handleRowsChange,
     showMenuButton: isEditing,
-    stateKey: `footer_${stateKey}`, // Pass unique key to TestPage
-    editBarPosition: "relative", // Add this prop
+    stateKey: `footer_${stateKey}`,
+    editBarPosition: "fixed",
+    editBarOffset: 20,
+    onClose: handleClose,
   };
 
   return (
@@ -121,8 +219,8 @@ const FooterContent = ({ stateKey }: FooterContentProps) => {
       className="group relative flex bg-gradient-to-b from-gray-900 to-black text-white shadow-xl transition-all duration-300"
       style={{
         height: `${gridHeight}px`,
-        // Add z-index when editing to ensure menus are visible
-        zIndex: isEditing ? 50 : 0,
+        opacity: isLoading ? 0 : 1,
+        transition: 'opacity 0.3s ease-in-out',
       }}
       onMouseEnter={() => setIsFooterHovered(true)}
       onMouseLeave={() => setIsFooterHovered(false)}

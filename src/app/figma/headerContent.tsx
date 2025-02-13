@@ -56,7 +56,7 @@ export default function HeaderContent({
   const [isHeaderHovered, setIsHeaderHovered] = useState(false);
   const [isHeaderEditing, setIsHeaderEditing] = useState(false);
   const [elements, setElements] = useState<HeaderElements>(DEFAULT_HEADER_STATE.elements);
-  const [headerHeight, setHeaderHeight] = useState(100);
+  const [headerHeight, setHeaderHeight] = useState(DEFAULT_HEADER_STATE.headerHeight);
   const [savedState, setSavedState] = useState({
     elements,
     headerHeight,
@@ -73,7 +73,7 @@ export default function HeaderContent({
     if (savedHeader) {
       const parsedState = JSON.parse(savedHeader) as HeaderState;
       setElements(parsedState.elements);
-      setHeaderHeight(parsedState.headerHeight);
+      setHeaderHeight(parsedState.headerHeight || DEFAULT_HEADER_STATE.headerHeight);
       handleLayoutSelection(parsedState.selectedLayout);
       handleColorChange(parsedState.bgColor);
     }
@@ -175,6 +175,12 @@ export default function HeaderContent({
     setIsElementMenuVisible(false);
   };
 
+  // Pass the correct initial height to Toolbar
+  const calculateInitialHeight = () => {
+    // Convert pixel height back to scale value (1-10)
+    return ((headerHeight - 100) / (100)) * 9 + 1;
+  };
+
   return (
     <div className="relative">
       {/* Header Container */}
@@ -274,7 +280,7 @@ export default function HeaderContent({
                   onOptionChange={handleLayoutSelection}
                   onBgColorChange={handleColorChange}
                   onHeightChange={handleHeightChange}
-                  initialHeight={(headerHeight - 60) / (140 / 9) + 1}
+                  initialHeight={calculateInitialHeight()}
                   onClose={() => {
                     setIsDesignMenuVisible(false);
                   }}
@@ -297,7 +303,7 @@ export default function HeaderContent({
             <div className="w-80 ml-1">
               <div className="flex flex-col rounded-lg bg-white shadow-xl">
                 <div className="flex items-center justify-between border-b p-4">
-                  <h3 className="font-medium">Add Elements</h3>
+                  <h3 className="font-medium text-black">Add Elements</h3>
                   <button
                     onClick={() => setIsElementMenuVisible(false)}
                     className="rounded p-1 hover:bg-gray-100"

@@ -6,7 +6,7 @@ import FooterContent from "./footerContent";
 import MainContent from "./mainContent";
 
 export default function Page() {
-  const [isEditing, setIsEditing] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
   const [isDesignMenuVisible, setIsDesignMenuVisible] = useState(false);
   const [isElementMenuVisible, setIsElementMenuVisible] = useState(false);
   const [viewMode, setViewMode] = useState<"desktop" | "mobile">("desktop");
@@ -36,12 +36,12 @@ export default function Page() {
       <main className={`relative grow ${isEditing ? "p-0" : "p-6"}`}>
         {/* Windows-like container */}
         <div
-          className={`flex flex-col overflow-hidden rounded-lg border border-gray-700 bg-gray-800 shadow-2xl transition-all duration-300
-            ${isEditing ? "fixed inset-0 z-[100] rounded-none border-none" : "h-full"}
+          className={`flex h-full flex-col rounded-lg border border-gray-700 bg-gray-800 shadow-2xl transition-all duration-300
+            ${isEditing ? "fixed inset-0 z-[100] rounded-none border-none" : ""}
             ${viewMode === "mobile" ? "mx-auto max-w-[375px]" : ""}`}
         >
-          {/* Combined Window Title Bar and TopMenu */}
-          <div className="flex h-12 items-center justify-between bg-gray-900 px-4">
+          {/* Window Title Bar - Fixed at top */}
+          <div className="flex h-12 shrink-0 items-center justify-between bg-gray-900 px-4 rounded-t-xl">
             <div className="flex items-center space-x-4">
               {/* Window Controls */}
               <div className="flex items-center space-x-2">
@@ -99,22 +99,25 @@ export default function Page() {
             )}
           </div>
 
-          {/* Window Content */}
-          <div className="flex grow flex-col overflow-auto">
-            <HeaderContent
-              selectedLayout={selectedLayout}
-              bgColor={bgColor}
-              handleColorChange={handleColorChange}
-              handleLayoutSelection={handleLayoutSelection}
-              isElementMenuVisible={isElementMenuVisible}
-              setIsElementMenuVisible={setIsElementMenuVisible}
-              isDesignMenuVisible={isDesignMenuVisible}
-              setIsDesignMenuVisible={setIsDesignMenuVisible}
-            />
-            <section className="grow">
-              <FooterContent stateKey="Main" />
-            </section>
-            <FooterContent stateKey="footer" />
+          {/* Website Content - Scrollable */}
+          <div className="flex-1 overflow-y-auto">
+            {/* Website Container */}
+            <div className="flex flex-col">
+              <HeaderContent
+                selectedLayout={selectedLayout}
+                bgColor={bgColor}
+                handleColorChange={handleColorChange}
+                handleLayoutSelection={handleLayoutSelection}
+                isElementMenuVisible={isElementMenuVisible}
+                setIsElementMenuVisible={setIsElementMenuVisible}
+                isDesignMenuVisible={isDesignMenuVisible}
+                setIsDesignMenuVisible={setIsDesignMenuVisible}
+              />
+              <div className="flex-1">
+                <FooterContent stateKey="Main" />
+              </div>
+              <FooterContent stateKey="footer" />
+            </div>
           </div>
         </div>
       </main>

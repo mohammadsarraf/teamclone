@@ -94,6 +94,22 @@ export default function HeaderContent({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isDesignMenuVisible, isElementMenuVisible]);
 
+  // Add useEffect to manage body scroll
+  useEffect(() => {
+    // When either menu is open, prevent body scroll
+    if (isDesignMenuVisible || isElementMenuVisible) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      // When menus are closed, restore body scroll
+      document.body.style.overflow = 'auto';
+    }
+
+    // Cleanup function to ensure scroll is restored when component unmounts
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [isDesignMenuVisible, isElementMenuVisible]);
+
   const handleElementChange = (
     elementType: keyof HeaderElements,
     value: boolean,
@@ -221,10 +237,9 @@ export default function HeaderContent({
       {/* Quick Actions - Only show when editing */}
       {isHeaderEditing && !isDesignMenuVisible && !isElementMenuVisible && (
         <div 
-          className="absolute left-1/2 -translate-x-1/2 transform z-[1001]"
-          style={{ top: `${Math.max(headerHeight, 100)}px` }}
+          className="absolute left-1/2 -translate-x-1/2 bottom-0 translate-y-1/2 z-[1001]"
         >
-          <div className="relative bottom-0 flex items-center gap-2 rounded-md bg-white px-2 py-1.5 shadow-lg">
+          <div className="flex items-center gap-2 rounded-md bg-white px-2 py-1.5 shadow-lg">
             <button
               onClick={() => {
                 setIsDesignMenuVisible(true);
@@ -258,76 +273,83 @@ export default function HeaderContent({
         </div>
       )}
 
-      {/* Menu Overlay - Added this new section */}
+      {/* Menu Overlay */}
       {(isDesignMenuVisible || isElementMenuVisible) && (
-        <div className="fixed inset-0 z-[1999] bg-transparent" onClick={() => {
-          setIsDesignMenuVisible(false);
-          setIsElementMenuVisible(false);
-        }} />
+        <div 
+          className="fixed inset-0 z-[1999] bg-black/20" 
+          onClick={() => {
+            setIsDesignMenuVisible(false);
+            setIsElementMenuVisible(false);
+          }}
+        />
       )}
 
-      {/* Design Menu */}
+      {/* Design Menu - Right side */}
       {isDesignMenuVisible && (
         <div 
           ref={menuRef}
-          className="absolute inset-x-0 top-full z-[2000]"
+          className="absolute right-0 z-[2000] max-h-[calc(100vh-var(--header-height))] overflow-y-auto"
+          style={{ 
+            top: `${Math.max(headerHeight, 100)}px`,
+            '--header-height': `${Math.max(headerHeight, 100)}px`
+          } as React.CSSProperties}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="flex w-full justify-end">
-            <div className="w-80 mr-1">
-              <div className="flex flex-col rounded-lg bg-white shadow-xl">
-                <Toolbar
-                  onOptionChange={handleLayoutSelection}
-                  onBgColorChange={handleColorChange}
-                  onHeightChange={handleHeightChange}
-                  initialHeight={calculateInitialHeight()}
-                  onClose={() => {
-                    setIsDesignMenuVisible(false);
-                  }}
-                  initialLayoutOption={selectedLayout}
-                />
-              </div>
+          <div className="w-80 mr-1">
+            <div className="flex flex-col rounded-lg bg-white shadow-xl">
+              <Toolbar
+                onOptionChange={handleLayoutSelection}
+                onBgColorChange={handleColorChange}
+                onHeightChange={handleHeightChange}
+                initialHeight={calculateInitialHeight()}
+                onClose={() => {
+                  setIsDesignMenuVisible(false);
+                }}
+                initialLayoutOption={selectedLayout}
+              />
             </div>
           </div>
         </div>
       )}
 
-      {/* Elements Menu */}
+      {/* Elements Menu - Left side */}
       {isElementMenuVisible && (
         <div 
           ref={menuRef}
-          className="absolute inset-x-0 top-full z-[2000]"
+          className="absolute left-0 z-[2000] max-h-[calc(100vh-var(--header-height))] overflow-y-auto"
+          style={{ 
+            top: `${Math.max(headerHeight, 100)}px`,
+            '--header-height': `${Math.max(headerHeight, 100)}px`
+          } as React.CSSProperties}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="flex w-full justify-start">
-            <div className="w-80 ml-1">
-              <div className="flex flex-col rounded-lg bg-white shadow-xl">
-                <div className="flex items-center justify-between border-b p-4">
-                  <h3 className="font-medium text-black">Add Elements</h3>
-                  <button
-                    onClick={() => setIsElementMenuVisible(false)}
-                    className="rounded p-1 hover:bg-gray-100"
+          <div className="w-80 ml-1">
+            <div className="flex flex-col rounded-lg bg-white shadow-xl">
+              <div className="flex items-center justify-between border-b p-4">
+                <h3 className="font-medium text-black">Add Elements</h3>
+                <button
+                  onClick={() => setIsElementMenuVisible(false)}
+                  className="rounded p-1 hover:bg-gray-100"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 text-gray-500"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 text-gray-500"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </button>
-                </div>
-                <div className="p-4">
-                  <ElementToolbar
-                    elements={elements}
-                    onElementChange={handleElementChange}
-                  />
-                </div>
+                    <path
+                      fillRule="evenodd"
+                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </button>
+              </div>
+              <div className="p-4">
+                <ElementToolbar
+                  elements={elements}
+                  onElementChange={handleElementChange}
+                />
               </div>
             </div>
           </div>

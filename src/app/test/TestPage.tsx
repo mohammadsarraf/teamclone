@@ -43,6 +43,10 @@ export interface TestPageProps {
   editBarPosition?: "fixed" | "relative";
   editBarOffset?: number;
   onClose?: () => void;
+  layout?: Block[];
+  onLayoutChange?: (layout: Layout[]) => void;
+  onAddBlock?: (text: string, type?: string) => void;
+  isActiveInstance?: boolean;
 }
 
 const TestPage = ({
@@ -56,8 +60,14 @@ const TestPage = ({
   editBarPosition = "relative",
   editBarOffset = 0,
   onClose,
+  layout,
+  onLayoutChange,
+  onAddBlock,
+  isActiveInstance,
 }: TestPageProps) => {
-  const [layout, setLayout] = useState<Block[]>(initialLayout);
+  const [layoutState, setLayoutState] = useState<Block[]>(
+    layout || initialLayout,
+  );
   const [activeShape, setActiveShape] = useState<string | null>(null);
   const [positions, setPositions] = useState<{
     [key: string]: { x: number; y: number; w: number; h: number };
@@ -79,14 +89,14 @@ const TestPage = ({
   const shapeManager = useMemo(
     () =>
       new ShapeManager(
-        layout,
-        setLayout,
+        layoutState,
+        setLayoutState,
         positions,
         setPositions,
         activeShape,
         setActiveShape,
       ),
-    [layout, positions, activeShape],
+    [layoutState, positions, activeShape],
   );
 
   // Load saved state on component mount
@@ -95,7 +105,7 @@ const TestPage = ({
     if (savedState) {
       try {
         const state = JSON.parse(savedState);
-        if (state.layout) setLayout(state.layout);
+        if (state.layout) setLayoutState(state.layout);
         if (state.positions) setPositions(state.positions);
         if (state.cols) setCols(state.cols);
         if (state.rows) setRows(state.rows);
@@ -212,7 +222,7 @@ const TestPage = ({
   const handleSaveChanges = () => {
     // Save state to localStorage
     const state = {
-      layout,
+      layout: layoutState,
       positions,
       cols,
       rows,
@@ -225,7 +235,7 @@ const TestPage = ({
   const handleResetChanges = () => {
     // Clear localStorage and reset to initial state
     localStorage.removeItem(`${stateKey}State`);
-    setLayout(initialLayout);
+    setLayoutState(initialLayout);
     setPositions({});
     setCols(initialCols);
     setRows(initialRows);
@@ -253,7 +263,7 @@ const TestPage = ({
             cols={cols}
             rows={rows}
             unitSize={unitSize}
-            layout={layout}
+            layout={layoutState}
             onLayoutChange={shapeManager.handleLayoutChange}
             onResizeStop={(layout, oldItem, newItem) => {
               shapeManager.handleLayoutChange(layout);
@@ -280,7 +290,7 @@ const TestPage = ({
             style={{ height: "100%", width: "100%" }}
             draggableHandle="[data-drag-handle]"
           >
-            {layout.map((block, index) => (
+            {layoutState.map((block, index) => (
               <div
                 key={block.i}
                 style={{
@@ -320,8 +330,8 @@ const TestPage = ({
                   currentFlipH={block.flipH || false}
                   currentFlipV={block.flipV || false}
                   currentColor={block.color}
-                  totalShapes={layout.length}
-                  index={layout.length - index}
+                  totalShapes={layoutState.length}
+                  index={layoutState.length - index}
                   className="shape-wrapper"
                   onFontChange={(font) =>
                     shapeManager.handleFontChange(block.i, font)

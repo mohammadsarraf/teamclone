@@ -64,6 +64,7 @@ const TextBox = ({
 }: TextBoxProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [contentHeight, setContentHeight] = useState(1);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const editor = useEditor({
     extensions: [
@@ -90,11 +91,15 @@ const TextBox = ({
         placeholder: "Type something...",
         emptyEditorClass: "is-editor-empty",
       }),
+      createSingleLineExtension(onEnterPress || (() => {})),
     ],
     content: text,
-    editable: true,
+    autofocus: false,
+    editable: isActive,
     onUpdate: ({ editor }) => {
-      onTextChange(editor.getText());
+      if (!isInitialLoad) {
+        onTextChange(editor.getHTML());
+      }
 
       if (containerRef.current) {
         const editorElement = editor.view.dom;
@@ -118,6 +123,11 @@ const TextBox = ({
       },
     },
   });
+
+  // Clear initial load flag after mount
+  useEffect(() => {
+    setIsInitialLoad(false);
+  }, []);
 
   // Update text alignment when it changes
   useEffect(() => {

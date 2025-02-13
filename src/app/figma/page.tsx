@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import HeaderContent from "./headerContent";
 import FooterContent from "./footerContent";
-import MainContent from "./mainContent";
 
 export default function Page() {
   const [isEditing, setIsEditing] = useState(false);
@@ -43,7 +42,7 @@ export default function Page() {
             ${viewMode === "mobile" ? "mx-auto max-w-[375px]" : ""}`}
         >
           {/* Window Title Bar - Fixed at top */}
-          <div className="flex h-12 shrink-0 items-center justify-between bg-gray-900 px-4 rounded-t-xl">
+          <div className="flex h-12 shrink-0 items-center justify-between rounded-t-xl bg-gray-900 px-4">
             <div className="flex items-center space-x-4">
               {/* Window Controls */}
               <div className="flex items-center space-x-2">
@@ -102,10 +101,10 @@ export default function Page() {
           </div>
 
           {/* Scrollable Content Area */}
-          <div 
-            className="min-h-0 flex-1 overflow-y-auto scroll-smooth" 
+          <div
+            className="min-h-0 flex-1 overflow-y-auto scroll-smooth"
             id="content-container"
-            style={{ visibility: isContentLoaded ? 'visible' : 'hidden' }}
+            style={{ visibility: isContentLoaded ? "visible" : "hidden" }}
           >
             {/* Header */}
             <div className="z-10 bg-gray-800">
@@ -126,8 +125,8 @@ export default function Page() {
               <div className="flex-1">
                 <FooterContent stateKey="Main" />
               </div>
-                <div className="flex-1">
-                <FooterContent stateKey="Footer" />
+              <div className="flex-1">
+                <FooterContent stateKey="Secondary" />
               </div>
             </div>
           </div>

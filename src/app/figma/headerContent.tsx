@@ -105,11 +105,13 @@ export default function HeaderContent({
     if (savedHeader) {
       try {
         const parsedState = JSON.parse(savedHeader) as HeaderState;
-        
+
         // Batch all state updates together
         const batchUpdate = () => {
           setElements(parsedState.elements);
-          setHeaderHeight(parsedState.headerHeight || DEFAULT_HEADER_STATE.headerHeight);
+          setHeaderHeight(
+            parsedState.headerHeight || DEFAULT_HEADER_STATE.headerHeight,
+          );
           // Instead of calling handlers directly, update the local state
           setHistory({
             past: [],
@@ -125,14 +127,14 @@ export default function HeaderContent({
         // Execute state updates in next tick
         setTimeout(batchUpdate, 0);
       } catch (err) {
-        console.error('Error loading header state:', err);
+        console.error("Error loading header state:", err);
       }
     }
   }, []); // Empty dependency array since we only want this to run once
 
   // Update history when state changes
   const updateHistory = (newState: HeaderState) => {
-    setHistory(prev => ({
+    setHistory((prev) => ({
       past: [...prev.past, prev.present],
       present: newState,
       future: [],
@@ -234,7 +236,7 @@ export default function HeaderContent({
       selectedLayout,
       bgColor,
     };
-    
+
     if (JSON.stringify(currentState) !== JSON.stringify(history.present)) {
       updateHistory(currentState);
     }
@@ -242,12 +244,12 @@ export default function HeaderContent({
 
   // Modify handleUndo
   const handleUndo = () => {
-    setHistory(prev => {
+    setHistory((prev) => {
       if (prev.past.length === 0) return prev;
-      
+
       const newPast = prev.past.slice(0, -1);
       const newPresent = prev.past[prev.past.length - 1];
-      
+
       // Update local states instead of calling parent handlers
       setElements(newPresent.elements);
       setHeaderHeight(newPresent.headerHeight);
@@ -264,12 +266,12 @@ export default function HeaderContent({
 
   // Modify handleRedo similarly
   const handleRedo = () => {
-    setHistory(prev => {
+    setHistory((prev) => {
       if (prev.future.length === 0) return prev;
-      
+
       const newFuture = prev.future.slice(1);
       const newPresent = prev.future[0];
-      
+
       // Update local states instead of calling parent handlers
       setElements(newPresent.elements);
       setHeaderHeight(newPresent.headerHeight);
@@ -329,7 +331,7 @@ export default function HeaderContent({
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (isHeaderEditing) {
-        if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+        if ((e.ctrlKey || e.metaKey) && e.key === "z") {
           e.preventDefault();
           if (e.shiftKey) {
             handleRedo();
@@ -340,8 +342,8 @@ export default function HeaderContent({
       }
     };
 
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
   }, [isHeaderEditing]);
 
   return (

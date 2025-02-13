@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { HiOutlineDesktopComputer, HiPlus } from "react-icons/hi";
 import { MdOutlineStyle } from "react-icons/md";
 import { layouts } from "./class";
@@ -38,7 +38,7 @@ const DEFAULT_HEADER_STATE: HeaderState = {
     isCart: false,
     isAccount: false,
   },
-  headerHeight: 80,
+  headerHeight: 100,
   selectedLayout: "Option 1",
   bgColor: "bg-black",
 };
@@ -55,19 +55,17 @@ export default function HeaderContent({
 }: HeaderContentProps) {
   const [isHeaderHovered, setIsHeaderHovered] = useState(false);
   const [isHeaderEditing, setIsHeaderEditing] = useState(false);
-  const [elements, setElements] = useState<HeaderElements>({
-    isButton: false,
-    isSocial: false,
-    isCart: false,
-    isAccount: false,
-  });
-  const [headerHeight, setHeaderHeight] = useState(80);
-
-  // Add state for saving/canceling changes
+  const [elements, setElements] = useState<HeaderElements>(DEFAULT_HEADER_STATE.elements);
+  const [headerHeight, setHeaderHeight] = useState(100);
   const [savedState, setSavedState] = useState({
     elements,
     headerHeight,
   });
+
+  // Add new states for hover effects
+  const [showOptions, setShowOptions] = useState(false);
+
+  const menuRef = useRef<HTMLDivElement>(null);
 
   // Load saved state on component mount
   useEffect(() => {
@@ -81,6 +79,21 @@ export default function HeaderContent({
     }
   }, []);
 
+  // Add click outside handler
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        if (isDesignMenuVisible || isElementMenuVisible) {
+          setIsDesignMenuVisible(false);
+          setIsElementMenuVisible(false);
+        }
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isDesignMenuVisible, isElementMenuVisible]);
+
   const handleElementChange = (
     elementType: keyof HeaderElements,
     value: boolean,
@@ -92,7 +105,7 @@ export default function HeaderContent({
   };
 
   const handleHeightChange = (scaleValue: number) => {
-    const minHeight = 60;
+    const minHeight = 100;
     const maxHeight = 200;
     const pixelHeight =
       minHeight + ((maxHeight - minHeight) * (scaleValue - 1)) / 9;
@@ -163,142 +176,154 @@ export default function HeaderContent({
   };
 
   return (
-    <div className="relative" style={{ zIndex: isHeaderEditing ? 50 : 0 }}>
-      {/* Header Content */}
-      <header
-        className={`relative flex items-center justify-between ${bgColor} px-6 transition-all duration-300`}
-        style={{ height: `${headerHeight}px` }}
+    <div className="relative">
+      {/* Header Container */}
+      <div
+        className={`relative flex items-center justify-between transition-all duration-300 ${bgColor}`}
+        style={{ height: `${Math.max(headerHeight, 100)}px` }}
         onMouseEnter={() => setIsHeaderHovered(true)}
         onMouseLeave={() => setIsHeaderHovered(false)}
       >
-        {layouts[selectedLayout](elements)}
+        {/* Main header content */}
+        <div className="relative flex w-full items-center justify-between px-6">
+          {layouts[selectedLayout]({
+            isButton: elements.isButton,
+            isSocial: elements.isSocial,
+            isCart: elements.isCart,
+            isAccount: elements.isAccount,
+          })}
+        </div>
 
-        {/* Edit Overlay */}
-        {!isHeaderEditing && isHeaderHovered && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+        {/* Edit Header Button - Shows on hover */}
+        {!isHeaderEditing && (
+          <div 
+            className={`absolute inset-0 flex items-center justify-center transition-opacity duration-200 ${
+              isHeaderHovered ? 'opacity-100' : 'opacity-0'
+            }`}
+          >
             <button
-              className="flex items-center gap-2 rounded-md bg-white px-4 py-2 text-sm font-medium text-gray-900 shadow-lg hover:bg-gray-50"
-              onClick={handleStartEditing}
+              onClick={() => setIsHeaderEditing(true)}
+              className="flex items-center gap-2 rounded-md bg-white/90 px-4 py-2 text-sm font-medium text-gray-700 shadow-lg hover:bg-white"
             >
-              <MdOutlineStyle className="text-lg" />
+              <MdOutlineStyle className="text-lg text-blue-600" />
               Edit Header
             </button>
           </div>
         )}
-      </header>
+      </div>
 
-      {/* Edit Tools */}
-      {isHeaderEditing && (
-        <div className="absolute inset-x-0 -bottom-16 flex items-center justify-center gap-4">
-          {/* Design Menu Button */}
-          <button
-            className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium shadow-lg transition-all
-              ${
-                isDesignMenuVisible
-                  ? "bg-blue-600 text-white"
-                  : "bg-white text-gray-900 hover:bg-gray-50"
-              }`}
-            onClick={() => {
-              setIsDesignMenuVisible(!isDesignMenuVisible);
-              setIsElementMenuVisible(false);
-            }}
-          >
-            <HiOutlineDesktopComputer className="text-lg" />
-            Design
-          </button>
-
-          {/* Elements Menu Button */}
-          <button
-            className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium shadow-lg transition-all
-              ${
-                isElementMenuVisible
-                  ? "bg-blue-600 text-white"
-                  : "bg-white text-gray-900 hover:bg-gray-50"
-              }`}
-            onClick={() => {
-              setIsElementMenuVisible(!isElementMenuVisible);
-              setIsDesignMenuVisible(false);
-            }}
-          >
-            <HiPlus className="text-lg" />
-            Add Elements
-          </button>
-
-          {/* Save/Cancel/Reset Buttons */}
-          <div className="ml-4 flex gap-2">
+      {/* Quick Actions - Only show when editing */}
+      {isHeaderEditing && !isDesignMenuVisible && !isElementMenuVisible && (
+        <div 
+          className="absolute left-1/2 -translate-x-1/2 transform z-[1001]"
+          style={{ top: `${Math.max(headerHeight, 100)}px` }}
+        >
+          <div className="relative bottom-0 flex items-center gap-2 rounded-md bg-white px-2 py-1.5 shadow-lg">
             <button
-              onClick={handleCancelEditing}
-              className="rounded-md bg-white px-4 py-2 text-sm font-medium text-gray-900 shadow-lg hover:bg-gray-50"
+              onClick={() => {
+                setIsDesignMenuVisible(true);
+              }}
+              className="flex items-center gap-2 rounded px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100"
             >
-              Cancel
+              <HiOutlineDesktopComputer className="text-lg text-blue-600" />
+              Design Header
             </button>
+            <div className="h-4 w-px bg-gray-200" />
             <button
-              onClick={handleSaveChanges}
-              className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-lg hover:bg-blue-700"
+              onClick={() => {
+                setIsElementMenuVisible(true);
+              }}
+              className="flex items-center gap-2 rounded px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100"
             >
-              Save Changes
+              <HiPlus className="text-lg text-purple-600" />
+              Add Elements
             </button>
+            <div className="h-4 w-px bg-gray-200" />
             <button
-              onClick={handleResetHeader}
-              className="rounded-md bg-red-500 px-4 py-2 text-sm font-medium text-white shadow-lg hover:bg-red-600"
+              onClick={() => {
+                handleSaveChanges();
+                setIsHeaderEditing(false);
+              }}
+              className="flex items-center gap-2 rounded px-3 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
             >
-              Reset Header
+              Done
             </button>
           </div>
         </div>
       )}
 
+      {/* Menu Overlay - Added this new section */}
+      {(isDesignMenuVisible || isElementMenuVisible) && (
+        <div className="fixed inset-0 z-[1999] bg-transparent" onClick={() => {
+          setIsDesignMenuVisible(false);
+          setIsElementMenuVisible(false);
+        }} />
+      )}
+
       {/* Design Menu */}
       {isDesignMenuVisible && (
-        <div className="absolute right-0 top-full z-[2000] mt-4 w-80">
-          <div className="rounded-lg bg-white shadow-xl">
-            <Toolbar
-              onOptionChange={handleLayoutSelection}
-              onBgColorChange={handleColorChange}
-              onHeightChange={handleHeightChange}
-              initialHeight={(headerHeight - 60) / (140 / 9) + 1}
-              onClose={() => setIsDesignMenuVisible(false)}
-              initialLayoutOption={selectedLayout}
-            />
+        <div 
+          ref={menuRef}
+          className="absolute inset-x-0 top-full z-[2000]"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex w-full justify-end">
+            <div className="w-80 mr-1">
+              <div className="flex flex-col rounded-lg bg-white shadow-xl">
+                <Toolbar
+                  onOptionChange={handleLayoutSelection}
+                  onBgColorChange={handleColorChange}
+                  onHeightChange={handleHeightChange}
+                  initialHeight={(headerHeight - 60) / (140 / 9) + 1}
+                  onClose={() => {
+                    setIsDesignMenuVisible(false);
+                  }}
+                  initialLayoutOption={selectedLayout}
+                />
+              </div>
+            </div>
           </div>
         </div>
       )}
 
       {/* Elements Menu */}
       {isElementMenuVisible && (
-        <div className="absolute right-0 top-full z-[2000] mt-4 w-80">
-          <div className="rounded-lg bg-white p-4 shadow-xl">
-            <div className="mb-4 flex items-center justify-between border-b pb-2">
-              <h3 className="text-sm font-medium text-gray-900">
-                Add Elements
-              </h3>
-              <button
-                onClick={() => setIsElementMenuVisible(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                ×
-              </button>
+        <div 
+          ref={menuRef}
+          className="absolute inset-x-0 top-full z-[2000]"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex w-full justify-start">
+            <div className="w-80 ml-1">
+              <div className="flex flex-col rounded-lg bg-white shadow-xl">
+                <div className="flex items-center justify-between border-b p-4">
+                  <h3 className="font-medium">Add Elements</h3>
+                  <button
+                    onClick={() => setIsElementMenuVisible(false)}
+                    className="rounded p-1 hover:bg-gray-100"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5 text-gray-500"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                </div>
+                <div className="p-4">
+                  <ElementToolbar
+                    elements={elements}
+                    onElementChange={handleElementChange}
+                  />
+                </div>
+              </div>
             </div>
-            <ElementToolbar
-              elements={elements}
-              onElementChange={(elementType: keyof HeaderElements, value: boolean) => {
-                handleElementChange(elementType, value);
-                // Auto-save when elements change
-                const headerState: HeaderState = {
-                  elements: {
-                    ...elements,
-                    [elementType]: value,
-                  },
-                  headerHeight,
-                  selectedLayout,
-                  bgColor,
-                };
-                localStorage.setItem(
-                  "headerState",
-                  JSON.stringify(headerState),
-                );
-              }}
-            />
           </div>
         </div>
       )}

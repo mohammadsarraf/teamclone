@@ -41,7 +41,7 @@ export default function Page() {
             ${viewMode === "mobile" ? "mx-auto max-w-[375px]" : ""}`}
         >
           {/* Window Title Bar - Fixed at top */}
-          <div className="flex h-12 shrink-0 items-center justify-between bg-gray-900 px-4 rounded-t-xl">
+          <div className="flex h-12 shrink-0 items-center justify-between rounded-t-xl bg-gray-900 px-4">
             <div className="flex items-center space-x-4">
               {/* Window Controls */}
               <div className="flex items-center space-x-2">

@@ -40,7 +40,7 @@ export const layouts: { [key: string]: (props: LayoutProps) => JSX.Element } = {
   ),
   "Option 2": ({ isButton, isSocial, isCart, isAccount }) => (
     <>
-      <div className="flex space-x-4 items-center">
+      <div className="flex items-center space-x-4">
         <h1 className="text-2xl font-bold">Menu</h1>
         <button className="rounded px-2 py-1 text-2xl font-bold text-white">
           YourWebsiteTitle

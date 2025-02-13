@@ -8,9 +8,14 @@ interface ColorMenuProps {
   currentColor?: string;
 }
 
-export default function ColorMenu({ onColorChange, currentColor = "bg-black" }: ColorMenuProps) {
+export default function ColorMenu({
+  onColorChange,
+  currentColor = "bg-black",
+}: ColorMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'solid' | 'gradient' | 'image'>('solid');
+  const [activeTab, setActiveTab] = useState<"solid" | "gradient" | "image">(
+    "solid",
+  );
 
   const solidColors = [
     { name: "White", value: "bg-white", textColor: "text-gray-900" },
@@ -43,10 +48,12 @@ export default function ColorMenu({ onColorChange, currentColor = "bg-black" }: 
         className="flex w-full items-center justify-between rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
       >
         <div className="flex items-center gap-2">
-          <div className={`h-4 w-4 rounded ${currentColor}`} />
+          <div className={`size-4 rounded ${currentColor}`} />
           <span>Background Color</span>
         </div>
-        <HiChevronDown className={`transform transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <HiChevronDown
+          className={`transition-transform${isOpen ? "rotate-180" : ""}`}
+        />
       </button>
 
       {isOpen && (
@@ -54,27 +61,33 @@ export default function ColorMenu({ onColorChange, currentColor = "bg-black" }: 
           {/* Color Type Tabs */}
           <div className="mb-3 flex gap-2 border-b border-gray-200 pb-2">
             <button
-              onClick={() => setActiveTab('solid')}
+              onClick={() => setActiveTab("solid")}
               className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm ${
-                activeTab === 'solid' ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50'
+                activeTab === "solid"
+                  ? "bg-gray-100 text-gray-900"
+                  : "text-gray-600 hover:bg-gray-50"
               }`}
             >
               <HiOutlineColorSwatch className="text-lg" />
               Solid
             </button>
             <button
-              onClick={() => setActiveTab('gradient')}
+              onClick={() => setActiveTab("gradient")}
               className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm ${
-                activeTab === 'gradient' ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50'
+                activeTab === "gradient"
+                  ? "bg-gray-100 text-gray-900"
+                  : "text-gray-600 hover:bg-gray-50"
               }`}
             >
               <IoColorPaletteOutline className="text-lg" />
               Gradient
             </button>
             <button
-              onClick={() => setActiveTab('image')}
+              onClick={() => setActiveTab("image")}
               className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm ${
-                activeTab === 'image' ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50'
+                activeTab === "image"
+                  ? "bg-gray-100 text-gray-900"
+                  : "text-gray-600 hover:bg-gray-50"
               }`}
             >
               <RxTransparencyGrid className="text-lg" />
@@ -83,7 +96,7 @@ export default function ColorMenu({ onColorChange, currentColor = "bg-black" }: 
           </div>
 
           {/* Color Grid */}
-          {activeTab === 'solid' && (
+          {activeTab === "solid" && (
             <div className="grid grid-cols-4 gap-2">
               {solidColors.map((color) => (
                 <button
@@ -94,7 +107,9 @@ export default function ColorMenu({ onColorChange, currentColor = "bg-black" }: 
                   }}
                   className={`group relative h-14 w-full rounded-md ${color.value} hover:ring-2 hover:ring-blue-500 hover:ring-offset-2`}
                 >
-                  <span className={`absolute bottom-1 left-1 text-xs font-medium ${color.textColor} opacity-0 group-hover:opacity-100`}>
+                  <span
+                    className={`absolute bottom-1 left-1 text-xs font-medium ${color.textColor} opacity-0 group-hover:opacity-100`}
+                  >
                     {color.name}
                   </span>
                 </button>
@@ -103,7 +118,7 @@ export default function ColorMenu({ onColorChange, currentColor = "bg-black" }: 
           )}
 
           {/* Gradient Grid */}
-          {activeTab === 'gradient' && (
+          {activeTab === "gradient" && (
             <div className="grid grid-cols-2 gap-2">
               {gradients.map((gradient) => (
                 <button
@@ -123,10 +138,12 @@ export default function ColorMenu({ onColorChange, currentColor = "bg-black" }: 
           )}
 
           {/* Image Upload Section */}
-          {activeTab === 'image' && (
+          {activeTab === "image" && (
             <div className="flex flex-col items-center gap-2 p-4">
               <RxTransparencyGrid className="text-4xl text-gray-400" />
-              <p className="text-sm text-gray-600">Coming soon: Upload an image to use as background</p>
+              <p className="text-sm text-gray-600">
+                Coming soon: Upload an image to use as background
+              </p>
             </div>
           )}
         </div>

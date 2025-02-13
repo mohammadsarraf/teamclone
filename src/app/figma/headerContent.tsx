@@ -55,8 +55,12 @@ export default function HeaderContent({
 }: HeaderContentProps) {
   const [isHeaderHovered, setIsHeaderHovered] = useState(false);
   const [isHeaderEditing, setIsHeaderEditing] = useState(false);
-  const [elements, setElements] = useState<HeaderElements>(DEFAULT_HEADER_STATE.elements);
-  const [headerHeight, setHeaderHeight] = useState(DEFAULT_HEADER_STATE.headerHeight);
+  const [elements, setElements] = useState<HeaderElements>(
+    DEFAULT_HEADER_STATE.elements,
+  );
+  const [headerHeight, setHeaderHeight] = useState(
+    DEFAULT_HEADER_STATE.headerHeight,
+  );
   const [savedState, setSavedState] = useState({
     elements,
     headerHeight,
@@ -73,7 +77,9 @@ export default function HeaderContent({
     if (savedHeader) {
       const parsedState = JSON.parse(savedHeader) as HeaderState;
       setElements(parsedState.elements);
-      setHeaderHeight(parsedState.headerHeight || DEFAULT_HEADER_STATE.headerHeight);
+      setHeaderHeight(
+        parsedState.headerHeight || DEFAULT_HEADER_STATE.headerHeight,
+      );
       handleLayoutSelection(parsedState.selectedLayout);
       handleColorChange(parsedState.bgColor);
     }
@@ -98,15 +104,15 @@ export default function HeaderContent({
   useEffect(() => {
     // When either menu is open, prevent body scroll
     if (isDesignMenuVisible || isElementMenuVisible) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
       // When menus are closed, restore body scroll
-      document.body.style.overflow = 'auto';
+      document.body.style.overflow = "auto";
     }
 
     // Cleanup function to ensure scroll is restored when component unmounts
     return () => {
-      document.body.style.overflow = 'auto';
+      document.body.style.overflow = "auto";
     };
   }, [isDesignMenuVisible, isElementMenuVisible]);
 
@@ -194,7 +200,7 @@ export default function HeaderContent({
   // Pass the correct initial height to Toolbar
   const calculateInitialHeight = () => {
     // Convert pixel height back to scale value (1-10)
-    return ((headerHeight - 100) / (100)) * 9 + 1;
+    return ((headerHeight - 100) / 100) * 9 + 1;
   };
 
   return (
@@ -218,9 +224,9 @@ export default function HeaderContent({
 
         {/* Edit Header Button - Shows on hover */}
         {!isHeaderEditing && (
-          <div 
+          <div
             className={`absolute inset-0 flex items-center justify-center transition-opacity duration-200 ${
-              isHeaderHovered ? 'opacity-100' : 'opacity-0'
+              isHeaderHovered ? "opacity-100" : "opacity-0"
             }`}
           >
             <button
@@ -236,9 +242,7 @@ export default function HeaderContent({
 
       {/* Quick Actions - Only show when editing */}
       {isHeaderEditing && !isDesignMenuVisible && !isElementMenuVisible && (
-        <div 
-          className="absolute left-1/2 -translate-x-1/2 bottom-0 translate-y-1/2 z-[1001]"
-        >
+        <div className="absolute bottom-0 left-1/2 z-[1001] -translate-x-1/2 translate-y-1/2">
           <div className="flex items-center gap-2 rounded-md bg-white px-2 py-1.5 shadow-lg">
             <button
               onClick={() => {
@@ -265,7 +269,7 @@ export default function HeaderContent({
                 handleSaveChanges();
                 setIsHeaderEditing(false);
               }}
-              className="flex items-center gap-2 rounded px-3 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+              className="flex items-center gap-2 rounded bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700"
             >
               Done
             </button>
@@ -275,8 +279,8 @@ export default function HeaderContent({
 
       {/* Menu Overlay */}
       {(isDesignMenuVisible || isElementMenuVisible) && (
-        <div 
-          className="fixed inset-0 z-[1999] bg-black/20" 
+        <div
+          className="fixed inset-0 z-[1999] bg-black/20"
           onClick={() => {
             setIsDesignMenuVisible(false);
             setIsElementMenuVisible(false);
@@ -286,16 +290,18 @@ export default function HeaderContent({
 
       {/* Design Menu - Right side */}
       {isDesignMenuVisible && (
-        <div 
+        <div
           ref={menuRef}
           className="absolute right-0 z-[2000] max-h-[calc(100vh-var(--header-height))] overflow-y-auto"
-          style={{ 
-            top: `${Math.max(headerHeight, 100)}px`,
-            '--header-height': `${Math.max(headerHeight, 100)}px`
-          } as React.CSSProperties}
+          style={
+            {
+              top: `${Math.max(headerHeight, 100)}px`,
+              "--header-height": `${Math.max(headerHeight, 100)}px`,
+            } as React.CSSProperties
+          }
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="w-80 mr-1">
+          <div className="mr-1 w-80">
             <div className="flex flex-col rounded-lg bg-white shadow-xl">
               <Toolbar
                 onOptionChange={handleLayoutSelection}
@@ -314,16 +320,18 @@ export default function HeaderContent({
 
       {/* Elements Menu - Left side */}
       {isElementMenuVisible && (
-        <div 
+        <div
           ref={menuRef}
           className="absolute left-0 z-[2000] max-h-[calc(100vh-var(--header-height))] overflow-y-auto"
-          style={{ 
-            top: `${Math.max(headerHeight, 100)}px`,
-            '--header-height': `${Math.max(headerHeight, 100)}px`
-          } as React.CSSProperties}
+          style={
+            {
+              top: `${Math.max(headerHeight, 100)}px`,
+              "--header-height": `${Math.max(headerHeight, 100)}px`,
+            } as React.CSSProperties
+          }
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="w-80 ml-1">
+          <div className="ml-1 w-80">
             <div className="flex flex-col rounded-lg bg-white shadow-xl">
               <div className="flex items-center justify-between border-b p-4">
                 <h3 className="font-medium text-black">Add Elements</h3>
@@ -333,7 +341,7 @@ export default function HeaderContent({
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 text-gray-500"
+                    className="size-5 text-gray-500"
                     viewBox="0 0 20 20"
                     fill="currentColor"
                   >

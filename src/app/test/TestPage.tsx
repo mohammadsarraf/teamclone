@@ -23,6 +23,7 @@ import {
   MdRedo,
 } from "react-icons/md";
 import { EditBar } from "./components/EditBar";
+import { FooterDesignMenu } from "./components/menus/FooterDesignMenu";
 
 // Dynamically import Zdog components with no SSR
 const ZdogComponents = dynamic(() => import("./components/ZdogComponents"), {
@@ -37,6 +38,17 @@ const ShapeComponents = dynamic(() => import("./components/ShapeComponents"), {
 const TextBox = dynamic(() => import("./components/TextBox"), { ssr: false });
 
 const initialLayout: Block[] = [];
+
+// Update the state interface to include backgroundColor
+interface SavedState {
+  layout: Block[];
+  positions: {
+    [key: string]: { x: number; y: number; w: number; h: number };
+  };
+  cols: number;
+  rows: number;
+  backgroundColor: string;
+}
 
 // Make sure to export the interface
 export interface TestPageProps {
@@ -88,6 +100,8 @@ const TestPage = ({
   const [showShapesSubmenu, setShowShapesSubmenu] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [showEditBar, setShowEditBar] = useState(false);
+  const [showDesignMenu, setShowDesignMenu] = useState(false);
+  const [backgroundColor, setBackgroundColor] = useState("#ffffff");
 
   const containerWidth = useWindowSize();
   const unitSize = containerWidth / cols;
@@ -226,16 +240,17 @@ const TestPage = ({
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, [historyIndex, history]);
 
-  // Load saved state on component mount
+  // Update the load state useEffect
   useEffect(() => {
     const savedState = localStorage.getItem(`${stateKey}State`);
     if (savedState) {
       try {
-        const state = JSON.parse(savedState);
+        const state: SavedState = JSON.parse(savedState);
         if (state.layout) setLayoutState(state.layout);
         if (state.positions) setPositions(state.positions);
         if (state.cols) setCols(state.cols);
         if (state.rows) setRows(state.rows);
+        if (state.backgroundColor) setBackgroundColor(state.backgroundColor);
       } catch (error) {
         console.error(`Error loading ${stateKey} state:`, error);
         localStorage.removeItem(`${stateKey}State`);
@@ -309,8 +324,7 @@ const TestPage = ({
 
   // Function to handle design click
   const handleDesignClick = () => {
-    setShowEditBar(!showEditBar);
-    // Close menu when toggling design mode
+    setShowDesignMenu(!showDesignMenu);
     setActiveMenu(null);
   };
 
@@ -346,27 +360,27 @@ const TestPage = ({
     setActiveMenu(null);
   };
 
+  // Update the save changes handler
   const handleSaveChanges = () => {
-    // Save state to localStorage
-    const state = {
+    const state: SavedState = {
       layout: layoutState,
       positions,
       cols,
       rows,
+      backgroundColor,
     };
     localStorage.setItem(`${stateKey}State`, JSON.stringify(state));
-    // Close menu after saving
     setActiveMenu(null);
   };
 
+  // Update the reset changes handler
   const handleResetChanges = () => {
-    // Clear localStorage and reset to initial state
     localStorage.removeItem(`${stateKey}State`);
     setLayoutState(initialLayout);
     setPositions({});
     setCols(initialCols);
     setRows(initialRows);
-    // Close menu after resetting
+    setBackgroundColor("#ffffff");
     setActiveMenu(null);
   };
 
@@ -378,9 +392,26 @@ const TestPage = ({
     canRedo: historyIndex < history.length - 1,
   };
 
+  // Add color change handler
+  const handleColorChange = (color: string) => {
+    setBackgroundColor(color);
+  };
+
   return (
     <div className="relative size-full">
-      <div className={`relative size-full ${className}`}>
+      <div
+        className={`relative size-full ${className}`}
+        style={{
+          backgroundColor: backgroundColor.startsWith("#")
+            ? backgroundColor
+            : "transparent",
+          backgroundImage: backgroundColor.startsWith("linear-gradient")
+            ? backgroundColor
+            : "none",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
         <GridOverlay
           show={isDragging || isResizing}
           cols={cols}
@@ -546,6 +577,15 @@ const TestPage = ({
               </div>
             ))}
           </GridContainer>
+
+          {/* Add the design menu */}
+          {showDesignMenu && (
+            <FooterDesignMenu
+              onColorChange={handleColorChange}
+              handleClose={() => setShowDesignMenu(false)}
+              currentColor={backgroundColor}
+            />
+          )}
 
           <div className="relative">
             <EditBar

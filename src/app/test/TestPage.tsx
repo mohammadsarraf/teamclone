@@ -14,7 +14,14 @@ import { Block } from "./types";
 import { AiOutlineSearch } from "react-icons/ai";
 import { RiText } from "react-icons/ri";
 import { FaShapes } from "react-icons/fa6";
-import { MdAdd, MdEdit, MdSettings, MdStyle, MdUndo, MdRedo } from "react-icons/md";
+import {
+  MdAdd,
+  MdEdit,
+  MdSettings,
+  MdStyle,
+  MdUndo,
+  MdRedo,
+} from "react-icons/md";
 import { EditBar } from "./components/EditBar";
 
 // Dynamically import Zdog components with no SSR
@@ -93,10 +100,11 @@ const TestPage = ({
   const updateLayoutWithHistory = (newLayout: Block[]) => {
     // Check if the new layout is actually different from the current one
     const currentLayout = history[historyIndex];
-    const hasChanged = JSON.stringify(currentLayout) !== JSON.stringify(newLayout);
-    
-    console.log('History Update:', {
-      action: 'attempt',
+    const hasChanged =
+      JSON.stringify(currentLayout) !== JSON.stringify(newLayout);
+
+    console.log("History Update:", {
+      action: "attempt",
       currentHistoryIndex: historyIndex,
       historyLength: history.length,
       hasChanged,
@@ -108,25 +116,25 @@ const TestPage = ({
     // Only update history if there's an actual change
     if (hasChanged) {
       setLayoutState(newLayout);
-      
+
       // Remove any future history after current index
       const newHistory = history.slice(0, historyIndex + 1);
-      
+
       // Add new layout to history
       const updatedHistory = [...newHistory, newLayout];
       setHistory(updatedHistory);
       setHistoryIndex(historyIndex + 1);
-      
-      console.log('History Update:', {
-        action: 'success',
+
+      console.log("History Update:", {
+        action: "success",
         newHistoryIndex: historyIndex + 1,
         newHistoryLength: updatedHistory.length,
         historyStack: updatedHistory,
       });
     } else {
-      console.log('History Update:', {
-        action: 'skipped',
-        reason: 'no changes detected',
+      console.log("History Update:", {
+        action: "skipped",
+        reason: "no changes detected",
         historyStack: history,
       });
     }
@@ -137,9 +145,9 @@ const TestPage = ({
     if (historyIndex > 0) {
       const newIndex = historyIndex - 1;
       const newLayout = history[newIndex];
-      
-      console.log('Undo:', {
-        action: 'start',
+
+      console.log("Undo:", {
+        action: "start",
         currentIndex: historyIndex,
         newIndex,
         currentLayout: history[historyIndex],
@@ -161,7 +169,7 @@ const TestPage = ({
       new ShapeManager(
         layoutState,
         (newLayout: Block[] | ((prevLayout: Block[]) => Block[])) => {
-          if (typeof newLayout === 'function') {
+          if (typeof newLayout === "function") {
             const updatedLayout = newLayout(layoutState);
             updateLayoutWithHistory(updatedLayout);
           } else {
@@ -193,9 +201,9 @@ const TestPage = ({
       ...block,
       ...newLayout[index],
     }));
-    
+
     updateLayoutWithHistory(updatedLayout);
-    
+
     if (onLayoutChange) {
       onLayoutChange(updatedLayout);
     }
@@ -204,7 +212,7 @@ const TestPage = ({
   // Add keyboard shortcuts for undo/redo
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+      if ((e.ctrlKey || e.metaKey) && e.key === "z") {
         e.preventDefault();
         if (e.shiftKey) {
           handleRedo();
@@ -214,8 +222,8 @@ const TestPage = ({
       }
     };
 
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
   }, [historyIndex, history]);
 
   // Load saved state on component mount

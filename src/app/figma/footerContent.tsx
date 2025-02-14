@@ -98,11 +98,11 @@ const FooterContent = ({ stateKey }: FooterContentProps) => {
   // Update layout change handler to handle Block type
   const handleLayoutChange = (newLayout: Layout[]) => {
     // Convert Layout to Block if necessary
-    const blockLayout = newLayout.map(item => ({
+    const blockLayout = newLayout.map((item) => ({
       ...item,
-      shape: (layout.find(block => block.i === item.i)?.shape || 'text'),
-      color: (layout.find(block => block.i === item.i)?.color || '#000000'),
-      opacity: (layout.find(block => block.i === item.i)?.opacity || 100),
+      shape: layout.find((block) => block.i === item.i)?.shape || "text",
+      color: layout.find((block) => block.i === item.i)?.color || "#000000",
+      opacity: layout.find((block) => block.i === item.i)?.opacity || 100,
     })) as Block[];
     setLayout(blockLayout);
     setHasUnsavedChanges(true);

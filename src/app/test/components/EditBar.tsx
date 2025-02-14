@@ -159,7 +159,7 @@ export const EditBar = ({
           onClick={onUndo}
           disabled={!canUndo}
           className={`edit-bar-button pointer-events-auto flex items-center gap-2 rounded px-3 py-1.5 text-sm transition-colors 
-            ${canUndo ? 'hover:bg-gray-700 active:bg-gray-600' : 'opacity-50 cursor-not-allowed'}`}
+            ${canUndo ? "hover:bg-gray-700 active:bg-gray-600" : "cursor-not-allowed opacity-50"}`}
         >
           <MdUndo className="text-lg" />
           Undo
@@ -169,7 +169,7 @@ export const EditBar = ({
           onClick={onRedo}
           disabled={!canRedo}
           className={`edit-bar-button pointer-events-auto flex items-center gap-2 rounded px-3 py-1.5 text-sm transition-colors
-            ${canRedo ? 'hover:bg-gray-700 active:bg-gray-600' : 'opacity-50 cursor-not-allowed'}`}
+            ${canRedo ? "hover:bg-gray-700 active:bg-gray-600" : "cursor-not-allowed opacity-50"}`}
         >
           <MdRedo className="text-lg" />
           Redo

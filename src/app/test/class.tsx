@@ -36,7 +36,7 @@ export class ShapeManager {
       prevLayout.map((block) => {
         const newPos = newLayout.find((item) => item.i === block.i);
         return newPos ? { ...block, ...newPos } : block;
-      })
+      }),
     );
   };
 
@@ -93,8 +93,8 @@ export class ShapeManager {
   handleColorChange = (blockId: string, color: string) => {
     this.setLayout((prevLayout: Block[]) =>
       prevLayout.map((block) =>
-        block.i === blockId ? { ...block, color } : block
-      )
+        block.i === blockId ? { ...block, color } : block,
+      ),
     );
   };
 
@@ -119,16 +119,16 @@ export class ShapeManager {
   handleOpacityChange = (blockId: string, opacity: number) => {
     this.setLayout((prevLayout: Block[]) =>
       prevLayout.map((block) =>
-        block.i === blockId ? { ...block, opacity } : block
-      )
+        block.i === blockId ? { ...block, opacity } : block,
+      ),
     );
   };
 
   handleRotationChange = (blockId: string, rotation: number) => {
     this.setLayout((prevLayout: Block[]) =>
       prevLayout.map((block) =>
-        block.i === blockId ? { ...block, rotation } : block
-      )
+        block.i === blockId ? { ...block, rotation } : block,
+      ),
     );
   };
 

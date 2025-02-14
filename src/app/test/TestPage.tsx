@@ -14,7 +14,7 @@ import { Block } from "./types";
 import { AiOutlineSearch } from "react-icons/ai";
 import { RiText } from "react-icons/ri";
 import { FaShapes } from "react-icons/fa6";
-import { MdAdd, MdEdit, MdSettings, MdStyle } from "react-icons/md";
+import { MdAdd, MdEdit, MdSettings, MdStyle, MdUndo, MdRedo } from "react-icons/md";
 import { EditBar } from "./components/EditBar";
 
 // Dynamically import Zdog components with no SSR
@@ -85,19 +85,138 @@ const TestPage = ({
   const containerWidth = useWindowSize();
   const unitSize = containerWidth / cols;
 
-  // Create ShapeManager instance
+  // Initialize history with the initial layout
+  const [history, setHistory] = useState<Block[][]>([layout || initialLayout]);
+  const [historyIndex, setHistoryIndex] = useState<number>(0);
+
+  // Update the updateLayoutWithHistory function with more detailed logging
+  const updateLayoutWithHistory = (newLayout: Block[]) => {
+    // Check if the new layout is actually different from the current one
+    const currentLayout = history[historyIndex];
+    const hasChanged = JSON.stringify(currentLayout) !== JSON.stringify(newLayout);
+    
+    console.log('History Update:', {
+      action: 'attempt',
+      currentHistoryIndex: historyIndex,
+      historyLength: history.length,
+      hasChanged,
+      currentLayout,
+      newLayout,
+      historyStack: history,
+    });
+
+    // Only update history if there's an actual change
+    if (hasChanged) {
+      setLayoutState(newLayout);
+      
+      // Remove any future history after current index
+      const newHistory = history.slice(0, historyIndex + 1);
+      
+      // Add new layout to history
+      const updatedHistory = [...newHistory, newLayout];
+      setHistory(updatedHistory);
+      setHistoryIndex(historyIndex + 1);
+      
+      console.log('History Update:', {
+        action: 'success',
+        newHistoryIndex: historyIndex + 1,
+        newHistoryLength: updatedHistory.length,
+        historyStack: updatedHistory,
+      });
+    } else {
+      console.log('History Update:', {
+        action: 'skipped',
+        reason: 'no changes detected',
+        historyStack: history,
+      });
+    }
+  };
+
+  // Update the handleUndo function with logging
+  const handleUndo = () => {
+    if (historyIndex > 0) {
+      const newIndex = historyIndex - 1;
+      const newLayout = history[newIndex];
+      
+      console.log('Undo:', {
+        action: 'start',
+        currentIndex: historyIndex,
+        newIndex,
+        currentLayout: history[historyIndex],
+        targetLayout: newLayout,
+        historyStack: history,
+      });
+
+      setHistoryIndex(newIndex);
+      setLayoutState(newLayout);
+      if (onLayoutChange) {
+        onLayoutChange(newLayout);
+      }
+    }
+  };
+
+  // Create ShapeManager instance with history-aware updates
   const shapeManager = useMemo(
     () =>
       new ShapeManager(
         layoutState,
-        setLayoutState,
+        (newLayout: Block[] | ((prevLayout: Block[]) => Block[])) => {
+          if (typeof newLayout === 'function') {
+            const updatedLayout = newLayout(layoutState);
+            updateLayoutWithHistory(updatedLayout);
+          } else {
+            updateLayoutWithHistory(newLayout);
+          }
+        },
         positions,
         setPositions,
         activeShape,
         setActiveShape,
       ),
-    [layoutState, positions, activeShape],
+    [layoutState, positions, activeShape, updateLayoutWithHistory],
   );
+
+  // Add undo/redo functions
+  const handleRedo = () => {
+    if (historyIndex < history.length - 1) {
+      setHistoryIndex(historyIndex + 1);
+      setLayoutState(history[historyIndex + 1]);
+      if (onLayoutChange) {
+        onLayoutChange(history[historyIndex + 1]);
+      }
+    }
+  };
+
+  // Update existing handleLayoutChange
+  const handleLayoutChange = (newLayout: Layout[]) => {
+    const updatedLayout = layoutState.map((block, index) => ({
+      ...block,
+      ...newLayout[index],
+    }));
+    
+    updateLayoutWithHistory(updatedLayout);
+    
+    if (onLayoutChange) {
+      onLayoutChange(updatedLayout);
+    }
+  };
+
+  // Add keyboard shortcuts for undo/redo
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+        e.preventDefault();
+        if (e.shiftKey) {
+          handleRedo();
+        } else {
+          handleUndo();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [historyIndex, history]);
 
   // Load saved state on component mount
   useEffect(() => {
@@ -243,6 +362,14 @@ const TestPage = ({
     setActiveMenu(null);
   };
 
+  // Add history buttons to EditBar
+  const editBarProps = {
+    onUndo: handleUndo,
+    onRedo: handleRedo,
+    canUndo: historyIndex > 0,
+    canRedo: historyIndex < history.length - 1,
+  };
+
   return (
     <div className="relative size-full">
       <div className={`relative size-full ${className}`}>
@@ -264,17 +391,30 @@ const TestPage = ({
             rows={rows}
             unitSize={unitSize}
             layout={layoutState}
-            onLayoutChange={shapeManager.handleLayoutChange}
+            onLayoutChange={(layout) => {
+              // Only handle layout changes that aren't from resize/drag operations
+              if (!isResizing && !isDragging) {
+                handleLayoutChange(layout);
+              }
+            }}
             onResizeStop={(layout, oldItem, newItem) => {
-              shapeManager.handleLayoutChange(layout);
+              // Handle resize completion
+              handleLayoutChange(layout);
               shapeManager.handleResizeStop(layout, oldItem, newItem);
               setIsResizing(false);
             }}
-            onResizeStart={() => setIsResizing(true)}
-            onDragStart={() => setIsDragging(true)}
+            onResizeStart={() => {
+              setIsResizing(true);
+              setActiveMenu(null);
+            }}
+            onDragStart={() => {
+              setIsDragging(true);
+              setActiveMenu(null);
+            }}
             onDragStop={(layout: Layout[]) => {
+              // Handle drag completion
+              handleLayoutChange(layout);
               setIsDragging(false);
-              shapeManager.handleLayoutChange(layout);
             }}
             preventCollision={false}
             allowOverlap={true}
@@ -417,6 +557,10 @@ const TestPage = ({
               position={editBarPosition}
               offset={editBarOffset}
               onClose={onClose}
+              onUndo={handleUndo}
+              onRedo={handleRedo}
+              canUndo={historyIndex > 0}
+              canRedo={historyIndex < history.length - 1}
             />
           </div>
         </div>

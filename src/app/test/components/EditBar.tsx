@@ -6,6 +6,8 @@ import {
   MdStyle,
   MdSave,
   MdRestartAlt,
+  MdUndo,
+  MdRedo,
 } from "react-icons/md";
 import AddBlock from "../../figma/addBlock";
 import { SettingsMenu } from "./menus/SettingsMenu";
@@ -27,6 +29,10 @@ interface EditBarProps {
   position?: "fixed" | "relative";
   offset?: number;
   onClose?: () => void;
+  onUndo?: () => void;
+  onRedo?: () => void;
+  canUndo?: boolean;
+  canRedo?: boolean;
 }
 
 export const EditBar = ({
@@ -46,6 +52,10 @@ export const EditBar = ({
   position,
   offset,
   onClose,
+  onUndo,
+  onRedo,
+  canUndo = false,
+  canRedo = false,
 }: EditBarProps) => {
   const [isMenuVisible, setIsMenuVisible] = React.useState(false);
   const [isSettingsVisible, setIsSettingsVisible] = React.useState(false);
@@ -142,6 +152,27 @@ export const EditBar = ({
         >
           <MdRestartAlt className="text-lg" />
           Reset
+        </button>
+        <div className="h-4 w-px bg-gray-700"></div>
+        <button
+          type="button"
+          onClick={onUndo}
+          disabled={!canUndo}
+          className={`edit-bar-button pointer-events-auto flex items-center gap-2 rounded px-3 py-1.5 text-sm transition-colors 
+            ${canUndo ? 'hover:bg-gray-700 active:bg-gray-600' : 'opacity-50 cursor-not-allowed'}`}
+        >
+          <MdUndo className="text-lg" />
+          Undo
+        </button>
+        <button
+          type="button"
+          onClick={onRedo}
+          disabled={!canRedo}
+          className={`edit-bar-button pointer-events-auto flex items-center gap-2 rounded px-3 py-1.5 text-sm transition-colors
+            ${canRedo ? 'hover:bg-gray-700 active:bg-gray-600' : 'opacity-50 cursor-not-allowed'}`}
+        >
+          <MdRedo className="text-lg" />
+          Redo
         </button>
       </div>
 

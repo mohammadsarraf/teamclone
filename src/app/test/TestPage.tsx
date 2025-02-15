@@ -39,6 +39,12 @@ const TextBox = dynamic(() => import("./components/TextBox"), { ssr: false });
 
 const initialLayout: Block[] = [];
 
+// Update the state interface to include backgroundColor in history entries
+interface HistoryState {
+  layout: Block[];
+  backgroundColor: string;
+}
+
 // Update the state interface to include backgroundColor
 interface SavedState {
   layout: Block[];
@@ -106,73 +112,99 @@ const TestPage = ({
   const containerWidth = useWindowSize();
   const unitSize = containerWidth / cols;
 
-  // Initialize history with the initial layout
-  const [history, setHistory] = useState<Block[][]>([layout || initialLayout]);
+  // Update the history state initialization
+  const [history, setHistory] = useState<HistoryState[]>([
+    { layout: initialLayout, backgroundColor: "#ffffff" },
+  ]);
   const [historyIndex, setHistoryIndex] = useState<number>(0);
 
-  // Update the updateLayoutWithHistory function with more detailed logging
-  const updateLayoutWithHistory = (newLayout: Block[]) => {
-    // Check if the new layout is actually different from the current one
-    const currentLayout = history[historyIndex];
+  // Update updateLayoutWithHistory to handle both layout and background color
+  const updateLayoutWithHistory = (
+    newLayout: Block[],
+    newBackgroundColor?: string,
+  ) => {
+    const currentState = history[historyIndex];
+    const nextState = {
+      layout: newLayout,
+      backgroundColor: newBackgroundColor ?? currentState.backgroundColor,
+    };
+
     const hasChanged =
-      JSON.stringify(currentLayout) !== JSON.stringify(newLayout);
+      JSON.stringify(currentState) !== JSON.stringify(nextState);
 
     console.log("History Update:", {
       action: "attempt",
       currentHistoryIndex: historyIndex,
       historyLength: history.length,
       hasChanged,
-      currentLayout,
-      newLayout,
+      currentState,
+      nextState,
       historyStack: history,
     });
 
-    // Only update history if there's an actual change
     if (hasChanged) {
-      setLayoutState(newLayout);
+      setLayoutState(nextState.layout);
+      setBackgroundColor(nextState.backgroundColor);
 
-      // Remove any future history after current index
       const newHistory = history.slice(0, historyIndex + 1);
+      const updatedHistory = [...newHistory, nextState];
 
-      // Add new layout to history
-      const updatedHistory = [...newHistory, newLayout];
       setHistory(updatedHistory);
-      setHistoryIndex(historyIndex + 1);
+      setHistoryIndex(updatedHistory.length - 1);
 
       console.log("History Update:", {
         action: "success",
-        newHistoryIndex: historyIndex + 1,
+        newHistoryIndex: updatedHistory.length - 1,
         newHistoryLength: updatedHistory.length,
         historyStack: updatedHistory,
-      });
-    } else {
-      console.log("History Update:", {
-        action: "skipped",
-        reason: "no changes detected",
-        historyStack: history,
       });
     }
   };
 
-  // Update the handleUndo function with logging
+  // Update handleUndo
   const handleUndo = () => {
     if (historyIndex > 0) {
       const newIndex = historyIndex - 1;
-      const newLayout = history[newIndex];
+      const previousState = history[newIndex];
 
       console.log("Undo:", {
         action: "start",
         currentIndex: historyIndex,
         newIndex,
-        currentLayout: history[historyIndex],
-        targetLayout: newLayout,
+        currentState: history[historyIndex],
+        targetState: previousState,
         historyStack: history,
       });
 
       setHistoryIndex(newIndex);
-      setLayoutState(newLayout);
+      setLayoutState(previousState.layout);
+      setBackgroundColor(previousState.backgroundColor);
       if (onLayoutChange) {
-        onLayoutChange(newLayout);
+        onLayoutChange(previousState.layout);
+      }
+    }
+  };
+
+  // Update handleRedo
+  const handleRedo = () => {
+    if (historyIndex < history.length - 1) {
+      const newIndex = historyIndex + 1;
+      const nextState = history[newIndex];
+
+      console.log("Redo:", {
+        action: "start",
+        currentIndex: historyIndex,
+        newIndex,
+        currentState: history[historyIndex],
+        targetState: nextState,
+        historyStack: history,
+      });
+
+      setHistoryIndex(newIndex);
+      setLayoutState(nextState.layout);
+      setBackgroundColor(nextState.backgroundColor);
+      if (onLayoutChange) {
+        onLayoutChange(nextState.layout);
       }
     }
   };
@@ -197,17 +229,6 @@ const TestPage = ({
       ),
     [layoutState, positions, activeShape, updateLayoutWithHistory],
   );
-
-  // Add undo/redo functions
-  const handleRedo = () => {
-    if (historyIndex < history.length - 1) {
-      setHistoryIndex(historyIndex + 1);
-      setLayoutState(history[historyIndex + 1]);
-      if (onLayoutChange) {
-        onLayoutChange(history[historyIndex + 1]);
-      }
-    }
-  };
 
   // Update existing handleLayoutChange
   const handleLayoutChange = (newLayout: Layout[]) => {
@@ -240,13 +261,20 @@ const TestPage = ({
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, [historyIndex, history]);
 
-  // Update the load state useEffect
+  // Update the load state useEffect to reset history when loading saved state
   useEffect(() => {
     const savedState = localStorage.getItem(`${stateKey}State`);
     if (savedState) {
       try {
         const state: SavedState = JSON.parse(savedState);
-        if (state.layout) setLayoutState(state.layout);
+        if (state.layout) {
+          setLayoutState(state.layout);
+          // Reset history with the loaded layout as the initial state
+          setHistory([
+            { layout: state.layout, backgroundColor: state.backgroundColor },
+          ]);
+          setHistoryIndex(0);
+        }
         if (state.positions) setPositions(state.positions);
         if (state.cols) setCols(state.cols);
         if (state.rows) setRows(state.rows);
@@ -380,7 +408,7 @@ const TestPage = ({
     setPositions({});
     setCols(initialCols);
     setRows(initialRows);
-    setBackgroundColor("#ffffff");
+    setBackgroundColor("#000000");
     setActiveMenu(null);
   };
 
@@ -392,9 +420,9 @@ const TestPage = ({
     canRedo: historyIndex < history.length - 1,
   };
 
-  // Add color change handler
+  // Update handleColorChange
   const handleColorChange = (color: string) => {
-    setBackgroundColor(color);
+    updateLayoutWithHistory(layoutState, color);
   };
 
   return (

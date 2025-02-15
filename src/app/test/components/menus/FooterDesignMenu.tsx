@@ -19,7 +19,7 @@ interface FooterDesignMenuProps {
 export const FooterDesignMenu = ({
   onColorChange,
   handleClose,
-  currentColor = "#ffffff",
+  currentColor = "#000000",
 }: FooterDesignMenuProps) => {
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [activeTab, setActiveTab] = useState("style"); // style, layout, spacing

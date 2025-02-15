@@ -41,7 +41,7 @@ const TextDesignMenu: React.FC<TextDesignMenuProps> = ({
 }) => {
   return (
     <div className="menu-content w-[300px] rounded-xl bg-white p-4 shadow-xl">
-      <div className="max-h-80 overflow-y-auto">
+      <div className=" overflow-y-auto">
         {/* Menu Header */}
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-black">Text Design</h3>
@@ -62,7 +62,7 @@ const TextDesignMenu: React.FC<TextDesignMenuProps> = ({
         </div>
 
         {/* Menu Content */}
-        <div className="space-y-6">
+        <div className="max-h-80 space-y-6 overflow-auto">
           {/* Typography */}
           <div className="mb-4 border-b border-gray-200 pb-3">
             <h3 className="mb-2 font-medium text-gray-800">Typography</h3>

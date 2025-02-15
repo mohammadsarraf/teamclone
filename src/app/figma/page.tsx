@@ -102,10 +102,22 @@ export default function Page() {
 
           {/* Scrollable Content Area */}
           <div
-            className="min-h-0 flex-1 overflow-y-auto scroll-smooth"
+            className="relative min-h-0 flex-1 overflow-y-auto scroll-smooth"
             id="content-container"
             style={{ visibility: isContentLoaded ? "visible" : "hidden" }}
           >
+            {/* Protective overlay when not editing */}
+            {!isEditing && (
+              <div
+                className="absolute inset-0 z-50 bg-transparent"
+                style={{ pointerEvents: "auto" }}
+                onClick={() => {
+                  // Optional: You could add a tooltip or message here
+                  console.log("Please click 'Edit' to modify the content");
+                }}
+              />
+            )}
+
             {/* Header */}
             <div className="z-10 bg-gray-800">
               <HeaderContent

@@ -25,7 +25,7 @@ const createSingleLineExtension = (onEnter: () => void) => {
 
 interface TextBoxProps {
   text: string;
-  onTextChange: (newText: string) => void;
+  onTextChange: (newText: string, newAlignment: "left" | "center" | "right") => void;
   isActive?: boolean;
   onStartEdit?: () => void;
   onEnterPress?: () => void;
@@ -76,10 +76,7 @@ const TextBox = ({
         blockquote: false,
         codeBlock: false,
         horizontalRule: false,
-        hardBreak: {
-          keepMarks: true,
-          HTMLAttributes: {},
-        }, // Configure hardBreak properly
+        hardBreak: true, // Enable hard breaks
       }),
       TextStyle,
       TextAlign.configure({
@@ -91,22 +88,80 @@ const TextBox = ({
         placeholder: "Type something...",
         emptyEditorClass: "is-editor-empty",
       }),
+      // Custom enter handler
+      Extension.create({
+        name: 'customEnter',
+        addKeyboardShortcuts() {
+          return {
+            Enter: () => {
+              if (this.editor.isActive('hardBreak')) {
+                return false;
+              }
+              this.editor.commands.setHardBreak();
+              return true;
+            },
+            'Shift-Enter': () => {
+              this.editor.commands.setHardBreak();
+              return true;
+            }
+          };
+        }
+      }),
     ],
-    content: text,
+    content: {
+      type: 'doc',
+      content: [{
+        type: 'paragraph',
+        attrs: { textAlign: textAlign }, // Set initial text alignment
+        content: text ? [{ type: 'text', text }] : []
+      }]
+    },
     editable: true,
     autofocus: false,
     onUpdate: ({ editor }) => {
-      onTextChange(editor.getText());
+      // Get the JSON content to preserve line breaks and alignment
+      const jsonContent = editor.getJSON();
+      
+      // Convert the JSON content to text with proper line breaks
+      const textContent = jsonContent.content
+        ?.map(node => {
+          if (node.type === 'paragraph') {
+            // Get the alignment from the node attributes
+            const alignment = node.attrs?.textAlign || 'left';
+            const text = node.content
+              ?.map(textNode => {
+                if (textNode.type === 'hardBreak') {
+                  return '\n';
+                }
+                return textNode.text || '';
+              })
+              .join('') || '';
+            
+            // Return both text and alignment
+            return { text, alignment };
+          }
+          return { text: '', alignment: 'left' };
+        }) || [];
+
+      // Get the predominant alignment from paragraphs
+      const alignments = textContent.map(p => p.alignment);
+      const predominantAlign = alignments.reduce((acc, curr) => 
+        acc[curr] ? { ...acc, [curr]: acc[curr] + 1 } : { ...acc, [curr]: 1 },
+        {} as Record<string, number>
+      );
+      const newAlignment = Object.entries(predominantAlign)
+        .sort(([,a], [,b]) => b - a)[0]?.[0] as "left" | "center" | "right" || "left";
+
+      // Combine all text content
+      const newText = textContent.map(p => p.text).join('\n');
+
+      // Call onTextChange with both text and alignment
+      onTextChange(newText, newAlignment);
 
       if (containerRef.current) {
         const editorElement = editor.view.dom;
         const scrollHeight = editorElement.scrollHeight;
-
-        // Use unitSize instead of container height for grid calculation
-        const requiredGridUnits = Math.max(
-          1,
-          Math.ceil(scrollHeight / unitSize),
-        );
+        const requiredGridUnits = Math.max(1, Math.ceil(scrollHeight / unitSize));
 
         if (requiredGridUnits !== contentHeight) {
           setContentHeight(requiredGridUnits);
@@ -120,6 +175,22 @@ const TextBox = ({
       },
     },
   });
+
+  // Update content when text prop changes
+  useEffect(() => {
+    if (editor && text !== editor.getText()) {
+      // Convert text with line breaks to proper content
+      const paragraphs = text.split('\n');
+      const content = {
+        type: 'doc',
+        content: paragraphs.map(paragraph => ({
+          type: 'paragraph',
+          content: [{ type: 'text', text: paragraph }]
+        }))
+      };
+      editor.commands.setContent(content);
+    }
+  }, [editor, text]);
 
   // Update text alignment when it changes without focusing
   useEffect(() => {
@@ -196,6 +267,7 @@ const TextBox = ({
           opacity: ${opacity / 100};
           overflow: visible;
           word-wrap: break-word;
+          overflow-wrap: break-word;
           white-space: pre-wrap;
         }
         .${uniqueId} .ProseMirror p {
@@ -224,6 +296,11 @@ const TextBox = ({
           height: 0;
           pointer-events: none;
           font-style: italic;
+        }
+        .${uniqueId} .ProseMirror br {
+          display: block;
+          content: "";
+          margin-top: 0;
         }
       `}</style>
     </div>

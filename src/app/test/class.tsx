@@ -71,10 +71,21 @@ export class ShapeManager {
     }
   };
 
-  handleTextChange = (blockId: string, newText: string) => {
+  handleTextChange = (
+    blockId: string, 
+    newText: string, 
+    newAlignment?: "left" | "center" | "right"
+  ) => {
     this.setLayout((prevLayout: Block[]) =>
       prevLayout.map((block) =>
-        block.i === blockId ? { ...block, text: newText } : block,
+        block.i === blockId ? { 
+          ...block, 
+          text: newText
+            .replace(/\r\n/g, '\n')  // Normalize Windows line breaks
+            .replace(/\r/g, '\n')    // Normalize Mac line breaks
+            .replace(/\n\n+/g, '\n'), // Remove multiple consecutive line breaks
+          ...(newAlignment && { textAlign: newAlignment }) // Update alignment if provided
+        } : block,
       ),
     );
   };

@@ -92,3 +92,7 @@ export interface ShapeItemProps {
   onHeightChange?: (height: number) => void;
   unitSize: number;
 }
+
+export interface TextBoxProps {
+  onTextChange: (text: string, alignment?: "left" | "center" | "right") => void;
+}

@@ -64,6 +64,7 @@ const TextBox = ({
 }: TextBoxProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [contentHeight, setContentHeight] = useState(1);
+  const [uniqueId] = useState(() => `textbox-${Math.random().toString(36).substr(2, 9)}`);
 
   const editor = useEditor({
     extensions: [
@@ -165,7 +166,7 @@ const TextBox = ({
         </div>
 
         {/* Text Editor Container */}
-        <div className="flex-1">
+        <div className={`flex-1 ${uniqueId}`}>
           <EditorContent
             editor={editor}
             className="size-full cursor-text"
@@ -175,8 +176,8 @@ const TextBox = ({
         </div>
       </div>
 
-      <style jsx global>{`
-        .ProseMirror {
+      <style>{`
+        .${uniqueId} .ProseMirror {
           height: auto;
           min-height: 100%;
           width: 100%;
@@ -193,11 +194,11 @@ const TextBox = ({
           letter-spacing: ${letterSpacing}px;
           color: ${color};
           opacity: ${opacity / 100};
-          overflow: visible; /* Changed from auto to visible */
+          overflow: visible;
           word-wrap: break-word;
           white-space: pre-wrap;
         }
-        .ProseMirror p {
+        .${uniqueId} .ProseMirror p {
           margin: 0;
           min-height: 1em;
           text-align: ${textAlign};
@@ -205,7 +206,7 @@ const TextBox = ({
           max-width: 100%;
           word-break: break-word;
         }
-        .ProseMirror p.is-empty::before {
+        .${uniqueId} .ProseMirror p.is-empty::before {
           color: #9ca3af;
           content: attr(data-placeholder);
           float: left;
@@ -213,10 +214,10 @@ const TextBox = ({
           pointer-events: none;
           font-style: italic;
         }
-        .ProseMirror-focused p.is-empty::before {
+        .${uniqueId} .ProseMirror-focused p.is-empty::before {
           opacity: 0.5;
         }
-        .ProseMirror.is-editor-empty:first-child::before {
+        .${uniqueId} .ProseMirror.is-editor-empty:first-child::before {
           color: #9ca3af;
           content: "Type something...";
           float: left;
@@ -224,7 +225,6 @@ const TextBox = ({
           pointer-events: none;
           font-style: italic;
         }
-        /* Remove scrollbar styles since we don't need them anymore */
       `}</style>
     </div>
   );

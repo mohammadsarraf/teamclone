@@ -25,7 +25,10 @@ const createSingleLineExtension = (onEnter: () => void) => {
 
 interface TextBoxProps {
   text: string;
-  onTextChange: (newText: string, newAlignment: "left" | "center" | "right") => void;
+  onTextChange: (
+    newText: string,
+    newAlignment: "left" | "center" | "right",
+  ) => void;
   isActive?: boolean;
   onStartEdit?: () => void;
   onEnterPress?: () => void;
@@ -64,7 +67,9 @@ const TextBox = ({
 }: TextBoxProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [contentHeight, setContentHeight] = useState(1);
-  const [uniqueId] = useState(() => `textbox-${Math.random().toString(36).substr(2, 9)}`);
+  const [uniqueId] = useState(
+    () => `textbox-${Math.random().toString(36).substr(2, 9)}`,
+  );
 
   const editor = useEditor({
     extensions: [
@@ -76,7 +81,10 @@ const TextBox = ({
         blockquote: false,
         codeBlock: false,
         horizontalRule: false,
-        hardBreak: true, // Enable hard breaks
+        hardBreak: {
+          keepMarks: true,
+          HTMLAttributes: {},
+        }, // Configure hardBreak properly
       }),
       TextStyle,
       TextAlign.configure({
@@ -90,70 +98,76 @@ const TextBox = ({
       }),
       // Custom enter handler
       Extension.create({
-        name: 'customEnter',
+        name: "customEnter",
         addKeyboardShortcuts() {
           return {
             Enter: () => {
-              if (this.editor.isActive('hardBreak')) {
+              if (this.editor.isActive("hardBreak")) {
                 return false;
               }
               this.editor.commands.setHardBreak();
               return true;
             },
-            'Shift-Enter': () => {
+            "Shift-Enter": () => {
               this.editor.commands.setHardBreak();
               return true;
-            }
+            },
           };
-        }
+        },
       }),
     ],
     content: {
-      type: 'doc',
-      content: [{
-        type: 'paragraph',
-        attrs: { textAlign: textAlign }, // Set initial text alignment
-        content: text ? [{ type: 'text', text }] : []
-      }]
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          attrs: { textAlign: textAlign }, // Set initial text alignment
+          content: text ? [{ type: "text", text }] : [],
+        },
+      ],
     },
     editable: true,
     autofocus: false,
     onUpdate: ({ editor }) => {
       // Get the JSON content to preserve line breaks and alignment
       const jsonContent = editor.getJSON();
-      
+
       // Convert the JSON content to text with proper line breaks
-      const textContent = jsonContent.content
-        ?.map(node => {
-          if (node.type === 'paragraph') {
+      const textContent =
+        jsonContent.content?.map((node) => {
+          if (node.type === "paragraph") {
             // Get the alignment from the node attributes
-            const alignment = node.attrs?.textAlign || 'left';
-            const text = node.content
-              ?.map(textNode => {
-                if (textNode.type === 'hardBreak') {
-                  return '\n';
-                }
-                return textNode.text || '';
-              })
-              .join('') || '';
-            
+            const alignment = node.attrs?.textAlign || "left";
+            const text =
+              node.content
+                ?.map((textNode) => {
+                  if (textNode.type === "hardBreak") {
+                    return "\n";
+                  }
+                  return textNode.text || "";
+                })
+                .join("") || "";
+
             // Return both text and alignment
             return { text, alignment };
           }
-          return { text: '', alignment: 'left' };
+          return { text: "", alignment: "left" };
         }) || [];
 
       // Get the predominant alignment from paragraphs
-      const alignments = textContent.map(p => p.alignment);
-      const predominantAlign = alignments.reduce((acc, curr) => 
-        acc[curr] ? { ...acc, [curr]: acc[curr] + 1 } : { ...acc, [curr]: 1 },
-        {} as Record<string, number>
+      const alignments = textContent.map((p) => p.alignment);
+      const predominantAlign = alignments.reduce(
+        (acc, curr) =>
+          acc[curr] ? { ...acc, [curr]: acc[curr] + 1 } : { ...acc, [curr]: 1 },
+        {} as Record<string, number>,
       );
-      const newAlignment = Object.entries(predominantAlign)
-        .sort(([,a], [,b]) => b - a)[0]?.[0] as "left" | "center" | "right" || "left";
+      const newAlignment =
+        (Object.entries(predominantAlign).sort(
+          ([, a], [, b]) => (b as number) - (a as number),
+        )[0]?.[0] as "left" | "center" | "right") || "left";
 
       // Combine all text content
-      const newText = textContent.map(p => p.text).join('\n');
+      const newText = textContent.map((p) => p.text).join("\n");
 
       // Call onTextChange with both text and alignment
       onTextChange(newText, newAlignment);
@@ -161,7 +175,10 @@ const TextBox = ({
       if (containerRef.current) {
         const editorElement = editor.view.dom;
         const scrollHeight = editorElement.scrollHeight;
-        const requiredGridUnits = Math.max(1, Math.ceil(scrollHeight / unitSize));
+        const requiredGridUnits = Math.max(
+          1,
+          Math.ceil(scrollHeight / unitSize),
+        );
 
         if (requiredGridUnits !== contentHeight) {
           setContentHeight(requiredGridUnits);
@@ -180,13 +197,13 @@ const TextBox = ({
   useEffect(() => {
     if (editor && text !== editor.getText()) {
       // Convert text with line breaks to proper content
-      const paragraphs = text.split('\n');
+      const paragraphs = text.split("\n");
       const content = {
-        type: 'doc',
-        content: paragraphs.map(paragraph => ({
-          type: 'paragraph',
-          content: [{ type: 'text', text: paragraph }]
-        }))
+        type: "doc",
+        content: paragraphs.map((paragraph) => ({
+          type: "paragraph",
+          content: [{ type: "text", text: paragraph }],
+        })),
       };
       editor.commands.setContent(content);
     }

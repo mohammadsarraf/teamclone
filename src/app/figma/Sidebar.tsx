@@ -34,7 +34,7 @@ export default function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="px-4 py-4">
+      <nav className="p-4">
         <div className="space-y-1">
           {menuItems.map((item, index) => (
             <button
@@ -52,10 +52,10 @@ export default function Sidebar() {
                   {item.text}
                 </span>
                 {/* Hover underline */}
-                <span className="absolute bottom-[-3px] left-0 right-0 h-[2px] scale-x-0 bg-white transition-transform duration-200 group-hover:scale-x-100" />
+                <span className="absolute inset-x-0 bottom-[-3px] h-[2px] scale-x-0 bg-white transition-transform duration-200 group-hover:scale-x-100" />
                 {/* Active underline */}
                 {activeItem === item.text && (
-                  <span className="absolute bottom-[-3px] left-0 right-0 h-[2px] bg-white" />
+                  <span className="absolute inset-x-0 bottom-[-3px] h-[2px] bg-white" />
                 )}
               </span>
             </button>

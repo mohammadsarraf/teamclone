@@ -74,6 +74,7 @@ export interface ShapeItemProps {
   color: string;
   text?: string;
   onTextChange?: (newText: string) => void;
+  onTextAlign?: (align: "left" | "center" | "right") => void;
   isActive?: boolean;
   opacity: number;
   rotation: number;

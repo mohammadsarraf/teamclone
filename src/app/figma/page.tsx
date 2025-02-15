@@ -117,16 +117,17 @@ export default function Page() {
                 setIsElementMenuVisible={setIsElementMenuVisible}
                 isDesignMenuVisible={isDesignMenuVisible}
                 setIsDesignMenuVisible={setIsDesignMenuVisible}
+                isEditing={isEditing}
               />
             </div>
 
             {/* Main Content Area */}
             <div className="flex flex-col">
               <div className="flex-1">
-                <FooterContent stateKey="Main" />
+                <FooterContent stateKey="Main" isEditing={isEditing} />
               </div>
               <div className="flex-1">
-                <FooterContent stateKey="Secondary" />
+                <FooterContent stateKey="Secondary" isEditing={isEditing} />
               </div>
             </div>
           </div>

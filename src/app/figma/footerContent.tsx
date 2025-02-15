@@ -14,6 +14,7 @@ interface FooterState {
 
 interface FooterContentProps {
   stateKey: string;
+  isEditing: boolean;
 }
 
 const DEFAULT_FOOTER_STATE: FooterState = {
@@ -23,9 +24,8 @@ const DEFAULT_FOOTER_STATE: FooterState = {
   activeBlock: null,
 };
 
-const FooterContent = ({ stateKey }: FooterContentProps) => {
+const FooterContent = ({ stateKey, isEditing }: FooterContentProps) => {
   const storageKey = `footerState_${stateKey}`;
-  const [isEditing, setIsEditing] = useState(false);
   const [isFooterHovered, setIsFooterHovered] = useState(false);
   const containerWidth = useWindowSize();
   const [gridHeight, setGridHeight] = useState(DEFAULT_FOOTER_STATE.gridHeight);
@@ -66,7 +66,6 @@ const FooterContent = ({ stateKey }: FooterContentProps) => {
 
     loadSavedState();
     // Always reset editing state on page load
-    setIsEditing(false);
     setIsActiveInstance(false);
   }, [storageKey]);
 
@@ -91,7 +90,6 @@ const FooterContent = ({ stateKey }: FooterContentProps) => {
       return;
     }
 
-    setIsEditing(true);
     setIsActiveInstance(true);
   };
 
@@ -119,7 +117,6 @@ const FooterContent = ({ stateKey }: FooterContentProps) => {
       };
       localStorage.setItem(storageKey, JSON.stringify(stateToSave));
       setHasUnsavedChanges(false);
-      setIsEditing(false);
       setIsActiveInstance(false);
     } catch (err) {
       setError("Failed to save changes");
@@ -131,7 +128,7 @@ const FooterContent = ({ stateKey }: FooterContentProps) => {
     // Restore the previous saved state
     setGridHeight(DEFAULT_FOOTER_STATE.gridHeight);
     setCurrentRows(DEFAULT_FOOTER_STATE.currentRows);
-    setIsEditing(false);
+    setIsActiveInstance(false);
   };
 
   // 6. Add confirmation dialog before resetting
@@ -149,7 +146,7 @@ const FooterContent = ({ stateKey }: FooterContentProps) => {
         localStorage.setItem(storageKey, JSON.stringify(DEFAULT_FOOTER_STATE));
 
         // Update saved state
-        setIsEditing(false);
+        setIsActiveInstance(false);
         setError(null); // Clear any previous errors
       } catch (err) {
         setError("Failed to reset footer");
@@ -159,7 +156,6 @@ const FooterContent = ({ stateKey }: FooterContentProps) => {
   };
 
   const handleClose = () => {
-    setIsEditing(false);
     setIsActiveInstance(false);
     setHasUnsavedChanges(false);
   };
@@ -180,7 +176,7 @@ const FooterContent = ({ stateKey }: FooterContentProps) => {
   // 8. Add keyboard shortcuts
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      if (isEditing) {
+      if (isActiveInstance) {
         if (e.key === "Escape") {
           handleCancelEditing();
         } else if ((e.ctrlKey || e.metaKey) && e.key === "s") {
@@ -192,7 +188,7 @@ const FooterContent = ({ stateKey }: FooterContentProps) => {
 
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [isEditing]);
+  }, [isActiveInstance]);
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -218,12 +214,11 @@ const FooterContent = ({ stateKey }: FooterContentProps) => {
     initialCols: initialCols,
     initialRows: initialRows,
     onHeightChange: handleRowsChange,
-    showMenuButton: isEditing && isActiveInstance,
+    showMenuButton: isActiveInstance,
     stateKey: `footer_${stateKey}`,
     editBarPosition: "fixed",
     editBarOffset: 20,
     onClose: () => {
-      setIsEditing(false);
       setIsActiveInstance(false);
       setHasUnsavedChanges(false);
     },
@@ -243,15 +238,15 @@ const FooterContent = ({ stateKey }: FooterContentProps) => {
         opacity: isLoading ? 0 : 1,
         transition: "opacity 0.3s ease-in-out",
       }}
-      onMouseEnter={() => !isEditing && setIsFooterHovered(true)}
-      onMouseLeave={() => !isEditing && setIsFooterHovered(false)}
+      onMouseEnter={() => !isActiveInstance && setIsFooterHovered(true)}
+      onMouseLeave={() => !isActiveInstance && setIsFooterHovered(false)}
       data-key={stateKey}
-      data-editing={isEditing}
+      data-editing={isActiveInstance}
     >
       <Test {...testProps} />
 
       {/* Edit Overlay */}
-      {!isEditing && isFooterHovered && (
+      {!isActiveInstance && isFooterHovered && isEditing && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/20">
           <button
             onClick={handleStartEditing}

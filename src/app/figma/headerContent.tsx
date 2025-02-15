@@ -14,6 +14,7 @@ interface HeaderContentProps {
   setIsElementMenuVisible: (value: boolean) => void;
   isDesignMenuVisible: boolean;
   setIsDesignMenuVisible: (value: boolean) => void;
+  isEditing: boolean;
 }
 
 interface HeaderElements {
@@ -58,6 +59,7 @@ export default function HeaderContent({
   setIsElementMenuVisible,
   isDesignMenuVisible,
   setIsDesignMenuVisible,
+  isEditing,
 }: HeaderContentProps) {
   const [isHeaderHovered, setIsHeaderHovered] = useState(false);
   const [isHeaderEditing, setIsHeaderEditing] = useState(false);
@@ -366,7 +368,7 @@ export default function HeaderContent({
         </div>
 
         {/* Edit Header Button - Shows on hover */}
-        {!isHeaderEditing && (
+        {!isHeaderEditing && isHeaderHovered && isEditing && (
           <div
             className={`absolute inset-0 flex items-center justify-center transition-opacity duration-200 ${
               isHeaderHovered ? "opacity-100" : "opacity-0"

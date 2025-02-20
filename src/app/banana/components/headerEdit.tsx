@@ -1,8 +1,5 @@
 "use client";
 import { useState } from "react";
-import { FaTwitter, FaInstagram, FaGithub } from "react-icons/fa6";
-import { MdAccountCircle } from "react-icons/md";
-import { FaShoppingCart } from "react-icons/fa";
 import HeaderEditMenu from "./HeaderEditMenu";
 import ElementToolbar from "./menus/ElementToolbar";
 import DesignToolbar from "./menus/DesignToolbar";
@@ -27,21 +24,12 @@ export default function HeaderEdit({ isFullscreen }: HeaderEditProps) {
     setActiveMenu("none");
   };
 
-  // Dummy functions to satisfy props
-  const dummyFunction = () => {};
-  const dummyElements = {
-    isButton: true,
-    isSocial: true,
-    isCart: true,
-    isAccount: true
-  };
-
   return (
     <div className="relative">
       {/* Header Container */}
       <header
         className={`relative flex w-full items-center justify-between bg-slate-600 px-6 py-4 ${
-          isEditing ? 'z-30' : ''
+          isEditing ? "z-30" : ""
         }`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -79,34 +67,23 @@ export default function HeaderEdit({ isFullscreen }: HeaderEditProps) {
 
       {/* Exit Editing Backdrop */}
       {isEditing && (
-        <div 
+        <div
           className="fixed inset-0 z-20 bg-black/5 backdrop-blur-[2px]"
           onClick={handleExitEdit}
         />
       )}
 
-      {/* Menus - Increased z-index to appear above backdrop */}
+      {/* Menus */}
       {isEditing && (
         <>
           {activeMenu === "element" && (
             <div className="absolute left-0 top-full z-40 mt-3">
-              <div className="size-full">
-                <ElementToolbar 
-                  onClose={() => handleMenuClick("none")} 
-                />
-              </div>
+              <ElementToolbar onClose={() => handleMenuClick("none")} />
             </div>
           )}
           {activeMenu === "design" && (
             <div className="absolute right-0 top-full z-40 mt-3">
-              <div className="size-full">
-                <DesignToolbar 
-                  onOptionChange={dummyFunction}
-                  onHeightChange={dummyFunction}
-                  onBgColorChange={dummyFunction}
-                  onClose={() => handleMenuClick("none")}
-                />
-              </div>
+              <DesignToolbar onClose={() => handleMenuClick("none")} />
             </div>
           )}
         </>

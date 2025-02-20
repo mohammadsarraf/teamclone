@@ -54,7 +54,7 @@ export default function ElementToolbar({ onClose }: ElementToolbarProps) {
           <h3 className="font-medium text-white">Elements</h3>
           <p className="text-xs text-gray-400">Add to header</p>
         </div>
-        <button 
+        <button
           onClick={onClose}
           className="rounded-md p-1 text-gray-400 hover:bg-[#404040] hover:text-white"
         >
@@ -64,34 +64,49 @@ export default function ElementToolbar({ onClose }: ElementToolbarProps) {
 
       <div className="flex flex-col gap-0.5 p-1">
         {elementOptions.map((option) => (
-          <div 
-            key={option.key} 
+          <div
+            key={option.key}
             className={`group rounded-md transition-colors ${
-              toggleStates[option.key] ? 'bg-[#404040]' : 'hover:bg-[#404040]'
+              toggleStates[option.key] ? "bg-[#404040]" : "hover:bg-[#404040]"
             }`}
           >
-            <button 
+            <button
               className="flex w-full items-center gap-2 p-2 text-left"
-              onClick={() => setToggleStates(prev => ({ ...prev, [option.key]: !prev[option.key] }))}
+              onClick={() =>
+                setToggleStates((prev) => ({
+                  ...prev,
+                  [option.key]: !prev[option.key],
+                }))
+              }
             >
-              <div className={`rounded-md bg-[#505050] p-1.5 transition-colors ${
-                toggleStates[option.key] ? 'bg-blue-500' : 'group-hover:bg-[#606060]'
-              }`}>
+              <div
+                className={`rounded-md bg-[#505050] p-1.5 transition-colors ${
+                  toggleStates[option.key]
+                    ? "bg-blue-500"
+                    : "group-hover:bg-[#606060]"
+                }`}
+              >
                 <option.icon className="text-base text-white" />
               </div>
-              <div className="flex-1 min-w-0">
+              <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between">
                   <span className="font-medium text-white">{option.label}</span>
                   <div className="relative h-4 w-7">
-                    <div className={`absolute inset-0 rounded-full transition-colors ${
-                      toggleStates[option.key] ? 'bg-blue-500' : 'bg-gray-600'
-                    }`} />
-                    <div className={`absolute top-0.5 h-3 w-3 rounded-full bg-white transition-all ${
-                      toggleStates[option.key] ? 'left-3.5' : 'left-0.5'
-                    }`} />
+                    <div
+                      className={`absolute inset-0 rounded-full transition-colors ${
+                        toggleStates[option.key] ? "bg-blue-500" : "bg-gray-600"
+                      }`}
+                    />
+                    <div
+                      className={`absolute top-0.5 size-3 rounded-full bg-white transition-all ${
+                        toggleStates[option.key] ? "left-3.5" : "left-0.5"
+                      }`}
+                    />
                   </div>
                 </div>
-                <p className="truncate text-xs text-gray-400">{option.description}</p>
+                <p className="truncate text-xs text-gray-400">
+                  {option.description}
+                </p>
               </div>
             </button>
           </div>
@@ -99,4 +114,4 @@ export default function ElementToolbar({ onClose }: ElementToolbarProps) {
       </div>
     </div>
   );
-} 
+}

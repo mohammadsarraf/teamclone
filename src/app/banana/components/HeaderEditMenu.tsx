@@ -19,37 +19,33 @@ export default function HeaderEditMenu({
   onDesignClick,
   activeMenu,
 }: HeaderEditMenuProps) {
-  return (
-    <>
-      {/* Show Edit Header button only when hovering and not editing */}
-      {!isEditing && isHovered ? (
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <button
-            onClick={onEditClick}
-            className="flex items-center gap-2 rounded-md bg-white/90 px-4 py-2 text-sm font-medium text-gray-700 shadow-lg transition-all hover:bg-white"
-          >
-            <GoPencil className="text-lg" />
-            Edit Header
-          </button>
-        </div>
-      ) : isEditing && activeMenu === "none" ? (
-        <div className="absolute inset-x-2 top-full mt-3 flex justify-between">
-          <button 
-            onClick={onElementClick}
-            className="flex items-center gap-2 rounded-md bg-white/90 px-4 py-2 text-sm font-medium text-gray-700 shadow-lg transition-all hover:bg-white"
-          >
-            <HiPlus className="text-lg" />
-            Add Elements
-          </button>
-          <button 
-            onClick={onDesignClick}
-            className="flex items-center gap-2 rounded-md bg-white/90 px-4 py-2 text-sm font-medium text-gray-700 shadow-lg transition-all hover:bg-white "
-          >
-            <GoPencil className="text-lg" />
-            Edit Design
-          </button>
-        </div>
-      ) : null}
-    </>
-  );
+  const buttonClasses = "flex items-center gap-2 rounded-md bg-white/90 px-4 py-2 text-sm font-medium text-gray-700 shadow-lg transition-all hover:bg-white";
+
+  if (!isEditing && isHovered) {
+    return (
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+        <button onClick={onEditClick} className={buttonClasses}>
+          <GoPencil className="text-lg" />
+          Edit Header
+        </button>
+      </div>
+    );
+  }
+
+  if (isEditing && activeMenu === "none") {
+    return (
+      <div className="absolute inset-x-2 top-full mt-3 flex justify-between">
+        <button onClick={onElementClick} className={buttonClasses}>
+          <HiPlus className="text-lg" />
+          Add Elements
+        </button>
+        <button onClick={onDesignClick} className={buttonClasses}>
+          <GoPencil className="text-lg" />
+          Design
+        </button>
+      </div>
+    );
+  }
+
+  return null;
 }

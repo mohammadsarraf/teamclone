@@ -6,9 +6,6 @@ import {
   HiX,
 } from "react-icons/hi";
 import { TiSocialSkypeOutline } from "react-icons/ti";
-import { FaShoppingCart } from "react-icons/fa";
-import { FaGithub, FaInstagram, FaTwitter } from "react-icons/fa6";
-import { MdAccountCircle } from "react-icons/md";
 import { useState } from "react";
 
 interface ElementToolbarProps {
@@ -27,76 +24,76 @@ export default function ElementToolbar({ onClose }: ElementToolbarProps) {
     {
       key: "isButton" as const,
       label: "Button",
+      description: "Add button",
       icon: HiOutlineTemplate,
-      preview: (
-        <button className="rounded-full bg-white px-4 py-1.5 text-sm font-medium text-black transition-colors hover:bg-white/90">
-          Button
-        </button>
-      ),
     },
     {
       key: "isSocial" as const,
       label: "Social",
+      description: "Add social links",
       icon: TiSocialSkypeOutline,
-      preview: (
-        <div className="flex gap-3">
-          <FaTwitter />
-          <FaInstagram />
-          <FaGithub />
-        </div>
-      ),
     },
     {
       key: "isCart" as const,
       label: "Cart",
+      description: "Add cart",
       icon: HiOutlineShoppingCart,
-      preview: <FaShoppingCart className="text-xl" />,
     },
     {
       key: "isAccount" as const,
       label: "Account",
+      description: "Add account",
       icon: HiOutlineUser,
-      preview: <MdAccountCircle className="text-xl" />,
     },
   ];
 
   return (
-    <div className="flex w-[320px] flex-col gap-4 rounded-lg bg-[#2d2d2d] p-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-medium text-white">Elements</h3>
+    <div className="flex w-[280px] flex-col overflow-hidden rounded-lg bg-[#2d2d2d] text-sm shadow-xl">
+      <div className="flex items-center justify-between border-b border-[#404040] px-3 py-2">
+        <div>
+          <h3 className="font-medium text-white">Elements</h3>
+          <p className="text-xs text-gray-400">Add to header</p>
+        </div>
         <button 
           onClick={onClose}
-          className="rounded-lg p-1 text-gray-400 hover:bg-[#404040] hover:text-white"
+          className="rounded-md p-1 text-gray-400 hover:bg-[#404040] hover:text-white"
         >
-          <HiX className="text-xl" />
+          <HiX className="text-lg" />
         </button>
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-0.5 p-1">
         {elementOptions.map((option) => (
-          <div key={option.key} className="group relative">
+          <div 
+            key={option.key} 
+            className={`group rounded-md transition-colors ${
+              toggleStates[option.key] ? 'bg-[#404040]' : 'hover:bg-[#404040]'
+            }`}
+          >
             <button 
-              className="flex w-full items-center justify-between rounded-lg bg-[#404040] p-3 text-white hover:bg-[#4a4a4a]"
+              className="flex w-full items-center gap-2 p-2 text-left"
               onClick={() => setToggleStates(prev => ({ ...prev, [option.key]: !prev[option.key] }))}
             >
-              <div className="flex items-center gap-2">
-                <option.icon className="text-xl" />
-                <span>{option.label}</span>
+              <div className={`rounded-md bg-[#505050] p-1.5 transition-colors ${
+                toggleStates[option.key] ? 'bg-blue-500' : 'group-hover:bg-[#606060]'
+              }`}>
+                <option.icon className="text-base text-white" />
               </div>
-              <div className="relative">
-                <div className={`h-6 w-11 rounded-full transition-colors ${
-                  toggleStates[option.key] ? 'bg-blue-500' : 'bg-gray-600'
-                }`} />
-                <div className={`absolute top-1 h-4 w-4 rounded-full bg-white transition-all ${
-                  toggleStates[option.key] ? 'left-6' : 'left-1'
-                }`} />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium text-white">{option.label}</span>
+                  <div className="relative h-4 w-7">
+                    <div className={`absolute inset-0 rounded-full transition-colors ${
+                      toggleStates[option.key] ? 'bg-blue-500' : 'bg-gray-600'
+                    }`} />
+                    <div className={`absolute top-0.5 h-3 w-3 rounded-full bg-white transition-all ${
+                      toggleStates[option.key] ? 'left-3.5' : 'left-0.5'
+                    }`} />
+                  </div>
+                </div>
+                <p className="truncate text-xs text-gray-400">{option.description}</p>
               </div>
             </button>
-            {/* <div className="absolute left-0 top-full z-10 hidden w-full rounded-lg bg-[#404040] p-2 group-hover:block">
-              <div className="flex items-center justify-center rounded bg-[#2d2d2d] p-2 text-white">
-                {option.preview}
-              </div>
-            </div> */}
           </div>
         ))}
       </div>

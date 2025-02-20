@@ -4,9 +4,10 @@ import HeaderEdit from "./components/headerEdit";
 import MainEdit from "./components/mainEdit";
 import FooterEdit from "./components/footerEdit";
 import SideMenu from "./components/sidemenu";
+import Edit from "./components/edit";
 
 export default function Banana() {
-  const [isFullscreen, setIsFullscreen] = useState(true); // make sure this is false
+  const [isFullscreen, setIsFullscreen] = useState(false); // make sure this is false
 
   return (
     <div className="flex h-screen">
@@ -45,11 +46,7 @@ export default function Banana() {
             <div
               className={`flex flex-1 flex-col ${isFullscreen ? "" : "rounded-b-lg"} bg-red-400`}
             >
-              <HeaderEdit isFullscreen={isFullscreen} />
-              <MainEdit />
-              <div className="flex-1">
-                <FooterEdit />
-              </div>
+              <Edit isFullscreen={isFullscreen} />
             </div>
           </div>
         </div>

@@ -87,7 +87,7 @@ const layoutOptions = [
   },
 ];
 
-export default function DesignToolbar({ onClose }: DesignToolbarProps) {
+export default function BananaDesignPanel({ onClose }: DesignToolbarProps) {
   const [currentView, setCurrentView] = useState<MenuView>("design");
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showLayoutDropdown, setShowLayoutDropdown] = useState(false);

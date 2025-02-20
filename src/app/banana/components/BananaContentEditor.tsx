@@ -1,6 +1,6 @@
 "use client";
 
-export default function MainEdit() {
+export default function BananaContentEditor() {
   return (
     <main className="flex w-full flex-col items-center justify-center bg-gray-700 p-8">
       <div className="grid grid-cols-2 gap-6">

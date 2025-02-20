@@ -1,10 +1,10 @@
 "use client";
 import { useState } from "react";
-import HeaderEdit from "./components/headerEdit";
-import MainEdit from "./components/mainEdit";
-import FooterEdit from "./components/footerEdit";
-import SideMenu from "./components/sidemenu";
-import Edit from "./components/edit";
+import HeaderEdit from "./components/BananaHeaderEditor";
+import MainEdit from "./components/BananaContentEditor";
+import FooterEdit from "./components/BananaFooterEditor";
+import SideMenu from "./components/BananaSidebar";
+import Edit from "./components/BananaEditor";
 
 export default function Banana() {
   const [isFullscreen, setIsFullscreen] = useState(false); // make sure this is false

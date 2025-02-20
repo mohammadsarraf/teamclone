@@ -12,7 +12,7 @@ interface ElementToolbarProps {
   onClose: () => void;
 }
 
-export default function ElementToolbar({ onClose }: ElementToolbarProps) {
+export default function BananaElementPanel({ onClose }: ElementToolbarProps) {
   const [toggleStates, setToggleStates] = useState({
     isButton: false,
     isSocial: false,

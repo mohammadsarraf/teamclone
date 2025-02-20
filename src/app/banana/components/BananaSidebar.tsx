@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FaSearch } from "react-icons/fa";
 
-export default function SideMenu() {
+export default function BananaSidebar() {
   const [activeItem, setActiveItem] = useState("Design");
 
   const menuItems = [

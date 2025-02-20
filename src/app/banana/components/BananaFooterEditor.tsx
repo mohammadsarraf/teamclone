@@ -1,6 +1,6 @@
 "use client";
 
-export default function FooterEdit() {
+export default function BananaFooterEditor() {
   return (
     <footer className="size-full bg-gray-800 p-8">
       <div className="flex h-full justify-between">

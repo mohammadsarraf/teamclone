@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
-import HeaderEditMenu from "./HeaderEditMenu";
-import ElementToolbar from "./menus/ElementToolbar";
-import DesignToolbar from "./menus/DesignToolbar";
+import HeaderEditMenu from "./BananaHeaderControls";
+import ElementToolbar from "./menus/BananaElementPanel";
+import DesignToolbar from "./menus/BananaDesignPanel";
 
 interface HeaderEditProps {
   isFullscreen: boolean;
@@ -10,7 +10,7 @@ interface HeaderEditProps {
 
 type MenuType = "none" | "element" | "design";
 
-export default function HeaderEdit({ isFullscreen }: HeaderEditProps) {
+export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [activeMenu, setActiveMenu] = useState<MenuType>("none");

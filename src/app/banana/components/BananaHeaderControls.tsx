@@ -11,7 +11,7 @@ interface HeaderEditMenuProps {
   activeMenu: "none" | "element" | "design";
 }
 
-export default function HeaderEditMenu({
+export default function BananaHeaderControls({
   isEditing,
   onEditClick,
   isHovered,
@@ -19,7 +19,8 @@ export default function HeaderEditMenu({
   onDesignClick,
   activeMenu,
 }: HeaderEditMenuProps) {
-  const buttonClasses = "flex items-center gap-2 rounded-md bg-white/90 px-4 py-2 text-sm font-medium text-gray-700 shadow-lg transition-all hover:bg-white";
+  const buttonClasses =
+    "flex items-center gap-2 rounded-md bg-white/90 px-4 py-2 text-sm font-medium text-gray-700 shadow-lg transition-all hover:bg-white";
 
   if (!isEditing && isHovered) {
     return (

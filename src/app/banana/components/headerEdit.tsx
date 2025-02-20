@@ -22,6 +22,11 @@ export default function HeaderEdit({ isFullscreen }: HeaderEditProps) {
     setActiveMenu(menuType === activeMenu ? "none" : menuType);
   };
 
+  const handleExitEdit = () => {
+    setIsEditing(false);
+    setActiveMenu("none");
+  };
+
   // Dummy functions to satisfy props
   const dummyFunction = () => {};
   const dummyElements = {
@@ -35,7 +40,9 @@ export default function HeaderEdit({ isFullscreen }: HeaderEditProps) {
     <div className="relative">
       {/* Header Container */}
       <header
-        className="relative flex w-full items-center justify-between bg-slate-600 px-6 py-4"
+        className={`relative flex w-full items-center justify-between bg-slate-600 px-6 py-4 ${
+          isEditing ? 'z-30' : ''
+        }`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -70,12 +77,20 @@ export default function HeaderEdit({ isFullscreen }: HeaderEditProps) {
         )}
       </header>
 
-      {/* Menus */}
+      {/* Exit Editing Backdrop */}
+      {isEditing && (
+        <div 
+          className="fixed inset-0 z-20 bg-black/5 backdrop-blur-[2px]"
+          onClick={handleExitEdit}
+        />
+      )}
+
+      {/* Menus - Increased z-index to appear above backdrop */}
       {isEditing && (
         <>
           {activeMenu === "element" && (
-            <div className="absolute left-0 top-full z-50 mt-3">
-              <div className="size-full bg-white">
+            <div className="absolute left-0 top-full z-40 mt-3">
+              <div className="size-full">
                 <ElementToolbar 
                   onClose={() => handleMenuClick("none")} 
                 />
@@ -83,15 +98,15 @@ export default function HeaderEdit({ isFullscreen }: HeaderEditProps) {
             </div>
           )}
           {activeMenu === "design" && (
-            <div className="absolute right-0 top-full z-50 mt-3">
-                <div className="size-full bg-white">
+            <div className="absolute right-0 top-full z-40 mt-3">
+              <div className="size-full">
                 <DesignToolbar 
-                onOptionChange={dummyFunction}
-                onHeightChange={dummyFunction}
-                onBgColorChange={dummyFunction}
-                onClose={dummyFunction}
-              />
-                </div>
+                  onOptionChange={dummyFunction}
+                  onHeightChange={dummyFunction}
+                  onBgColorChange={dummyFunction}
+                  onClose={() => handleMenuClick("none")}
+                />
+              </div>
             </div>
           )}
         </>

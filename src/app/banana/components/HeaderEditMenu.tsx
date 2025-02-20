@@ -1,6 +1,5 @@
 "use client";
-import { useState } from "react";
-import { MdOutlineStyle } from "react-icons/md";
+import { GoPencil } from "react-icons/go";
 import { HiPlus } from "react-icons/hi";
 
 interface HeaderEditMenuProps {
@@ -29,7 +28,7 @@ export default function HeaderEditMenu({
             onClick={onEditClick}
             className="flex items-center gap-2 rounded-md bg-white/90 px-4 py-2 text-sm font-medium text-gray-700 shadow-lg transition-all hover:bg-white"
           >
-            <MdOutlineStyle className="text-lg" />
+            <GoPencil className="text-lg" />
             Edit Header
           </button>
         </div>
@@ -44,10 +43,10 @@ export default function HeaderEditMenu({
           </button>
           <button 
             onClick={onDesignClick}
-            className="flex items-center gap-2 rounded-md bg-white/90 px-4 py-2 text-sm font-medium text-gray-700 shadow-lg transition-all hover:bg-white"
+            className="flex items-center gap-2 rounded-md bg-white/90 px-4 py-2 text-sm font-medium text-gray-700 shadow-lg transition-all hover:bg-white "
           >
-            <MdOutlineStyle className="text-lg" />
-            Design
+            <GoPencil className="text-lg" />
+            Edit Design
           </button>
         </div>
       ) : null}

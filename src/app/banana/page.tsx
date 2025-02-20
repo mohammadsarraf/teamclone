@@ -6,7 +6,7 @@ import FooterEdit from "./components/footerEdit";
 import SideMenu from "./components/sidemenu";
 
 export default function Banana() {
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(true); // make sure this is false
 
   return (
     <div className="flex h-screen">
@@ -14,20 +14,22 @@ export default function Banana() {
       {!isFullscreen && <SideMenu />}
 
       {/* Main Content with Window Bar */}
-      <div className={`flex flex-col ${isFullscreen ? 'w-screen' : 'flex-1'}`}>
+      <div className={`flex flex-col ${isFullscreen ? "w-screen" : "flex-1"}`}>
         {/* Main Content Area */}
-        <div className={`flex-1 ${isFullscreen ? '' : 'bg-[#1b1b1b] p-8'}`}>
+        <div className={`flex-1 ${isFullscreen ? "" : "bg-[#1b1b1b] p-8"}`}>
           <div className="flex h-full flex-col">
-            <div className={`flex items-center justify-between ${isFullscreen ? '' : 'rounded-t-lg'} bg-blue-800 p-3`}>
+            <div
+              className={`flex items-center justify-between ${isFullscreen ? "" : "rounded-t-lg"} bg-blue-800 p-3`}
+            >
               <div className="flex items-center space-x-2">
                 {/* Window Controls */}
                 <div className="flex items-center space-x-2">
-                  <button 
+                  <button
                     className="size-3 rounded-full bg-red-500 hover:bg-red-600"
                     onClick={() => isFullscreen && setIsFullscreen(false)}
                   />
                   <button className="size-3 rounded-full bg-yellow-500 hover:bg-yellow-600" />
-                  <button 
+                  <button
                     className="size-3 rounded-full bg-green-500 hover:bg-green-600"
                     onClick={() => !isFullscreen && setIsFullscreen(true)}
                   />
@@ -40,8 +42,10 @@ export default function Banana() {
               {/* Right Side Actions (optional) */}
               <div className="flex items-center space-x-2" />
             </div>
-            <div className={`flex flex-1 flex-col ${isFullscreen ? '' : 'rounded-b-lg'} bg-red-400`}>
-              <HeaderEdit />
+            <div
+              className={`flex flex-1 flex-col ${isFullscreen ? "" : "rounded-b-lg"} bg-red-400`}
+            >
+              <HeaderEdit isFullscreen={isFullscreen} />
               <MainEdit />
               <div className="flex-1">
                 <FooterEdit />

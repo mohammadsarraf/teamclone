@@ -13,7 +13,7 @@ export default function BananaEditor({
       <div className="flex-1">
         <MainEdit isFullscreen={isFullscreen} />
       </div>
-      <FooterEdit />
+      <FooterEdit isFullscreen={isFullscreen} />
     </div>
   );
 }

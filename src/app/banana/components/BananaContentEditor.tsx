@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import BananaContent from "./BananaContent";
 
 interface ContentProps {
@@ -8,9 +8,30 @@ interface ContentProps {
 export default function BananaContentEditor({ isFullscreen }: ContentProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isEditing) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // If section is less than 50% visible, exit edit mode
+        if (entry.intersectionRatio < 0.5) {
+          setIsEditing(false);
+        }
+      },
+      { threshold: 0.5 },
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [isEditing]);
 
   return (
-    <div className="relative h-full">
+    <div className="relative h-full" ref={containerRef}>
       {/* Content Container */}
       <div className="relative h-full">
         {/* Edit Tools Container - Sticky */}
@@ -18,7 +39,10 @@ export default function BananaContentEditor({ isFullscreen }: ContentProps) {
           <div className="sticky top-0 z-40 px-4">
             <div className="relative">
               {/* Left Button */}
-              <button className="absolute left-0 flex items-center gap-2 rounded-md bg-white/90 px-4 py-2 text-sm font-medium text-gray-700 shadow-lg transition-all hover:bg-white hover:shadow-xl">
+              <button
+                onClick={() => setIsEditing(false)}
+                className="absolute left-0 flex items-center gap-2 rounded-md bg-white/90 px-4 py-2 text-sm font-medium text-gray-700 shadow-lg transition-all hover:bg-white hover:shadow-xl"
+              >
                 <span className="text-lg">✏️</span>
                 Edit Content
               </button>
@@ -48,31 +72,28 @@ export default function BananaContentEditor({ isFullscreen }: ContentProps) {
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
+          {/* Backdrop blur - Inside content */}
+          {isEditing && (
+            <div className="pointer-events-none absolute inset-0 z-20 bg-black/5 backdrop-blur-[2px]" />
+          )}
+
           <BananaContent className="bg-gray-700" />
-        </div>
 
-        {/* Backdrop blur */}
-        {isEditing && (
-          <div
-            className="fixed inset-0 z-20 bg-black/5 backdrop-blur-[2px]"
-            onClick={() => setIsEditing(false)}
-          />
-        )}
+          {/* Edit Overlay - Fixed to viewport */}
+          {isFullscreen && !isEditing && isHovered && (
+            <div className="pointer-events-none fixed inset-0 z-50">
+              <div className="absolute inset-0 bg-black/20 transition-opacity" />
+              <button
+                onClick={() => setIsEditing(true)}
+                onMouseEnter={() => setIsHovered(true)}
+                className="pointer-events-auto absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-md bg-white/90 px-4 py-2 text-sm font-medium text-gray-700 shadow-lg transition-all hover:bg-white"
+              >
+                Edit Content
+              </button>
+            </div>
+          )}
+        </div>
       </div>
-
-      {/* Edit Overlay - Fixed to viewport */}
-      {isFullscreen && !isEditing && isHovered && (
-        <div className="pointer-events-none fixed inset-0 z-50">
-          <div className="absolute inset-0 bg-black/20 transition-opacity" />
-          <button
-            onClick={() => setIsEditing(true)}
-            onMouseEnter={() => setIsHovered(true)}
-            className="pointer-events-auto absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-md bg-white/90 px-4 py-2 text-sm font-medium text-gray-700 shadow-lg transition-all hover:bg-white"
-          >
-            Edit Content
-          </button>
-        </div>
-      )}
     </div>
   );
 }

@@ -1,42 +1,82 @@
 "use client";
+import { useState } from "react";
+import BananaFooter from "./BananaFooter";
 
-export default function BananaFooterEditor() {
+interface ContentProps {
+  isFullscreen: boolean;
+}
+
+export default function BananaFooterEditor({ isFullscreen }: ContentProps) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
-    <footer className="size-full bg-gray-800 p-8">
-      <div className="flex h-full justify-between">
-        {/* Company Info */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-bold text-white">Company Name</h3>
-          <p className="text-sm text-gray-400">
-            123 Street Name
-            <br />
-            City, State 12345
-            <br />
-            contact@company.com
-          </p>
-        </div>
+    <div className="relative h-full">
+      {/* Content Container */}
+      <div className="relative h-full">
+        {/* Edit Tools Container - Sticky */}
+        {isEditing && (
+          <div className="sticky top-0 z-40 px-4">
+            <div className="relative">
+              {/* Left Button */}
+              <button
+                onClick={() => setIsEditing(false)}
+                className="absolute left-0 flex items-center gap-2 rounded-md bg-white/90 px-4 py-2 text-sm font-medium text-gray-700 shadow-lg transition-all hover:bg-white hover:shadow-xl"
+              >
+                <span className="text-lg">✏️</span>
+                Edit Footer
+              </button>
 
-        {/* Quick Links */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-bold text-white">Quick Links</h3>
-          <ul className="space-y-2 text-sm text-gray-400">
-            <li>About Us</li>
-            <li>Services</li>
-            <li>Contact</li>
-            <li>Terms of Service</li>
-          </ul>
-        </div>
-
-        {/* Social Links */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-bold text-white">Follow Us</h3>
-          <div className="flex space-x-4 text-gray-400">
-            <span>Twitter</span>
-            <span>Facebook</span>
-            <span>Instagram</span>
+              {/* Right Menu */}
+              <div className="absolute right-0 flex flex-col gap-2 rounded-md bg-white/90 p-2 text-black shadow-lg">
+                <button className="flex items-center gap-2 rounded-md border border-gray-400 px-3 py-1.5 text-left transition-all hover:bg-gray-100">
+                  <span className="text-lg">🎨</span>
+                  <span>Design</span>
+                </button>
+                <button className="flex items-center gap-2 rounded-md border border-gray-400 px-3 py-1.5 text-left transition-all hover:bg-gray-100">
+                  <span className="text-lg">📝</span>
+                  <span>Edit Text</span>
+                </button>
+                <button className="flex items-center gap-2 rounded-md border border-gray-400 px-3 py-1.5 text-left transition-all hover:bg-gray-100">
+                  <span className="text-lg">🔧</span>
+                  <span>Settings</span>
+                </button>
+              </div>
+            </div>
           </div>
+        )}
+
+        {/* Scrollable Content */}
+        <div
+          className={`relative h-full ${isEditing ? "z-30" : ""}`}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          <BananaFooter />
+
+          {/* Edit Overlay - Fixed to viewport */}
+          {isFullscreen && !isEditing && isHovered && (
+            <div className="pointer-events-none fixed inset-0 z-50">
+              <div className="absolute inset-0 bg-black/20 transition-opacity" />
+              <button
+                onClick={() => setIsEditing(true)}
+                onMouseEnter={() => setIsHovered(true)}
+                className="pointer-events-auto absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-md bg-white/90 px-4 py-2 text-sm font-medium text-gray-700 shadow-lg transition-all hover:bg-white"
+              >
+                Edit Footer
+              </button>
+            </div>
+          )}
         </div>
+
+        {/* Backdrop blur */}
+        {isEditing && (
+          <div
+            className="fixed inset-0 z-20 bg-black/5 backdrop-blur-[2px]"
+            onClick={() => setIsEditing(false)}
+          />
+        )}
       </div>
-    </footer>
+    </div>
   );
 }

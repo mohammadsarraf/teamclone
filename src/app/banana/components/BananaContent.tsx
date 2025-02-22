@@ -6,7 +6,7 @@ interface ContentProps {
 
 export default function BananaContent({ className = "" }: ContentProps) {
   return (
-    <main className={`h-full w-full ${className}`}>
+    <main className={`size-full ${className}`}>
       <div className="grid grid-cols-2 gap-6 p-8">
         <div className="h-48 rounded-lg bg-gray-600 p-4">
           <h2 className="text-xl font-bold text-white">Section 1</h2>

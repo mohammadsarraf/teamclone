@@ -17,10 +17,14 @@ export default function Banana() {
       {/* Main Content with Window Bar */}
       <div className={`flex flex-col ${isFullscreen ? "w-screen" : "flex-1"}`}>
         {/* Main Content Area */}
-        <div className={`flex-1 ${isFullscreen ? "" : "bg-[#1b1b1b] p-8"} overflow-hidden`}>
-          <div className="h-full flex flex-col">
+        <div
+          className={`flex-1 ${isFullscreen ? "" : "bg-[#1b1b1b] p-8"} overflow-hidden`}
+        >
+          <div className="flex h-full flex-col">
             {/* Window Bar */}
-            <div className={`flex items-center justify-between ${isFullscreen ? "" : "rounded-t-lg"} bg-blue-800 p-3`}>
+            <div
+              className={`flex items-center justify-between ${isFullscreen ? "" : "rounded-t-lg"} bg-blue-800 p-3`}
+            >
               <div className="flex items-center space-x-2">
                 {/* Window Controls */}
                 <div className="flex items-center space-x-2">
@@ -44,7 +48,9 @@ export default function Banana() {
             </div>
 
             {/* Content Container */}
-            <div className={`flex-1 ${isFullscreen ? "" : "rounded-b-lg"} bg-red-400 overflow-hidden`}>
+            <div
+              className={`flex-1 ${isFullscreen ? "" : "rounded-b-lg"} overflow-hidden bg-red-400`}
+            >
               <Edit isFullscreen={isFullscreen} />
             </div>
           </div>

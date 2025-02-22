@@ -8,7 +8,7 @@ export default function BananaEditor({
   isFullscreen: boolean;
 }) {
   return (
-    <div className="h-full flex flex-col overflow-auto">
+    <div className="flex h-full flex-col overflow-auto">
       <HeaderEdit isFullscreen={isFullscreen} />
       <div className="flex-1">
         <MainEdit isFullscreen={isFullscreen} />

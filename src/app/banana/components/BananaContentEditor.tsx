@@ -10,7 +10,7 @@ export default function BananaContentEditor({ isFullscreen }: ContentProps) {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <div 
+    <div
       className="h-full overflow-auto"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -50,16 +50,16 @@ export default function BananaContentEditor({ isFullscreen }: ContentProps) {
             </button>
 
             {/* Right Menu */}
-            <div className="absolute right-4 top-4 flex flex-col gap-2 rounded-md bg-white/90 p-2 shadow-lg text-black">
-              <button className="flex items-center gap-2 rounded-md px-3 py-1.5 text-left transition-all hover:bg-gray-100 border border-gray-400">
+            <div className="absolute right-4 top-4 flex flex-col gap-2 rounded-md bg-white/90 p-2 text-black shadow-lg">
+              <button className="flex items-center gap-2 rounded-md border border-gray-400 px-3 py-1.5 text-left transition-all hover:bg-gray-100">
                 <span className="text-lg">🎨</span>
                 <span>Design</span>
               </button>
-              <button className="flex items-center gap-2 rounded-md px-3 py-1.5 text-left transition-all hover:bg-gray-100 border border-gray-400">
+              <button className="flex items-center gap-2 rounded-md border border-gray-400 px-3 py-1.5 text-left transition-all hover:bg-gray-100">
                 <span className="text-lg">📝</span>
                 <span>Edit Text</span>
               </button>
-              <button className="flex items-center gap-2 rounded-md px-3 py-1.5 text-left transition-all hover:bg-gray-100 border border-gray-400">
+              <button className="flex items-center gap-2 rounded-md border border-gray-400 px-3 py-1.5 text-left transition-all hover:bg-gray-100">
                 <span className="text-lg">🔧</span>
                 <span>Settings</span>
               </button>

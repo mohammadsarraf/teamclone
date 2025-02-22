@@ -49,7 +49,7 @@ export default function Banana() {
 
             {/* Content Container */}
             <div
-              className={`flex-1 ${isFullscreen ? "" : "rounded-b-lg"} overflow-hidden bg-red-400`}
+              className={`flex-1 ${isFullscreen ? "" : "rounded-b-lg"} overflow-hidden`}
             >
               <Edit isFullscreen={isFullscreen} />
             </div>

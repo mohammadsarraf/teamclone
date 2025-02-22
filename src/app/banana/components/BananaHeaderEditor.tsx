@@ -34,7 +34,7 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
         onMouseLeave={() => setIsHovered(false)}
       >
         {/* Actual Header Content */}
-        <BananaHeader className="bg-slate-600" />
+        <BananaHeader />
 
         {/* Edit Overlay */}
         {isFullscreen && (isHovered || isEditing) && (

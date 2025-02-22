@@ -4,10 +4,10 @@ interface HeaderProps {
   className?: string;
 }
 
-export default function BananaHeader({ className = "" }: HeaderProps) {
+export default function BananaHeader() {
   return (
     <header
-      className={`flex w-full items-center justify-between px-6 py-4 ${className}`}
+      className={`flex w-full items-center justify-between bg-black px-6 py-4`}
     >
       {/* Left side - Logo and Navigation */}
       <div className="flex items-center space-x-6">

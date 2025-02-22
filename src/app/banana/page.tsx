@@ -3,11 +3,11 @@ import { useState } from "react";
 import HeaderEdit from "./components/BananaHeaderEditor";
 import MainEdit from "./components/BananaContentEditor";
 import FooterEdit from "./components/BananaFooterEditor";
-import SideMenu from "./components/BananaSidebar";
+import SideMenu from "./components/sidemenu";
 import Edit from "./components/BananaEditor";
 
 export default function Banana() {
-  const [isFullscreen, setIsFullscreen] = useState(false); // make sure this is false
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   return (
     <div className="flex h-screen">
@@ -17,11 +17,10 @@ export default function Banana() {
       {/* Main Content with Window Bar */}
       <div className={`flex flex-col ${isFullscreen ? "w-screen" : "flex-1"}`}>
         {/* Main Content Area */}
-        <div className={`flex-1 ${isFullscreen ? "" : "bg-[#1b1b1b] p-8"}`}>
-          <div className="flex h-full flex-col">
-            <div
-              className={`flex items-center justify-between ${isFullscreen ? "" : "rounded-t-lg"} bg-blue-800 p-3`}
-            >
+        <div className={`flex-1 ${isFullscreen ? "" : "bg-[#1b1b1b] p-8"} overflow-hidden`}>
+          <div className="h-full flex flex-col">
+            {/* Window Bar */}
+            <div className={`flex items-center justify-between ${isFullscreen ? "" : "rounded-t-lg"} bg-blue-800 p-3`}>
               <div className="flex items-center space-x-2">
                 {/* Window Controls */}
                 <div className="flex items-center space-x-2">
@@ -43,9 +42,9 @@ export default function Banana() {
               {/* Right Side Actions (optional) */}
               <div className="flex items-center space-x-2" />
             </div>
-            <div
-              className={`flex flex-1 flex-col ${isFullscreen ? "" : "rounded-b-lg"} bg-red-400`}
-            >
+
+            {/* Content Container */}
+            <div className={`flex-1 ${isFullscreen ? "" : "rounded-b-lg"} bg-red-400 overflow-hidden`}>
               <Edit isFullscreen={isFullscreen} />
             </div>
           </div>

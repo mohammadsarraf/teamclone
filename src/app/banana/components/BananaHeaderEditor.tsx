@@ -3,6 +3,7 @@ import { useState } from "react";
 import HeaderEditMenu from "./BananaHeaderControls";
 import ElementToolbar from "./menus/BananaElementPanel";
 import DesignToolbar from "./menus/BananaDesignPanel";
+import BananaHeader from "./BananaHeader";
 
 interface HeaderEditProps {
   isFullscreen: boolean;
@@ -26,26 +27,14 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
 
   return (
     <div className="relative">
-      {/* Header Container */}
-      <header
-        className={`relative flex w-full items-center justify-between bg-slate-600 px-6 py-4 ${
-          isEditing ? "z-30" : ""
-        }`}
+      {/* Header Container with hover detection */}
+      <div
+        className={`relative ${isEditing ? "z-30" : ""}`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        {/* Left side - Logo and Navigation */}
-        <div className="flex items-center space-x-6">
-          <h1 className="text-2xl font-bold text-white">YourWebsiteTitle</h1>
-          <nav className="flex space-x-4">
-            <button className="text-lg font-medium text-white/90 transition-colors hover:text-white">
-              Menu
-            </button>
-            <button className="text-lg font-medium text-white/90 transition-colors hover:text-white">
-              Reservation
-            </button>
-          </nav>
-        </div>
+        {/* Actual Header Content */}
+        <BananaHeader className="bg-slate-600" />
 
         {/* Edit Overlay */}
         {isFullscreen && (isHovered || isEditing) && (
@@ -63,19 +52,18 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
             />
           </>
         )}
-      </header>
+      </div>
 
-      {/* Exit Editing Backdrop */}
-      {isEditing && (
-        <div
-          className="fixed inset-0 z-20 bg-black/5 backdrop-blur-[2px]"
-          onClick={handleExitEdit}
-        />
-      )}
-
-      {/* Menus */}
+      {/* Edit Mode UI */}
       {isEditing && (
         <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 z-20 bg-black/5 backdrop-blur-[2px]"
+            onClick={handleExitEdit}
+          />
+
+          {/* Toolbars */}
           {activeMenu === "element" && (
             <div className="absolute left-0 top-full z-40 mt-3">
               <ElementToolbar onClose={() => handleMenuClick("none")} />

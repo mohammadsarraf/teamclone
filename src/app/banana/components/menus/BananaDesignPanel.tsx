@@ -12,6 +12,9 @@ interface DesignToolbarProps {
   onHeightChange: (height: number) => void;
   onLinkSpacingChange: (spacing: number) => void;
   onElementSpacingChange: (spacing: number) => void;
+  onHeightChangeComplete: (height: number) => void;
+  onLinkSpacingChangeComplete: (spacing: number) => void;
+  onElementSpacingChangeComplete: (spacing: number) => void;
   initialLayout: HeaderLayout;
   initialHeight: number;
   initialLinkSpacing: number;
@@ -115,6 +118,9 @@ export default function BananaDesignPanel({
   onHeightChange,
   onLinkSpacingChange,
   onElementSpacingChange,
+  onHeightChangeComplete,
+  onLinkSpacingChangeComplete,
+  onElementSpacingChangeComplete,
   initialLayout,
   initialHeight,
   initialLinkSpacing,
@@ -130,14 +136,19 @@ export default function BananaDesignPanel({
   const [elementSpacing, setElementSpacing] = useState(initialElementSpacing);
   const [isClosing, setIsClosing] = useState(false);
 
-  useEffect(() => {
-    onLayoutChange(selectedLayout);
-  }, [selectedLayout, onLayoutChange]);
+  const handleLayoutChange = (newLayout: HeaderLayout) => {
+    setSelectedLayout(newLayout);
+    onLayoutChange(newLayout);
+  };
 
   const handleHeightChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newHeight = Number(e.target.value);
     setHeaderHeight(newHeight);
     onHeightChange(newHeight);
+  };
+
+  const handleHeightChangeComplete = () => {
+    onHeightChangeComplete(headerHeight);
   };
 
   const handleLinkSpacingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -146,10 +157,18 @@ export default function BananaDesignPanel({
     onLinkSpacingChange(newSpacing);
   };
 
+  const handleLinkSpacingChangeComplete = () => {
+    onLinkSpacingChangeComplete(linkSpacing);
+  };
+
   const handleElementSpacingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newSpacing = Number(e.target.value);
     setElementSpacing(newSpacing);
     onElementSpacingChange(newSpacing);
+  };
+
+  const handleElementSpacingChangeComplete = () => {
+    onElementSpacingChangeComplete(elementSpacing);
   };
 
   // Add cleanup for all dropdowns/pickers when toolbar is closing
@@ -243,7 +262,7 @@ export default function BananaDesignPanel({
 
               {/* Sliders Section */}
               <div className="space-y-5">
-                <span>Spacing</span>
+                <span className="text-sm font-medium text-white">Spacing</span>
 
                 {/* Link Spacing Slider */}
                 <div className="space-y-2">
@@ -259,6 +278,8 @@ export default function BananaDesignPanel({
                     max={48}
                     value={linkSpacing}
                     onChange={handleLinkSpacingChange}
+                    onMouseUp={handleLinkSpacingChangeComplete}
+                    onTouchEnd={handleLinkSpacingChangeComplete}
                     className="h-1.5 w-full appearance-none rounded-full bg-[#333333] accent-blue-500 hover:accent-blue-400"
                   />
                 </div>
@@ -277,14 +298,17 @@ export default function BananaDesignPanel({
                     max={32}
                     value={elementSpacing}
                     onChange={handleElementSpacingChange}
+                    onMouseUp={handleElementSpacingChangeComplete}
+                    onTouchEnd={handleElementSpacingChangeComplete}
                     className="h-1.5 w-full appearance-none rounded-full bg-[#333333] accent-blue-500 hover:accent-blue-400"
                   />
                 </div>
               </div>
 
-                {/* Height Slider */}
-                <span>Size</span>
+              <div className="space-y-5">
+                <span className="text-sm font-medium text-white">Size</span>
 
+                {/* Height Slider */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-white">Height</span>
@@ -296,9 +320,12 @@ export default function BananaDesignPanel({
                     max={200}
                     value={headerHeight}
                     onChange={handleHeightChange}
+                    onMouseUp={handleHeightChangeComplete}
+                    onTouchEnd={handleHeightChangeComplete}
                     className="h-1.5 w-full appearance-none rounded-full bg-[#333333] accent-blue-500 hover:accent-blue-400"
                   />
                 </div>
+              </div>
 
               {/* Style Section */}
               {/* <div className="space-y-2.5">
@@ -392,7 +419,7 @@ export default function BananaDesignPanel({
                   selectedLayout === option.name ? "bg-[#404040]" : ""
                 }`}
                 onClick={() => {
-                  setSelectedLayout(option.name);
+                  handleLayoutChange(option.name);
                   setShowLayoutDropdown(false);
                 }}
               >

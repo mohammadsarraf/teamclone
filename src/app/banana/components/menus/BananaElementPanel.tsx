@@ -6,7 +6,7 @@ import {
   HiX,
 } from "react-icons/hi";
 import { TiSocialSkypeOutline } from "react-icons/ti";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 interface ElementToolbarProps {
   onClose: () => void;
@@ -31,9 +31,14 @@ export default function BananaElementPanel({
 }: ElementToolbarProps) {
   const [toggleStates, setToggleStates] = useState(initialElements);
 
-  useEffect(() => {
-    onElementsChange(toggleStates);
-  }, [toggleStates, onElementsChange]);
+  const handleToggleChange = (key: keyof typeof toggleStates) => {
+    const newToggleStates = {
+      ...toggleStates,
+      [key]: !toggleStates[key],
+    };
+    setToggleStates(newToggleStates);
+    onElementsChange(newToggleStates);
+  };
 
   const elementOptions = [
     {
@@ -87,12 +92,7 @@ export default function BananaElementPanel({
           >
             <button
               className="flex w-full items-center gap-2 p-2 text-left"
-              onClick={() =>
-                setToggleStates((prev) => ({
-                  ...prev,
-                  [option.key]: !prev[option.key],
-                }))
-              }
+              onClick={() => handleToggleChange(option.key)}
             >
               <div
                 className={`rounded-md bg-[#505050] p-1.5 transition-colors ${

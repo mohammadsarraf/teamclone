@@ -1,9 +1,11 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SideMenu from "./components/sidemenu";
 import Edit from "./components/BananaEditor";
 import { FiSave } from "react-icons/fi";
 import { GrRedo, GrUndo } from "react-icons/gr";
+// Import types
+import "./types";
 
 export default function Banana() {
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -11,10 +13,66 @@ export default function Banana() {
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
 
+  // Check for undo/redo availability periodically
+  useEffect(() => {
+    const checkUndoRedoStatus = () => {
+      if (typeof window !== 'undefined' && window.bananaHeaderEditor) {
+        setCanUndo(!!window.bananaHeaderEditor.canUndo);
+        setCanRedo(!!window.bananaHeaderEditor.canRedo);
+      }
+    };
+
+    // Check immediately and then every 100ms
+    checkUndoRedoStatus();
+    const interval = setInterval(checkUndoRedoStatus, 100);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleUndo = () => {
+    if (typeof window !== 'undefined' && 
+        window.bananaHeaderEditor && 
+        window.bananaHeaderEditor.undo && 
+        window.bananaHeaderEditor.canUndo) {
+      window.bananaHeaderEditor.undo();
+    }
+  };
+
+  const handleRedo = () => {
+    if (typeof window !== 'undefined' && 
+        window.bananaHeaderEditor && 
+        window.bananaHeaderEditor.redo && 
+        window.bananaHeaderEditor.canRedo) {
+      window.bananaHeaderEditor.redo();
+    }
+  };
+
   const handleSave = async () => {
     setIsSaving(true);
-    // Add save logic here
-    await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate save
+    
+    // Get the current state from the header editor
+    if (typeof window !== 'undefined' && window.bananaHeaderEditor && window.bananaHeaderEditor.currentState) {
+      try {
+        // Save to localStorage
+        localStorage.setItem('bananaHeaderState', JSON.stringify(window.bananaHeaderEditor.currentState));
+        localStorage.setItem('bananaHeaderHistoryIndex', String(window.bananaHeaderEditor.currentHistoryIndex || 0));
+        
+        console.log('Saved header state:', window.bananaHeaderEditor.currentState);
+        console.log('Saved at history index:', window.bananaHeaderEditor.currentHistoryIndex);
+        
+        // Simulate network delay
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        
+        // Success message
+        alert('Header state saved successfully!');
+      } catch (error) {
+        console.error('Error saving header state:', error);
+        alert('Failed to save header state. Please try again.');
+      }
+    } else {
+      alert('No header state available to save.');
+    }
+    
     setIsSaving(false);
   };
 
@@ -53,12 +111,14 @@ export default function Banana() {
                   <button
                     className="rounded p-1 transition-colors hover:bg-white/10 disabled:opacity-40"
                     disabled={!canUndo}
+                    onClick={handleUndo}
                   >
                     <GrUndo className="size-4" />
                   </button>
                   <button
                     className="rounded p-1 transition-colors hover:bg-white/10 disabled:opacity-40"
                     disabled={!canRedo}
+                    onClick={handleRedo}
                   >
                     <GrRedo className="size-4" />
                   </button>

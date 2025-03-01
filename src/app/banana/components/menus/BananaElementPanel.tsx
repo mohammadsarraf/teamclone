@@ -24,7 +24,11 @@ interface ElementToolbarProps {
   };
 }
 
-export default function BananaElementPanel({ onClose, onElementsChange, initialElements }: ElementToolbarProps) {
+export default function BananaElementPanel({
+  onClose,
+  onElementsChange,
+  initialElements,
+}: ElementToolbarProps) {
   const [toggleStates, setToggleStates] = useState(initialElements);
 
   useEffect(() => {

@@ -20,14 +20,14 @@ interface HeaderProps {
   };
 }
 
-export default function BananaHeader({ 
+export default function BananaHeader({
   enabledElements = {
     isButton: false,
     isSocial: false,
     isCart: false,
     isAccount: false,
   },
-  layout = "Option 1" 
+  layout = "Option 1",
 }: HeaderProps) {
   const Logo = () => (
     <h1 className="text-2xl font-bold text-white">YourWebsiteTitle</h1>

@@ -21,12 +21,12 @@ const layoutOptions = [
       <div className="flex h-12 w-full items-center rounded bg-[#404040] px-3">
         <div className="h-3 w-8 rounded bg-white/80" /> {/* Logo */}
         <div className="ml-6 flex gap-2">
-          {[1, 2].map((i) => ( /* Navigation */
+          {[1, 2].map((i /* Navigation */) => (
             <div key={i} className="h-2 w-6 rounded bg-white/60" />
           ))}
         </div>
         <div className="ml-auto flex items-center gap-3">
-          {[1, 2].map((i) => ( /* Dynamic Elements */
+          {[1, 2].map((i /* Dynamic Elements */) => (
             <div key={i} className="size-3 rounded-full bg-white/60" />
           ))}
         </div>
@@ -37,13 +37,18 @@ const layoutOptions = [
     name: "Option 2" as const,
     preview: (
       <div className="flex h-12 w-full items-center justify-between rounded bg-[#404040] px-3">
-        <div className="flex gap-2"> {/* Left Navigation */}
+        <div className="flex gap-2">
+          {" "}
+          {/* Left Navigation */}
           {[1, 2].map((i) => (
             <div key={i} className="h-2 w-6 rounded bg-white/60" />
           ))}
         </div>
-        <div className="absolute left-1/2 h-3 w-8 -translate-x-1/2 rounded bg-white/80" /> {/* Centered Logo */}
-        <div className="flex gap-2"> {/* Right Elements */}
+        <div className="absolute left-1/2 h-3 w-8 -translate-x-1/2 rounded bg-white/80" />{" "}
+        {/* Centered Logo */}
+        <div className="flex gap-2">
+          {" "}
+          {/* Right Elements */}
           {[1, 2].map((i) => (
             <div key={i} className="size-3 rounded-full bg-white/60" />
           ))}
@@ -56,7 +61,9 @@ const layoutOptions = [
     preview: (
       <div className="flex h-12 w-full flex-col items-center justify-center rounded bg-[#404040] px-3 py-2">
         <div className="h-3 w-8 rounded bg-white/80" /> {/* Logo Top */}
-        <div className="mt-1.5 flex items-center gap-4"> {/* Nav and Elements Below */}
+        <div className="mt-1.5 flex items-center gap-4">
+          {" "}
+          {/* Nav and Elements Below */}
           <div className="flex gap-2">
             {[1, 2].map((i) => (
               <div key={i} className="h-2 w-6 rounded bg-white/60" />
@@ -75,13 +82,18 @@ const layoutOptions = [
     name: "Option 4" as const,
     preview: (
       <div className="relative flex h-12 w-full items-center justify-between rounded bg-[#404040] px-3">
-        <div className="flex gap-2"> {/* Left Nav */}
+        <div className="flex gap-2">
+          {" "}
+          {/* Left Nav */}
           {[1, 2].map((i) => (
             <div key={i} className="h-2 w-6 rounded bg-white/60" />
           ))}
         </div>
-        <div className="absolute left-1/2 h-3 w-8 -translate-x-1/2 rounded bg-white/80" /> {/* Center Logo */}
-        <div className="flex gap-2"> {/* Right Elements */}
+        <div className="absolute left-1/2 h-3 w-8 -translate-x-1/2 rounded bg-white/80" />{" "}
+        {/* Center Logo */}
+        <div className="flex gap-2">
+          {" "}
+          {/* Right Elements */}
           {[1, 2].map((i) => (
             <div key={i} className="size-3 rounded-full bg-white/60" />
           ))}
@@ -91,11 +103,16 @@ const layoutOptions = [
   },
 ];
 
-export default function BananaDesignPanel({ onClose, onLayoutChange, initialLayout }: DesignToolbarProps) {
+export default function BananaDesignPanel({
+  onClose,
+  onLayoutChange,
+  initialLayout,
+}: DesignToolbarProps) {
   const [currentView, setCurrentView] = useState<MenuView>("design");
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showLayoutDropdown, setShowLayoutDropdown] = useState(false);
-  const [selectedLayout, setSelectedLayout] = useState<HeaderLayout>(initialLayout);
+  const [selectedLayout, setSelectedLayout] =
+    useState<HeaderLayout>(initialLayout);
   const [isClosing, setIsClosing] = useState(false);
 
   useEffect(() => {

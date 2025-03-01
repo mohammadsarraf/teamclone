@@ -88,8 +88,8 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
           {/* Toolbars */}
           {activeMenu === "element" && (
             <div className="absolute left-0 top-full z-40 mt-3">
-              <ElementToolbar 
-                onClose={() => handleMenuClick("none")} 
+              <ElementToolbar
+                onClose={() => handleMenuClick("none")}
                 onElementsChange={handleElementToggle}
                 initialElements={enabledElements}
               />
@@ -97,8 +97,8 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
           )}
           {activeMenu === "design" && (
             <div className="absolute right-0 top-full z-40 mt-3">
-              <DesignToolbar 
-                onClose={() => handleMenuClick("none")} 
+              <DesignToolbar
+                onClose={() => handleMenuClick("none")}
                 onLayoutChange={handleLayoutChange}
                 initialLayout={headerLayout}
               />

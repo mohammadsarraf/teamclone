@@ -6,19 +6,30 @@ import {
   HiX,
 } from "react-icons/hi";
 import { TiSocialSkypeOutline } from "react-icons/ti";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface ElementToolbarProps {
   onClose: () => void;
+  onElementsChange: (elements: {
+    isButton: boolean;
+    isSocial: boolean;
+    isCart: boolean;
+    isAccount: boolean;
+  }) => void;
+  initialElements: {
+    isButton: boolean;
+    isSocial: boolean;
+    isCart: boolean;
+    isAccount: boolean;
+  };
 }
 
-export default function BananaElementPanel({ onClose }: ElementToolbarProps) {
-  const [toggleStates, setToggleStates] = useState({
-    isButton: false,
-    isSocial: false,
-    isCart: false,
-    isAccount: false,
-  });
+export default function BananaElementPanel({ onClose, onElementsChange, initialElements }: ElementToolbarProps) {
+  const [toggleStates, setToggleStates] = useState(initialElements);
+
+  useEffect(() => {
+    onElementsChange(toggleStates);
+  }, [toggleStates, onElementsChange]);
 
   const elementOptions = [
     {

@@ -4,95 +4,103 @@ import { HiX, HiChevronDown } from "react-icons/hi";
 import { HiOutlineColorSwatch } from "react-icons/hi";
 import { IoColorPaletteOutline } from "react-icons/io5";
 import { RxTransparencyGrid } from "react-icons/rx";
+import type { HeaderLayout } from "../BananaHeader";
 
 interface DesignToolbarProps {
   onClose: () => void;
+  onLayoutChange: (layout: HeaderLayout) => void;
+  initialLayout: HeaderLayout;
 }
 
 type MenuView = "design" | "color";
 
 const layoutOptions = [
   {
-    name: "Option 1",
+    name: "Option 1" as const,
     preview: (
       <div className="flex h-12 w-full items-center rounded bg-[#404040] px-3">
-        <div className="h-3 w-8 rounded bg-white/80" />
+        <div className="h-3 w-8 rounded bg-white/80" /> {/* Logo */}
         <div className="ml-6 flex gap-2">
-          {[1, 2, 3].map((i) => (
+          {[1, 2].map((i) => ( /* Navigation */
             <div key={i} className="h-2 w-6 rounded bg-white/60" />
           ))}
         </div>
         <div className="ml-auto flex items-center gap-3">
-          <div className="size-3 rounded-full bg-white/60" />
-          <div className="h-3 w-6 rounded bg-white/80" />
+          {[1, 2].map((i) => ( /* Dynamic Elements */
+            <div key={i} className="size-3 rounded-full bg-white/60" />
+          ))}
         </div>
       </div>
     ),
   },
   {
-    name: "Option 2",
+    name: "Option 2" as const,
     preview: (
       <div className="flex h-12 w-full items-center justify-between rounded bg-[#404040] px-3">
-        <div className="flex gap-2">
-          {" "}
-          {/* Left Elements */}
-          <div className="h-2 w-6 rounded bg-white/60" />
-          <div className="h-2 w-6 rounded bg-white/60" />
+        <div className="flex gap-2"> {/* Left Navigation */}
+          {[1, 2].map((i) => (
+            <div key={i} className="h-2 w-6 rounded bg-white/60" />
+          ))}
         </div>
-        <div className="h-3 w-8 rounded bg-white/80" /> {/* Centered Logo */}
-        <div className="flex gap-2">
-          {" "}
-          {/* Right Elements */}
-          <div className="h-2 w-6 rounded bg-white/60" />
-          <div className="h-2 w-6 rounded bg-white/60" />
+        <div className="absolute left-1/2 h-3 w-8 -translate-x-1/2 rounded bg-white/80" /> {/* Centered Logo */}
+        <div className="flex gap-2"> {/* Right Elements */}
+          {[1, 2].map((i) => (
+            <div key={i} className="size-3 rounded-full bg-white/60" />
+          ))}
         </div>
       </div>
     ),
   },
   {
-    name: "Option 3",
+    name: "Option 3" as const,
     preview: (
       <div className="flex h-12 w-full flex-col items-center justify-center rounded bg-[#404040] px-3 py-2">
         <div className="h-3 w-8 rounded bg-white/80" /> {/* Logo Top */}
-        <div className="mt-1.5 flex gap-2">
-          {" "}
-          {/* Nav Below */}
-          <div className="h-2 w-6 rounded bg-white/60" />
-          <div className="h-2 w-6 rounded bg-white/60" />
-          <div className="h-2 w-6 rounded bg-white/60" />
+        <div className="mt-1.5 flex items-center gap-4"> {/* Nav and Elements Below */}
+          <div className="flex gap-2">
+            {[1, 2].map((i) => (
+              <div key={i} className="h-2 w-6 rounded bg-white/60" />
+            ))}
+          </div>
+          <div className="flex gap-2">
+            {[1, 2].map((i) => (
+              <div key={i} className="size-3 rounded-full bg-white/60" />
+            ))}
+          </div>
         </div>
       </div>
     ),
   },
   {
-    name: "Option 4",
+    name: "Option 4" as const,
     preview: (
-      <div className="flex h-12 w-full items-center rounded bg-[#404040] px-3">
-        <div className="flex gap-2">
-          {" "}
-          {/* Left Nav */}
-          <div className="h-2 w-6 rounded bg-white/60" />
-          <div className="h-2 w-6 rounded bg-white/60" />
+      <div className="relative flex h-12 w-full items-center justify-between rounded bg-[#404040] px-3">
+        <div className="flex gap-2"> {/* Left Nav */}
+          {[1, 2].map((i) => (
+            <div key={i} className="h-2 w-6 rounded bg-white/60" />
+          ))}
         </div>
-        <div className="mx-auto h-3 w-8 rounded bg-white/80" />{" "}
-        {/* Center Logo */}
-        <div className="flex gap-2">
-          {" "}
-          {/* Right Nav */}
-          <div className="h-2 w-6 rounded bg-white/60" />
-          <div className="h-2 w-6 rounded bg-white/60" />
+        <div className="absolute left-1/2 h-3 w-8 -translate-x-1/2 rounded bg-white/80" /> {/* Center Logo */}
+        <div className="flex gap-2"> {/* Right Elements */}
+          {[1, 2].map((i) => (
+            <div key={i} className="size-3 rounded-full bg-white/60" />
+          ))}
         </div>
       </div>
     ),
   },
 ];
 
-export default function BananaDesignPanel({ onClose }: DesignToolbarProps) {
+export default function BananaDesignPanel({ onClose, onLayoutChange, initialLayout }: DesignToolbarProps) {
   const [currentView, setCurrentView] = useState<MenuView>("design");
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showLayoutDropdown, setShowLayoutDropdown] = useState(false);
-  const [selectedLayout, setSelectedLayout] = useState(layoutOptions[0].name);
+  const [selectedLayout, setSelectedLayout] = useState<HeaderLayout>(initialLayout);
   const [isClosing, setIsClosing] = useState(false);
+
+  useEffect(() => {
+    onLayoutChange(selectedLayout);
+  }, [selectedLayout, onLayoutChange]);
 
   // Add cleanup for all dropdowns/pickers when toolbar is closing
   useEffect(() => {
@@ -107,17 +115,13 @@ export default function BananaDesignPanel({ onClose }: DesignToolbarProps) {
     const baseClasses = "rounded-md px-3 py-1.5 font-medium transition-all";
     const activeClasses = "bg-[#333333] text-white";
     const inactiveClasses = "text-gray-400 hover:text-white hover:bg-[#262626]";
-
     return `${baseClasses} ${isActive ? activeClasses : inactiveClasses}`;
   };
 
   const handleClose = () => {
-    // First cleanup all open states
     setShowLayoutDropdown(false);
     setShowColorPicker(false);
     setIsClosing(true);
-
-    // Then trigger the closing animation
     setTimeout(() => {
       onClose();
     }, 150);
@@ -127,7 +131,7 @@ export default function BananaDesignPanel({ onClose }: DesignToolbarProps) {
     <>
       {/* Main Toolbar */}
       <div
-        className={`flex w-[280px] flex-col overflow-hidden rounded-lg border border-[#333333] bg-[#1a1a1a] text-sm shadow-xl transition-all duration-150 ${
+        className={`flex w-[325px] flex-col overflow-hidden rounded-lg border border-[#333333] bg-[#1a1a1a] text-sm shadow-xl transition-all duration-150 ${
           isClosing ? "translate-x-2 opacity-0" : "opacity-100"
         }`}
       >

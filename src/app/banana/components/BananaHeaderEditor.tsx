@@ -29,6 +29,9 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
     isAccount: false,
   });
   const [headerLayout, setHeaderLayout] = useState<HeaderLayout>("Option 1");
+  const [headerHeight, setHeaderHeight] = useState(80);
+  const [linkSpacing, setLinkSpacing] = useState(24);
+  const [elementSpacing, setElementSpacing] = useState(16);
 
   const handleMenuClick = (menuType: MenuType) => {
     setActiveMenu(menuType === activeMenu ? "none" : menuType);
@@ -47,6 +50,18 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
     setHeaderLayout(layout);
   };
 
+  const handleHeightChange = (height: number) => {
+    setHeaderHeight(height);
+  };
+
+  const handleLinkSpacingChange = (spacing: number) => {
+    setLinkSpacing(spacing);
+  };
+
+  const handleElementSpacingChange = (spacing: number) => {
+    setElementSpacing(spacing);
+  };
+
   return (
     <div className="relative">
       {/* Header Container with hover detection */}
@@ -56,7 +71,13 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
         onMouseLeave={() => setIsHovered(false)}
       >
         {/* Actual Header Content */}
-        <BananaHeader enabledElements={enabledElements} layout={headerLayout} />
+        <BananaHeader 
+          enabledElements={enabledElements} 
+          layout={headerLayout}
+          height={headerHeight}
+          linkSpacing={linkSpacing}
+          elementSpacing={elementSpacing}
+        />
 
         {/* Edit Overlay */}
         {isFullscreen && (isHovered || isEditing) && (
@@ -101,6 +122,12 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
                 onClose={() => handleMenuClick("none")}
                 onLayoutChange={handleLayoutChange}
                 initialLayout={headerLayout}
+                onHeightChange={handleHeightChange}
+                initialHeight={headerHeight}
+                onLinkSpacingChange={handleLinkSpacingChange}
+                initialLinkSpacing={linkSpacing}
+                onElementSpacingChange={handleElementSpacingChange}
+                initialElementSpacing={elementSpacing}
               />
             </div>
           )}

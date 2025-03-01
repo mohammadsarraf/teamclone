@@ -9,7 +9,13 @@ import type { HeaderLayout } from "../BananaHeader";
 interface DesignToolbarProps {
   onClose: () => void;
   onLayoutChange: (layout: HeaderLayout) => void;
+  onHeightChange: (height: number) => void;
+  onLinkSpacingChange: (spacing: number) => void;
+  onElementSpacingChange: (spacing: number) => void;
   initialLayout: HeaderLayout;
+  initialHeight: number;
+  initialLinkSpacing: number;
+  initialElementSpacing: number;
 }
 
 type MenuView = "design" | "color";
@@ -106,18 +112,45 @@ const layoutOptions = [
 export default function BananaDesignPanel({
   onClose,
   onLayoutChange,
+  onHeightChange,
+  onLinkSpacingChange,
+  onElementSpacingChange,
   initialLayout,
+  initialHeight,
+  initialLinkSpacing,
+  initialElementSpacing,
 }: DesignToolbarProps) {
   const [currentView, setCurrentView] = useState<MenuView>("design");
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showLayoutDropdown, setShowLayoutDropdown] = useState(false);
   const [selectedLayout, setSelectedLayout] =
     useState<HeaderLayout>(initialLayout);
+  const [headerHeight, setHeaderHeight] = useState(initialHeight);
+  const [linkSpacing, setLinkSpacing] = useState(initialLinkSpacing);
+  const [elementSpacing, setElementSpacing] = useState(initialElementSpacing);
   const [isClosing, setIsClosing] = useState(false);
 
   useEffect(() => {
     onLayoutChange(selectedLayout);
   }, [selectedLayout, onLayoutChange]);
+
+  const handleHeightChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newHeight = Number(e.target.value);
+    setHeaderHeight(newHeight);
+    onHeightChange(newHeight);
+  };
+
+  const handleLinkSpacingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newSpacing = Number(e.target.value);
+    setLinkSpacing(newSpacing);
+    onLinkSpacingChange(newSpacing);
+  };
+
+  const handleElementSpacingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newSpacing = Number(e.target.value);
+    setElementSpacing(newSpacing);
+    onElementSpacingChange(newSpacing);
+  };
 
   // Add cleanup for all dropdowns/pickers when toolbar is closing
   useEffect(() => {
@@ -210,20 +243,7 @@ export default function BananaDesignPanel({
 
               {/* Sliders Section */}
               <div className="space-y-5">
-                {/* Height Slider */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-white">
-                      Height
-                    </span>
-                    <span className="text-xs text-gray-400">80px</span>
-                  </div>
-                  <input
-                    type="range"
-                    className="h-1.5 w-full appearance-none rounded-full bg-[#333333] accent-blue-500 hover:accent-blue-400"
-                    defaultValue={80}
-                  />
-                </div>
+                <span>Spacing</span>
 
                 {/* Link Spacing Slider */}
                 <div className="space-y-2">
@@ -231,12 +251,15 @@ export default function BananaDesignPanel({
                     <span className="text-sm font-medium text-white">
                       Link Spacing
                     </span>
-                    <span className="text-xs text-gray-400">24px</span>
+                    <span className="text-xs text-gray-400">{linkSpacing}px</span>
                   </div>
                   <input
                     type="range"
+                    min={12}
+                    max={48}
+                    value={linkSpacing}
+                    onChange={handleLinkSpacingChange}
                     className="h-1.5 w-full appearance-none rounded-full bg-[#333333] accent-blue-500 hover:accent-blue-400"
-                    defaultValue={24}
                   />
                 </div>
 
@@ -246,35 +269,39 @@ export default function BananaDesignPanel({
                     <span className="text-sm font-medium text-white">
                       Element Spacing
                     </span>
-                    <span className="text-xs text-gray-400">16px</span>
+                    <span className="text-xs text-gray-400">{elementSpacing}px</span>
                   </div>
                   <input
                     type="range"
+                    min={8}
+                    max={32}
+                    value={elementSpacing}
+                    onChange={handleElementSpacingChange}
                     className="h-1.5 w-full appearance-none rounded-full bg-[#333333] accent-blue-500 hover:accent-blue-400"
-                    defaultValue={16}
                   />
                 </div>
               </div>
 
-              {/* Alignment Section */}
-              <div className="space-y-2.5">
-                <span className="text-sm font-medium text-white">
-                  Alignment
-                </span>
-                <div className="grid grid-cols-3 gap-1.5">
-                  {["Left", "Center", "Right"].map((align) => (
-                    <button
-                      key={align}
-                      className="rounded-md border border-[#404040] bg-[#262626] px-3 py-2 text-sm text-white transition-colors hover:bg-[#333333] focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      {align}
-                    </button>
-                  ))}
+                {/* Height Slider */}
+                <span>Size</span>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-white">Height</span>
+                    <span className="text-xs text-gray-400">{headerHeight}px</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={80}
+                    max={200}
+                    value={headerHeight}
+                    onChange={handleHeightChange}
+                    className="h-1.5 w-full appearance-none rounded-full bg-[#333333] accent-blue-500 hover:accent-blue-400"
+                  />
                 </div>
-              </div>
 
               {/* Style Section */}
-              <div className="space-y-2.5">
+              {/* <div className="space-y-2.5">
                 <span className="text-sm font-medium text-white">Style</span>
                 <div className="grid grid-cols-2 gap-1.5">
                   {["Default", "Minimal", "Modern", "Classic"].map((style) => (
@@ -286,7 +313,7 @@ export default function BananaDesignPanel({
                     </button>
                   ))}
                 </div>
-              </div>
+              </div> */}
             </>
           ) : (
             <>

@@ -161,7 +161,9 @@ export default function BananaDesignPanel({
     onLinkSpacingChangeComplete(linkSpacing);
   };
 
-  const handleElementSpacingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleElementSpacingChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const newSpacing = Number(e.target.value);
     setElementSpacing(newSpacing);
     onElementSpacingChange(newSpacing);
@@ -270,7 +272,9 @@ export default function BananaDesignPanel({
                     <span className="text-sm font-medium text-white">
                       Link Spacing
                     </span>
-                    <span className="text-xs text-gray-400">{linkSpacing}px</span>
+                    <span className="text-xs text-gray-400">
+                      {linkSpacing}px
+                    </span>
                   </div>
                   <input
                     type="range"
@@ -290,7 +294,9 @@ export default function BananaDesignPanel({
                     <span className="text-sm font-medium text-white">
                       Element Spacing
                     </span>
-                    <span className="text-xs text-gray-400">{elementSpacing}px</span>
+                    <span className="text-xs text-gray-400">
+                      {elementSpacing}px
+                    </span>
                   </div>
                   <input
                     type="range"
@@ -311,8 +317,12 @@ export default function BananaDesignPanel({
                 {/* Height Slider */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-white">Height</span>
-                    <span className="text-xs text-gray-400">{headerHeight}px</span>
+                    <span className="text-sm font-medium text-white">
+                      Height
+                    </span>
+                    <span className="text-xs text-gray-400">
+                      {headerHeight}px
+                    </span>
                   </div>
                   <input
                     type="range"

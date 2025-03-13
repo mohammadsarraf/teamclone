@@ -2,10 +2,10 @@
 declare global {
   // Define MenuType here to match the one in BananaHeaderEditor.tsx
   type MenuType = "none" | "element" | "design";
-  
+
   // Define HeaderLayout to match the one in BananaHeader.tsx
   type HeaderLayout = "Option 1" | "Option 2" | "Option 3" | "Option 4";
-  
+
   // Define EnabledElements to match the one in BananaHeaderEditor.tsx
   interface EnabledElements {
     isButton: boolean;
@@ -13,7 +13,7 @@ declare global {
     isCart: boolean;
     isAccount: boolean;
   }
-  
+
   // Complete state of the header for history tracking
   interface HeaderState {
     layout: HeaderLayout;
@@ -24,7 +24,7 @@ declare global {
     activeMenu: MenuType;
     isEditing: boolean;
   }
-  
+
   interface Window {
     bananaHeaderEditor?: {
       undo: (() => void) | null;
@@ -37,4 +37,20 @@ declare global {
   }
 }
 
-export {}; 
+import { Layout } from "react-grid-layout";
+
+export interface GridItem extends Layout {
+  title: string;
+  type: 'section' | 'square' | 'textbox';
+  content?: string;
+  backgroundColor?: string;
+  textColor?: string;
+  borderRadius?: number;
+  padding?: number;
+  fontSize?: number;
+  fontWeight?: string;
+  shadow?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
+  layer: number;
+}
+
+export {};

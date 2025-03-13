@@ -16,7 +16,7 @@ export default function Banana() {
   // Check for undo/redo availability periodically
   useEffect(() => {
     const checkUndoRedoStatus = () => {
-      if (typeof window !== 'undefined' && window.bananaHeaderEditor) {
+      if (typeof window !== "undefined" && window.bananaHeaderEditor) {
         setCanUndo(!!window.bananaHeaderEditor.canUndo);
         setCanRedo(!!window.bananaHeaderEditor.canRedo);
       }
@@ -30,49 +30,69 @@ export default function Banana() {
   }, []);
 
   const handleUndo = () => {
-    if (typeof window !== 'undefined' && 
-        window.bananaHeaderEditor && 
-        window.bananaHeaderEditor.undo && 
-        window.bananaHeaderEditor.canUndo) {
+    if (
+      typeof window !== "undefined" &&
+      window.bananaHeaderEditor &&
+      window.bananaHeaderEditor.undo &&
+      window.bananaHeaderEditor.canUndo
+    ) {
       window.bananaHeaderEditor.undo();
     }
   };
 
   const handleRedo = () => {
-    if (typeof window !== 'undefined' && 
-        window.bananaHeaderEditor && 
-        window.bananaHeaderEditor.redo && 
-        window.bananaHeaderEditor.canRedo) {
+    if (
+      typeof window !== "undefined" &&
+      window.bananaHeaderEditor &&
+      window.bananaHeaderEditor.redo &&
+      window.bananaHeaderEditor.canRedo
+    ) {
       window.bananaHeaderEditor.redo();
     }
   };
 
   const handleSave = async () => {
     setIsSaving(true);
-    
+
     // Get the current state from the header editor
-    if (typeof window !== 'undefined' && window.bananaHeaderEditor && window.bananaHeaderEditor.currentState) {
+    if (
+      typeof window !== "undefined" &&
+      window.bananaHeaderEditor &&
+      window.bananaHeaderEditor.currentState
+    ) {
       try {
         // Save to localStorage
-        localStorage.setItem('bananaHeaderState', JSON.stringify(window.bananaHeaderEditor.currentState));
-        localStorage.setItem('bananaHeaderHistoryIndex', String(window.bananaHeaderEditor.currentHistoryIndex || 0));
-        
-        console.log('Saved header state:', window.bananaHeaderEditor.currentState);
-        console.log('Saved at history index:', window.bananaHeaderEditor.currentHistoryIndex);
-        
+        localStorage.setItem(
+          "bananaHeaderState",
+          JSON.stringify(window.bananaHeaderEditor.currentState),
+        );
+        localStorage.setItem(
+          "bananaHeaderHistoryIndex",
+          String(window.bananaHeaderEditor.currentHistoryIndex || 0),
+        );
+
+        console.log(
+          "Saved header state:",
+          window.bananaHeaderEditor.currentState,
+        );
+        console.log(
+          "Saved at history index:",
+          window.bananaHeaderEditor.currentHistoryIndex,
+        );
+
         // Simulate network delay
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        
+
         // Success message
-        alert('Header state saved successfully!');
+        alert("Header state saved successfully!");
       } catch (error) {
-        console.error('Error saving header state:', error);
-        alert('Failed to save header state. Please try again.');
+        console.error("Error saving header state:", error);
+        alert("Failed to save header state. Please try again.");
       }
     } else {
-      alert('No header state available to save.');
+      alert("No header state available to save.");
     }
-    
+
     setIsSaving(false);
   };
 

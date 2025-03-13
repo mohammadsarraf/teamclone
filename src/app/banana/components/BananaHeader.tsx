@@ -83,7 +83,7 @@ export default function BananaHeader({
   // Layout Option 1: Logo Left, Nav Center, Elements Right
   if (layout === "Option 1") {
     return (
-      <header 
+      <header
         className="flex w-full items-center justify-between bg-black px-6 transition-[height] duration-75"
         style={headerStyle}
       >
@@ -99,7 +99,7 @@ export default function BananaHeader({
   // Layout Option 2: Nav Left, Logo Center, Elements Right
   if (layout === "Option 2") {
     return (
-      <header 
+      <header
         className="flex w-full items-center justify-between bg-black px-6 transition-[height] duration-75"
         style={headerStyle}
       >
@@ -115,12 +115,15 @@ export default function BananaHeader({
   // Layout Option 3: Logo Top, Nav Bottom (Centered)
   if (layout === "Option 3") {
     return (
-      <header 
+      <header
         className="flex w-full flex-col items-center justify-center bg-black px-6 transition-[height] duration-75"
         style={headerStyle}
       >
         <Logo />
-        <div style={{ gap: `${elementSpacing}px` }} className="mt-4 flex items-center">
+        <div
+          style={{ gap: `${elementSpacing}px` }}
+          className="mt-4 flex items-center"
+        >
           <Navigation />
           <DynamicElements />
         </div>
@@ -131,7 +134,7 @@ export default function BananaHeader({
   // Layout Option 4: Nav Split, Logo Center
   if (layout === "Option 4") {
     return (
-      <header 
+      <header
         className="relative flex w-full items-center justify-between bg-black px-6 transition-[height] duration-75"
         style={headerStyle}
       >

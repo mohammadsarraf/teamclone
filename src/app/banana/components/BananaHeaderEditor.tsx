@@ -34,7 +34,7 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [activeMenu, setActiveMenu] = useState<MenuType>("none");
-  
+
   // Current state
   const [enabledElements, setEnabledElements] = useState<EnabledElements>({
     isButton: false,
@@ -46,7 +46,7 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
   const [headerHeight, setHeaderHeight] = useState(80);
   const [linkSpacing, setLinkSpacing] = useState(24);
   const [elementSpacing, setElementSpacing] = useState(16);
-  
+
   // History management
   const [history, setHistory] = useState<HeaderState[]>([
     {
@@ -59,29 +59,29 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
         isSocial: false,
         isCart: false,
         isAccount: false,
-      }
-    }
+      },
+    },
   ]);
   const [currentHistoryIndex, setCurrentHistoryIndex] = useState(0);
-  
+
   // Load saved state from localStorage on mount
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       try {
-        const savedState = localStorage.getItem('bananaHeaderState');
-        const savedIndex = localStorage.getItem('bananaHeaderHistoryIndex');
-        
+        const savedState = localStorage.getItem("bananaHeaderState");
+        const savedIndex = localStorage.getItem("bananaHeaderHistoryIndex");
+
         if (savedState) {
           const parsedState = JSON.parse(savedState) as HeaderState;
-          
+
           // Apply the saved state
           applyState(parsedState);
-          
+
           // Update history
           const newHistory = [...history];
           newHistory[0] = parsedState; // Replace initial state
           setHistory(newHistory);
-          
+
           // Set history index if available
           if (savedIndex) {
             const index = parseInt(savedIndex, 10);
@@ -89,15 +89,15 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
               setCurrentHistoryIndex(index);
             }
           }
-          
-          console.log('Loaded saved header state:', parsedState);
+
+          console.log("Loaded saved header state:", parsedState);
         }
       } catch (error) {
-        console.error('Error loading saved header state:', error);
+        console.error("Error loading saved header state:", error);
       }
     }
   }, []);
-  
+
   // Derived state for undo/redo availability
   const canUndo = currentHistoryIndex > 0;
   const canRedo = currentHistoryIndex < history.length - 1;
@@ -106,10 +106,10 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
   const addToHistory = (newState: HeaderState) => {
     // Remove any future states if we've gone back in history and then made a change
     const newHistory = history.slice(0, currentHistoryIndex + 1);
-    
+
     // Add the new state
     newHistory.push(newState);
-    
+
     // Update history and move pointer to the end
     setHistory(newHistory);
     setCurrentHistoryIndex(newHistory.length - 1);
@@ -121,7 +121,7 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
     height: headerHeight,
     linkSpacing: linkSpacing,
     elementSpacing: elementSpacing,
-    enabledElements: { ...enabledElements }
+    enabledElements: { ...enabledElements },
   });
 
   // Apply a state from history
@@ -131,7 +131,7 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
     setLinkSpacing(state.linkSpacing);
     setElementSpacing(state.elementSpacing);
     setEnabledElements(state.enabledElements);
-    
+
     // Reset menu state when applying a state from history
     setActiveMenu("none");
   };
@@ -173,11 +173,11 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
     // Only update if the elements have actually changed
     if (JSON.stringify(elements) !== JSON.stringify(enabledElements)) {
       setEnabledElements(elements);
-      
+
       // Add to history
       const newState = {
         ...getCurrentState(),
-        enabledElements: elements
+        enabledElements: elements,
       };
       addToHistory(newState);
     }
@@ -187,11 +187,11 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
     // Only update if the layout has actually changed
     if (layout !== headerLayout) {
       setHeaderLayout(layout);
-      
+
       // Add to history
       const newState = {
         ...getCurrentState(),
-        layout
+        layout,
       };
       addToHistory(newState);
     }
@@ -199,7 +199,7 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
 
   const handleHeightChange = (height: number) => {
     setHeaderHeight(height);
-    
+
     // For slider changes, we don't want to add to history on every pixel change
     // We'll handle this in the design panel component
   };
@@ -208,7 +208,7 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
     // Add to history when slider interaction is complete
     const newState = {
       ...getCurrentState(),
-      height
+      height,
     };
     addToHistory(newState);
   };
@@ -221,7 +221,7 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
   const handleLinkSpacingChangeComplete = (spacing: number) => {
     const newState = {
       ...getCurrentState(),
-      linkSpacing: spacing
+      linkSpacing: spacing,
     };
     addToHistory(newState);
   };
@@ -234,7 +234,7 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
   const handleElementSpacingChangeComplete = (spacing: number) => {
     const newState = {
       ...getCurrentState(),
-      elementSpacing: spacing
+      elementSpacing: spacing,
     };
     addToHistory(newState);
   };
@@ -242,54 +242,64 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
   // Add keyboard event listener for undo/redo and expose functions to window
   useEffect(() => {
     // Expose undo/redo functions to window for the top buttons
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       // Make sure we have a valid state to expose
       const currentState = history[currentHistoryIndex];
-      
+
       window.bananaHeaderEditor = {
         undo: canUndo && history[currentHistoryIndex - 1] ? handleUndo : null,
         redo: canRedo && history[currentHistoryIndex + 1] ? handleRedo : null,
         canUndo: canUndo && !!history[currentHistoryIndex - 1],
         canRedo: canRedo && !!history[currentHistoryIndex + 1],
         currentState: currentState || null,
-        currentHistoryIndex
+        currentHistoryIndex,
       };
     }
-    
+
     const handleKeyDown = (e: KeyboardEvent) => {
       // Only handle keyboard shortcuts when in edit mode
       if (!isEditing) return;
-      
-      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+
+      const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
       const cmdOrCtrl = isMac ? e.metaKey : e.ctrlKey;
-      
+
       // Undo: Cmd+Z or Ctrl+Z
-      if (cmdOrCtrl && e.key === 'z' && !e.shiftKey) {
+      if (cmdOrCtrl && e.key === "z" && !e.shiftKey) {
         e.preventDefault();
         if (canUndo && history[currentHistoryIndex - 1]) {
           handleUndo();
         }
       }
-      
+
       // Redo: Cmd+Shift+Z or Ctrl+Y
-      if ((cmdOrCtrl && e.key === 'z' && e.shiftKey) || 
-          (cmdOrCtrl && e.key === 'y')) {
+      if (
+        (cmdOrCtrl && e.key === "z" && e.shiftKey) ||
+        (cmdOrCtrl && e.key === "y")
+      ) {
         e.preventDefault();
         if (canRedo && history[currentHistoryIndex + 1]) {
           handleRedo();
         }
       }
     };
-    
-    window.addEventListener('keydown', handleKeyDown);
+
+    window.addEventListener("keydown", handleKeyDown);
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener("keydown", handleKeyDown);
       // Clean up the window object when component unmounts
-      if (typeof window !== 'undefined') {
+      if (typeof window !== "undefined") {
         delete window.bananaHeaderEditor;
       }
     };
-  }, [isEditing, canUndo, canRedo, handleUndo, handleRedo, history, currentHistoryIndex]);
+  }, [
+    isEditing,
+    canUndo,
+    canRedo,
+    handleUndo,
+    handleRedo,
+    history,
+    currentHistoryIndex,
+  ]);
 
   return (
     <div className="relative">
@@ -300,8 +310,8 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
         onMouseLeave={() => setIsHovered(false)}
       >
         {/* Actual Header Content */}
-        <BananaHeader 
-          enabledElements={enabledElements} 
+        <BananaHeader
+          enabledElements={enabledElements}
           layout={headerLayout}
           height={headerHeight}
           linkSpacing={linkSpacing}
@@ -359,7 +369,9 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
                 initialElementSpacing={elementSpacing}
                 onHeightChangeComplete={handleHeightChangeComplete}
                 onLinkSpacingChangeComplete={handleLinkSpacingChangeComplete}
-                onElementSpacingChangeComplete={handleElementSpacingChangeComplete}
+                onElementSpacingChangeComplete={
+                  handleElementSpacingChangeComplete
+                }
               />
             </div>
           )}

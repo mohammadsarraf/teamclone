@@ -9,7 +9,7 @@ export default function BananaUndoRedo() {
   // Check for undo/redo availability periodically
   useEffect(() => {
     const checkUndoRedoStatus = () => {
-      if (typeof window !== 'undefined' && window.bananaHeaderEditor) {
+      if (typeof window !== "undefined" && window.bananaHeaderEditor) {
         // @ts-ignore - Accessing custom properties on window
         setCanUndo(!!window.bananaHeaderEditor.canUndo);
         // @ts-ignore
@@ -26,7 +26,11 @@ export default function BananaUndoRedo() {
 
   const handleUndo = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent event bubbling
-    if (typeof window !== 'undefined' && window.bananaHeaderEditor && window.bananaHeaderEditor.undo) {
+    if (
+      typeof window !== "undefined" &&
+      window.bananaHeaderEditor &&
+      window.bananaHeaderEditor.undo
+    ) {
       // @ts-ignore - Accessing custom properties on window
       window.bananaHeaderEditor.undo();
     }
@@ -34,7 +38,11 @@ export default function BananaUndoRedo() {
 
   const handleRedo = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent event bubbling
-    if (typeof window !== 'undefined' && window.bananaHeaderEditor && window.bananaHeaderEditor.redo) {
+    if (
+      typeof window !== "undefined" &&
+      window.bananaHeaderEditor &&
+      window.bananaHeaderEditor.redo
+    ) {
       // @ts-ignore - Accessing custom properties on window
       window.bananaHeaderEditor.redo();
     }
@@ -60,4 +68,4 @@ export default function BananaUndoRedo() {
       </button>
     </div>
   );
-} 
+}

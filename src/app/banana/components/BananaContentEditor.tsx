@@ -1,26 +1,18 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import BananaContent from "./BananaContent";
 import BananaItemPanel from "./menus/BananaItemPanel";
-import { GridItem } from "./BananaContent";
+import GridSettingsMenu from "./GridSettingsMenu";
+import BlockMenu from "./menus/BlockMenu";
+import { GridItem, BlockTemplate, GridSettings } from "../types";
 
 interface ContentProps {
   isFullscreen: boolean;
 }
 
-interface BlockTemplate {
-  title: string;
-  description: string;
-  height: number;
-  type: 'section' | 'square' | 'textbox';
-  width?: number;
-}
-
-interface GridSettings {
-  rows: number;
-  columns: number;
-  margin: number;
-  padding: number;
+interface ContextMenuPosition {
+  x: number;
+  y: number;
 }
 
 const blockTemplates: BlockTemplate[] = [
@@ -48,16 +40,18 @@ const blockTemplates: BlockTemplate[] = [
   {
     title: "Text Box",
     description: "Editable text area for custom content",
-    height: 1,
-    width: 4,
+    height: 2,
+    width: 20,
     type: 'textbox'
   }
 ];
 
 const defaultGridSettings: GridSettings = {
   rows: 20,
-  columns: 12,
-  margin: 8,
+  columns: 50,
+  margin: 8, // For backward compatibility
+  horizontalMargin: 8,
+  verticalMargin: 8,
   padding: 16
 };
 
@@ -66,10 +60,17 @@ export default function BananaContentEditor({ isFullscreen }: ContentProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [showBlockMenu, setShowBlockMenu] = useState(false);
   const [showGridSettings, setShowGridSettings] = useState(false);
-  const [layout, setLayout] = useState<any[]>([]);
+  const [showEditSectionMenu, setShowEditSectionMenu] = useState(false);
+  const [layout, setLayout] = useState<GridItem[]>([]);
   const [gridSettings, setGridSettings] = useState<GridSettings>(defaultGridSettings);
-  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [selectedItem, setSelectedItem] = useState<GridItem | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [contextMenuPosition, setContextMenuPosition] = useState<ContextMenuPosition | null>(null);
+  const [focusedItem, setFocusedItem] = useState<string | null>(null);
+  const [editSectionButtonRef, setEditSectionButtonRef] = useState<HTMLButtonElement | null>(null);
+  const [menuPosition, setMenuPosition] = useState({ top: 60, left: 0 });
+  const [blockMenuPosition, setBlockMenuPosition] = useState({ top: 0, left: 0 });
+  const addBlockButtonRef = useRef<HTMLButtonElement>(null);
 
   // Handle ESC key press
   useEffect(() => {
@@ -91,57 +92,71 @@ export default function BananaContentEditor({ isFullscreen }: ContentProps) {
       ? Math.max(...layout.map(item => item.layer || 0))
       : 0;
 
-    const newBlock = {
+    const newBlock: GridItem = {
       i: `${template.type}-${layout.length + 1}`,
       x: 0,
-      y: 0,
-      w: template.width || 4,
-      h: template.height,
+      y: template.type === 'textbox' ? 5 : 0,
+      w: template.type === 'textbox' ? 10 : 3,
+      h: 3,
       title: `${template.title} ${layout.length + 1}`,
       type: template.type,
-      content: template.type === 'textbox' ? 'Click to edit text' : undefined,
+      content: template.type === 'textbox' ? '' : undefined,
+      placeholder: template.type === 'textbox' ? 'Click to edit text' : undefined,
       backgroundColor: '#3B82F6',
-      textColor: '#FFFFFF',
+      textColor: template.type === 'textbox' ? '#FFFFFF' : undefined,
       borderRadius: 8,
       padding: 16,
       fontSize: 16,
       fontWeight: 'normal',
       shadow: 'none',
-      layer: maxLayer + 1 // Place new blocks on top
+      layer: maxLayer + 1, // Place new blocks on top
+      shapeType: template.type === 'square' ? 'square' : undefined, // Set default shape type for squares
+      // Set default text style for textboxes
+      textStyle: template.type === 'textbox' ? 'paragraph-1' : undefined,
+      textDecoration: undefined,
+      fontFamily: undefined
     };
 
     setLayout([...layout, newBlock]);
     setShowBlockMenu(false);
   };
 
-  const handleItemClick = (item: any) => {
-    // Close other menus when opening item panel
-    setShowBlockMenu(false);
-    setShowGridSettings(false);
+  const handleItemClick = (itemId: string, e?: React.MouseEvent) => {
+    // Find the item by id
+    const item = layout.find(item => item.i === itemId);
+    if (!item) return;
+    
+    if (e) {
+      e.preventDefault();
+      setContextMenuPosition({
+        x: e.clientX,
+        y: e.clientY,
+      });
+    }
     setSelectedItem(item);
   };
 
-  const handleItemUpdate = (updates: Partial<any>) => {
+  const handleItemUpdate = (updates: Partial<GridItem> | { _tempLayout: GridItem[] }) => {
     if ('_tempLayout' in updates) {
       // Handle layout reordering
       setLayout(updates._tempLayout);
-      const updatedItem = updates._tempLayout.find((item: GridItem) => item.i === selectedItem.i);
+      const updatedItem = updates._tempLayout.find((item: GridItem) => item.i === selectedItem?.i);
       if (updatedItem) {
         setSelectedItem(updatedItem);
       }
     } else {
       // For non-layer updates, just update normally
       const updatedLayout = layout.map(item => 
-        item.i === selectedItem.i ? { ...item, ...updates } : item
+        item.i === selectedItem?.i ? { ...item, ...updates } : item
       );
       setLayout(updatedLayout);
-      setSelectedItem({ ...selectedItem, ...updates });
+      setSelectedItem({ ...selectedItem, ...updates } as GridItem);
     }
   };
 
   const handleDelete = () => {
     // Filter out the selected item from layout
-    const updatedLayout = layout.filter(item => item.i !== selectedItem.i);
+    const updatedLayout = layout.filter(item => item.i !== selectedItem?.i);
     setLayout(updatedLayout);
     setSelectedItem(null); // Close the panel
   };
@@ -163,145 +178,165 @@ export default function BananaContentEditor({ isFullscreen }: ContentProps) {
     }
   };
 
+  const handleFocusChange = (focusedItemId: string | null) => {
+    console.log("Focus changed to:", focusedItemId);
+    setFocusedItem(focusedItemId);
+    
+    // Hide menus when an item is focused
+    if (focusedItemId !== null) {
+      setShowBlockMenu(false);
+      setShowGridSettings(false);
+    }
+  };
+
+  const handleGridSettingsChange = (newSettings: GridSettings) => {
+    // Ensure all required properties are present
+    const updatedSettings: GridSettings = {
+      ...gridSettings,
+      ...newSettings,
+      // Make sure horizontalMargin and verticalMargin are set even if they weren't in newSettings
+      horizontalMargin: newSettings.horizontalMargin ?? newSettings.margin ?? gridSettings.horizontalMargin,
+      verticalMargin: newSettings.verticalMargin ?? newSettings.margin ?? gridSettings.verticalMargin
+    };
+    
+    setGridSettings(updatedSettings);
+  };
+
+  const handleCloseContextMenu = () => {
+    setSelectedItem(null);
+    setContextMenuPosition(null);
+  };
+
+  // Update menu position when the edit section button is clicked
+  const handleEditSectionClick = () => {
+    if (editSectionButtonRef) {
+      const rect = editSectionButtonRef.getBoundingClientRect();
+      setMenuPosition({
+        top: rect.bottom + 8, // Position below the button with a small gap
+        left: rect.left
+      });
+    }
+    setShowEditSectionMenu(!showEditSectionMenu);
+    setShowBlockMenu(false);
+    setShowGridSettings(false);
+  };
+
+  // Update block menu position when the add block button is clicked
+  const handleAddBlockClick = () => {
+    if (addBlockButtonRef.current) {
+      const rect = addBlockButtonRef.current.getBoundingClientRect();
+      setBlockMenuPosition({
+        top: rect.bottom + 8, // Position below the button with a small gap
+        left: rect.left
+      });
+    }
+    setShowBlockMenu(!showBlockMenu);
+    setShowGridSettings(false);
+    setShowEditSectionMenu(false);
+  };
+
+  // Handle clicking outside the menu to close it
+  const handleOutsideClick = (e: MouseEvent) => {
+    // Close Edit Section Menu when clicking outside
+    if (showEditSectionMenu) {
+      const menuElement = document.querySelector('.grid-settings-menu');
+      if (menuElement && !menuElement.contains(e.target as Node)) {
+        setShowEditSectionMenu(false);
+      }
+    }
+    
+    // Close Block Menu when clicking outside
+    if (showBlockMenu) {
+      const menuElement = document.querySelector('.block-menu');
+      const buttonElement = addBlockButtonRef.current;
+      
+      // Check if click is outside both the menu and the button that opened it
+      if (
+        menuElement && 
+        !menuElement.contains(e.target as Node) && 
+        buttonElement && 
+        !buttonElement.contains(e.target as Node)
+      ) {
+        setShowBlockMenu(false);
+      }
+    }
+  };
+
+  // Add event listener for outside clicks
+  useEffect(() => {
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+    };
+  }, [showEditSectionMenu, showBlockMenu]);
+
   return (
     <div className="relative flex-1">
-      {/* Main Content Area with smooth transition */}
-      <div 
-        className={`transition-all duration-300 ease-in-out ${
-          selectedItem && !isDragging ? 'mr-80' : ''
-        }`}
-      >
+      {/* Main Content Area */}
+      <div>
         {/* Content Container */}
         <div className="relative h-full">
           {/* Edit Tools Container - Sticky */}
-          {isEditing && !isDragging && !selectedItem && (
+          {isEditing && !isDragging && !selectedItem && focusedItem === null && (
             <div className="sticky top-0 z-40 px-4">
               <div className="relative">
-                {/* Left Button with Dropdown */}
-                <div className="absolute left-0">
-                  <button 
-                    onClick={() => {
-                      setShowBlockMenu(!showBlockMenu);
-                      setShowGridSettings(false);
-                    }}
-                    className="flex items-center gap-2 rounded-md bg-white/90 px-4 py-2 text-sm font-medium text-gray-700 shadow-lg transition-all hover:bg-white hover:shadow-xl"
-                  >
-                    <span>Add Block</span>
-                    <svg 
-                      className={`h-4 w-4 transition-transform ${showBlockMenu ? 'rotate-180' : ''}`} 
-                      fill="none" 
-                      viewBox="0 0 24 24" 
-                      stroke="currentColor"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-
-                  {/* Block Menu Dropdown */}
-                  {showBlockMenu && !isDragging && (
-                    <div className="absolute left-0 top-full mt-1 w-64 rounded-md bg-white shadow-xl">
-                      {blockTemplates.map((template, index) => (
-                        <button
-                          key={index}
-                          onClick={() => handleAddBlock(template)}
-                          className="flex w-full flex-col gap-1 px-4 py-3 text-left hover:bg-gray-50"
-                        >
-                          <span className="font-medium text-gray-900">{template.title}</span>
-                          <span className="text-sm text-gray-500">{template.description}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Right Menu */}
-                <div className="absolute right-0">
-                  <div className="relative">
+                {/* Left Button with Dropdown - Only show when no menu is open */}
+                {!showEditSectionMenu && !showBlockMenu && (
+                  <div className="absolute left-0">
                     <button 
-                      onClick={() => {
-                        setShowGridSettings(!showGridSettings);
-                        setShowBlockMenu(false);
-                      }}
+                      ref={addBlockButtonRef}
+                      onClick={handleAddBlockClick}
                       className="flex items-center gap-2 rounded-md bg-white/90 px-4 py-2 text-sm font-medium text-gray-700 shadow-lg transition-all hover:bg-white hover:shadow-xl"
                     >
-                      Edit Section
+                      <span>Add Block</span>
+                      <svg 
+                        className={`h-4 w-4 transition-transform ${showBlockMenu ? 'rotate-180' : ''}`} 
+                        fill="none" 
+                        viewBox="0 0 24 24" 
+                        stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
                     </button>
-
-                    {/* Grid Settings Panel */}
-                    {showGridSettings && !isDragging && (
-                      <div className="absolute right-0 top-full mt-1 w-64 rounded-md bg-white p-4 shadow-xl">
-                        <h3 className="mb-4 font-medium text-gray-900">Grid Settings</h3>
-                        
-                        {/* Rows Setting */}
-                        <div className="mb-4">
-                          <label className="mb-1 block text-sm font-medium text-gray-700">
-                            Rows: {gridSettings.rows}
-                          </label>
-                          <input
-                            type="range"
-                            min="10"
-                            max="30"
-                            value={gridSettings.rows}
-                            onChange={(e) => handleGridSettingChange('rows', parseInt(e.target.value))}
-                            className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200"
-                          />
-                        </div>
-
-                        {/* Columns Setting */}
-                        <div className="mb-4">
-                          <label className="mb-1 block text-sm font-medium text-gray-700">
-                            Columns: {gridSettings.columns}
-                          </label>
-                          <input
-                            type="range"
-                            min="6"
-                            max="24"
-                            value={gridSettings.columns}
-                            onChange={(e) => handleGridSettingChange('columns', parseInt(e.target.value))}
-                            className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200"
-                          />
-                        </div>
-
-                        {/* Margin Setting */}
-                        <div className="mb-4">
-                          <label className="mb-1 block text-sm font-medium text-gray-700">
-                            Margin: {gridSettings.margin}px
-                          </label>
-                          <input
-                            type="range"
-                            min="0"
-                            max="20"
-                            value={gridSettings.margin}
-                            onChange={(e) => handleGridSettingChange('margin', parseInt(e.target.value))}
-                            className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200"
-                          />
-                        </div>
-
-                        {/* Padding Setting */}
-                        <div className="mb-4">
-                          <label className="mb-1 block text-sm font-medium text-gray-700">
-                            Padding: {gridSettings.padding}px
-                          </label>
-                          <input
-                            type="range"
-                            min="0"
-                            max="32"
-                            value={gridSettings.padding}
-                            onChange={(e) => handleGridSettingChange('padding', parseInt(e.target.value))}
-                            className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200"
-                          />
-                        </div>
-
-                        {/* Reset Button */}
-                        <button
-                          onClick={() => setGridSettings(defaultGridSettings)}
-                          className="mt-2 w-full rounded-md bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200"
-                        >
-                          Reset to Default
-                        </button>
-                      </div>
-                    )}
                   </div>
+                )}
+
+                {/* Block Menu - Show regardless of button visibility */}
+                {showBlockMenu && !isDragging && (
+                  <BlockMenu 
+                    onAddBlock={handleAddBlock}
+                    onClose={() => setShowBlockMenu(false)}
+                    position={blockMenuPosition}
+                  />
+                )}
+
+                {/* Right Menu - Only show Edit Section button when no menu is open */}
+                <div className="absolute right-0">
+                  {!showEditSectionMenu && !showBlockMenu ? (
+                    <button
+                      ref={ref => setEditSectionButtonRef(ref)}
+                      onClick={handleEditSectionClick}
+                      className="flex items-center gap-2 rounded-md bg-white/90 px-4 py-2 text-sm font-medium text-gray-700 shadow-lg transition-all hover:bg-white hover:shadow-xl"
+                    >
+                      <span>Edit Section</span>
+                      <svg
+                        className={`h-4 w-4 transition-transform ${showEditSectionMenu ? 'rotate-180' : ''}`}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                  ) : showEditSectionMenu && (
+                    /* Edit Section Menu */
+                    <GridSettingsMenu
+                      initialSettings={gridSettings}
+                      onSettingsChange={handleGridSettingsChange}
+                      onClose={() => setShowEditSectionMenu(false)}
+                      position={menuPosition}
+                    />
+                  )}
                 </div>
               </div>
             </div>
@@ -312,6 +347,11 @@ export default function BananaContentEditor({ isFullscreen }: ContentProps) {
             className={`relative h-full overflow-auto ${isEditing ? "z-30" : ""}`}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
+            onClick={() => {
+              // Close menus when clicking on the content area
+              if (showBlockMenu) setShowBlockMenu(false);
+              if (showEditSectionMenu) setShowEditSectionMenu(false);
+            }}
           >
             <BananaContent 
               className="bg-gray-700" 
@@ -320,40 +360,51 @@ export default function BananaContentEditor({ isFullscreen }: ContentProps) {
               gridSettings={gridSettings}
               onItemClick={handleItemClick}
               onDragStateChange={handleDragStateChange}
+              onFocusChange={handleFocusChange}
               isEditing={isEditing}
-              showGridSettings={showGridSettings}
+              isInteracting={showEditSectionMenu || showBlockMenu}
             />
           </div>
         </div>
       </div>
 
-      {/* Side Panel with smooth transition */}
-      <div 
-        className={`fixed right-0 top-0 z-50 h-full w-80 transform bg-white shadow-xl transition-transform duration-300 ease-in-out ${
-          selectedItem && !isDragging ? 'translate-x-0' : 'translate-x-full'
-        }`}
-      >
-        {selectedItem && !isDragging && (
-          <BananaItemPanel
-            selectedItem={selectedItem}
-            onUpdate={handleItemUpdate}
-            onClose={() => setSelectedItem(null)}
-            onDelete={handleDelete}
-            layout={layout}
-          />
-        )}
-      </div>
+      {/* Context Menu */}
+      {selectedItem && contextMenuPosition && !isDragging && (
+        <div 
+          className="fixed z-50"
+          style={{
+            left: contextMenuPosition.x,
+            top: contextMenuPosition.y,
+          }}
+        >
+          <div className="w-64 rounded-lg bg-white shadow-xl">
+            <BananaItemPanel
+              selectedItem={selectedItem}
+              onUpdate={handleItemUpdate}
+              onClose={handleCloseContextMenu}
+              onDelete={handleDelete}
+              layout={layout}
+            />
+          </div>
+        </div>
+      )}
 
-      {/* Backdrop blur */}
-      {isEditing && !isDragging && (
+      {/* Backdrop blur when item is selected */}
+      {selectedItem && !isDragging && (
         <div
           className="fixed inset-0 z-20 bg-black/5 backdrop-blur-[2px]"
-          onClick={() => {
-            setIsEditing(false);
-            setShowGridSettings(false);
-            setShowBlockMenu(false);
-          }}
+          onClick={handleCloseContextMenu}
         />
+      )}
+
+      {/* Edit mode overlay blur */}
+      {isEditing && (
+        <div 
+          className="fixed inset-0 z-10 cursor-pointer"
+          onClick={() => setIsEditing(false)}
+        >
+          <div className="absolute inset-0 bg-black/10 backdrop-blur-[1px]" />
+        </div>
       )}
 
       {/* Edit Overlay - Fixed to viewport */}

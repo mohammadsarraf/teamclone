@@ -182,11 +182,8 @@ export default function BananaDesignPanel({
   }, [isClosing]);
 
   // Helper function to combine class names
-  const getButtonClass = (isActive: boolean) => {
-    const baseClasses = "rounded-md px-3 py-1.5 font-medium transition-all";
-    const activeClasses = "bg-[#333333] text-white";
-    const inactiveClasses = "text-gray-400 hover:text-white hover:bg-[#262626]";
-    return `${baseClasses} ${isActive ? activeClasses : inactiveClasses}`;
+  const getTabClass = (isActive: boolean) => {
+    return `py-3 px-3 text-center font-medium text-sm ${isActive ? 'border-b-2 border-indigo-600 text-indigo-600' : 'text-black hover:text-indigo-500'}`;
   };
 
   const handleClose = () => {
@@ -202,53 +199,62 @@ export default function BananaDesignPanel({
     <>
       {/* Main Toolbar */}
       <div
-        className={`flex w-[325px] flex-col overflow-hidden rounded-lg border border-[#333333] bg-[#1a1a1a] text-sm shadow-xl transition-all duration-150 ${
+        className={`fixed shadow-lg z-50 overflow-hidden bg-white rounded-lg border border-gray-200 transition-all duration-150 ${
           isClosing ? "translate-x-2 opacity-0" : "opacity-100"
         }`}
+        style={{ 
+          top: '150px', 
+          right: '16px',
+          width: '320px',
+          maxHeight: '85vh'
+        }}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#333333] px-3 py-2.5">
-          <div className="flex gap-1">
+        {/* Close button */}
+        <button 
+          onClick={handleClose}
+          className="absolute bottom-3 right-3 p-1 rounded-full hover:bg-gray-100 z-10"
+          aria-label="Close menu"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+          </svg>
+        </button>
+
+        {/* Header with Tabs */}
+        <div className="border-b">
+          <div className="flex flex-wrap">
             <button
               onClick={() => setCurrentView("design")}
-              className={getButtonClass(currentView === "design")}
+              className={getTabClass(currentView === "design")}
             >
               Design
             </button>
             <button
               onClick={() => setCurrentView("color")}
-              className={getButtonClass(currentView === "color")}
+              className={getTabClass(currentView === "color")}
             >
               Color
             </button>
           </div>
-          <button
-            onClick={handleClose}
-            className="rounded-md p-1.5 text-gray-400 transition-colors hover:bg-[#333333] hover:text-white"
-            aria-label="Close menu"
-          >
-            <HiX className="text-lg" />
-          </button>
         </div>
 
         {/* Content */}
-        <div className="custom-scrollbar flex h-[480px] flex-col space-y-5 overflow-y-auto p-4">
+        <div className="overflow-y-auto" style={{ maxHeight: 'calc(85vh - 48px)' }}>
           {currentView === "design" ? (
             <>
+            <div className="p-4">
               {/* Layout Section */}
-              <div className="space-y-2.5">
-                <span className="text-sm font-medium text-white">Layout</span>
+              <div className="mb-6">
+                <h3 className="text-xs font-semibold text-black uppercase mb-3">Layout</h3>
                 <div className="relative">
                   <button
                     onClick={() => setShowLayoutDropdown(!showLayoutDropdown)}
-                    className="flex w-full flex-col rounded-lg border border-[#404040] bg-[#262626] p-3 text-left transition-colors hover:bg-[#333333] focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="flex w-full flex-col rounded-md border border-gray-200 bg-white p-3 text-left transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
                     <div className="mb-2 flex items-center justify-between">
-                      <span className="text-white">{selectedLayout}</span>
+                      <span className="text-black">{selectedLayout}</span>
                       <HiChevronDown
-                        className={`transition-transform${
-                          showLayoutDropdown ? "rotate-180" : ""
-                        }`}
+                        className={`transition-transform ${showLayoutDropdown ? "rotate-180" : ""}`}
                       />
                     </div>
                     {/* Preview of selected layout */}
@@ -262,19 +268,19 @@ export default function BananaDesignPanel({
                 </div>
               </div>
 
-              {/* Sliders Section */}
-              <div className="space-y-5">
-                <span className="text-sm font-medium text-white">Spacing</span>
+              {/* Spacing Section */}
+              <div className="mb-6">
+                <h3 className="text-xs font-semibold text-black uppercase mb-3">Spacing</h3>
 
                 {/* Link Spacing Slider */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-white">
+                <div className="mb-4">
+                  <div className="flex justify-between items-center mb-1">
+                    <label className="text-sm font-medium text-black">
                       Link Spacing
-                    </span>
-                    <span className="text-xs text-gray-400">
-                      {linkSpacing}px
-                    </span>
+                    </label>
+                    <div className="bg-gray-100 rounded-md px-3 py-1 w-16 text-center">
+                      <span className="text-black">{linkSpacing}px</span>
+                    </div>
                   </div>
                   <input
                     type="range"
@@ -284,19 +290,19 @@ export default function BananaDesignPanel({
                     onChange={handleLinkSpacingChange}
                     onMouseUp={handleLinkSpacingChangeComplete}
                     onTouchEnd={handleLinkSpacingChangeComplete}
-                    className="h-1.5 w-full appearance-none rounded-full bg-[#333333] accent-blue-500 hover:accent-blue-400"
+                    className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
                   />
                 </div>
 
                 {/* Element Spacing Slider */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-white">
+                <div className="mb-4">
+                  <div className="flex justify-between items-center mb-1">
+                    <label className="text-sm font-medium text-black">
                       Element Spacing
-                    </span>
-                    <span className="text-xs text-gray-400">
-                      {elementSpacing}px
-                    </span>
+                    </label>
+                    <div className="bg-gray-100 rounded-md px-3 py-1 w-16 text-center">
+                      <span className="text-black">{elementSpacing}px</span>
+                    </div>
                   </div>
                   <input
                     type="range"
@@ -306,23 +312,24 @@ export default function BananaDesignPanel({
                     onChange={handleElementSpacingChange}
                     onMouseUp={handleElementSpacingChangeComplete}
                     onTouchEnd={handleElementSpacingChangeComplete}
-                    className="h-1.5 w-full appearance-none rounded-full bg-[#333333] accent-blue-500 hover:accent-blue-400"
+                    className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
                   />
                 </div>
               </div>
 
-              <div className="space-y-5">
-                <span className="text-sm font-medium text-white">Size</span>
+              {/* Size Section */}
+              <div className="mb-6">
+                <h3 className="text-xs font-semibold text-black uppercase mb-3">Size</h3>
 
                 {/* Height Slider */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-white">
+                <div className="mb-4">
+                  <div className="flex justify-between items-center mb-1">
+                    <label className="text-sm font-medium text-black">
                       Height
-                    </span>
-                    <span className="text-xs text-gray-400">
-                      {headerHeight}px
-                    </span>
+                    </label>
+                    <div className="bg-gray-100 rounded-md px-3 py-1 w-16 text-center">
+                      <span className="text-black">{headerHeight}px</span>
+                    </div>
                   </div>
                   <input
                     type="range"
@@ -332,34 +339,36 @@ export default function BananaDesignPanel({
                     onChange={handleHeightChange}
                     onMouseUp={handleHeightChangeComplete}
                     onTouchEnd={handleHeightChangeComplete}
-                    className="h-1.5 w-full appearance-none rounded-full bg-[#333333] accent-blue-500 hover:accent-blue-400"
+                    className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
                   />
                 </div>
               </div>
 
               {/* Style Section */}
-              {/* <div className="space-y-2.5">
-                <span className="text-sm font-medium text-white">Style</span>
+              {/* <div className="mb-6">
+                <h3 className="text-xs font-semibold text-black uppercase mb-3">Style</h3>
                 <div className="grid grid-cols-2 gap-1.5">
                   {["Default", "Minimal", "Modern", "Classic"].map((style) => (
                     <button
                       key={style}
-                      className="rounded-md border border-[#404040] bg-[#262626] px-3 py-2 text-sm text-white transition-colors hover:bg-[#333333] focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-black transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     >
                       {style}
                     </button>
                   ))}
                 </div>
               </div> */}
+            </div>
             </>
           ) : (
             <>
+            <div className="p-4">
               {/* Color Section */}
-              <div className="space-y-2">
-                <span className="text-sm text-white">Background</span>
+              <div className="mb-6">
+                <h3 className="text-xs font-semibold text-black uppercase mb-3">Background</h3>
                 <button
                   onClick={() => setShowColorPicker(!showColorPicker)}
-                  className="flex w-full items-center justify-between rounded-md bg-[#404040] px-3 py-2 text-white hover:bg-[#4a4a4a]"
+                  className="flex w-full items-center justify-between rounded-md border border-gray-200 bg-white px-3 py-2 text-black hover:bg-gray-50"
                 >
                   <div className="flex items-center gap-2">
                     <div className="size-4 rounded bg-black" />
@@ -369,8 +378,8 @@ export default function BananaDesignPanel({
                 </button>
 
                 {showColorPicker && (
-                  <div className="rounded-md bg-[#404040] p-2">
-                    <div className="mb-2 flex flex-col gap-1">
+                  <div className="mt-2 rounded-md border border-gray-200 bg-white p-3">
+                    <div className="mb-3 flex flex-col gap-1">
                       {[
                         { label: "Solid", icon: IoColorPaletteOutline },
                         { label: "Gradient", icon: HiOutlineColorSwatch },
@@ -378,7 +387,7 @@ export default function BananaDesignPanel({
                       ].map((option) => (
                         <button
                           key={option.label}
-                          className="flex items-center gap-2 rounded px-2 py-1.5 text-white hover:bg-[#505050]"
+                          className="flex items-center gap-2 rounded px-2 py-1.5 text-black hover:bg-gray-100"
                         >
                           <option.icon className="text-lg" />
                           <span>{option.label}</span>
@@ -395,7 +404,7 @@ export default function BananaDesignPanel({
                       ].map((color) => (
                         <button
                           key={color}
-                          className="group relative size-8 rounded"
+                          className="group relative size-8 rounded border border-gray-200"
                           style={{ backgroundColor: color }}
                         />
                       ))}
@@ -403,6 +412,7 @@ export default function BananaDesignPanel({
                   </div>
                 )}
               </div>
+            </div>
             </>
           )}
         </div>
@@ -411,11 +421,11 @@ export default function BananaDesignPanel({
       {/* Layout Dropdown Backdrop - Only show if not closing */}
       {showLayoutDropdown && !isClosing && (
         <div
-          className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm transition-opacity"
+          className="fixed inset-0 z-50 bg-black/10 backdrop-blur-sm transition-opacity"
           onClick={() => setShowLayoutDropdown(false)}
         >
           <div
-            className="absolute z-50 w-[280px] rounded-lg border border-[#404040] bg-[#262626] shadow-xl"
+            className="absolute z-50 w-[280px] rounded-lg border border-gray-200 bg-white shadow-lg"
             style={{
               top: "120px",
               right: "300px",
@@ -425,15 +435,15 @@ export default function BananaDesignPanel({
             {layoutOptions.map((option) => (
               <button
                 key={option.name}
-                className={`w-full border-b border-[#404040] p-3 text-left transition-colors last:border-0 hover:bg-[#404040] ${
-                  selectedLayout === option.name ? "bg-[#404040]" : ""
+                className={`w-full border-b border-gray-200 p-3 text-left transition-colors last:border-0 hover:bg-gray-50 ${
+                  selectedLayout === option.name ? "bg-indigo-50" : ""
                 }`}
                 onClick={() => {
                   handleLayoutChange(option.name);
                   setShowLayoutDropdown(false);
                 }}
               >
-                <div className="mb-2 text-white">{option.name}</div>
+                <div className="mb-2 text-black">{option.name}</div>
                 <div className="overflow-hidden rounded">{option.preview}</div>
               </button>
             ))}

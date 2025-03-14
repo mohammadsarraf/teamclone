@@ -38,19 +38,56 @@ declare global {
 }
 
 import { Layout } from "react-grid-layout";
+import { ReactNode } from 'react';
 
-export interface GridItem extends Layout {
-  title: string;
-  type: 'section' | 'square' | 'textbox';
+export interface GridItem {
+  i: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  title?: string;
+  type?: string;
   content?: string;
+  placeholder?: string;
   backgroundColor?: string;
   textColor?: string;
   borderRadius?: number;
   padding?: number;
   fontSize?: number;
   fontWeight?: string;
-  shadow?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
-  layer: number;
+  shadow?: string;
+  layer?: number;
+  shapeType?: string;
+  textStyle?: string;
+  textDecoration?: string;
+  fontFamily?: string;
+}
+
+export interface BlockTemplate {
+  title: string;
+  description: string;
+  height: number;
+  type: 'section' | 'square' | 'textbox' | 'image' | 'video' | 'button' | 'form' | 'audio' | 'newsletter' | 'accordion' | 'shape' | 'scrolling' | 'line' | 'quote' | 'map' | 'embed' | 'markdown' | 'code' | 'summary' | 'calendar';
+  width?: number;
+  icon?: ReactNode;
+}
+
+export interface GridSettings {
+  rows: number;
+  columns: number;
+  margin: number; // For backward compatibility
+  horizontalMargin: number;
+  verticalMargin: number;
+  padding: number;
+  fillScreen?: boolean;
+  heightSetting?: 'small' | 'medium' | 'large' | 'custom';
+  customHeight?: number;
+  minHeight?: number;
+  maxHeight?: number;
+  contentWidth?: 'narrow' | 'medium' | 'wide' | 'full';
+  contentAlignment?: 'left' | 'center' | 'right';
+  verticalAlignment?: 'top' | 'middle' | 'bottom';
 }
 
 export {};

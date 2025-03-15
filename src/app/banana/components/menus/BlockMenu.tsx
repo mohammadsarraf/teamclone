@@ -336,7 +336,7 @@ const BlockMenu: React.FC<BlockMenuProps> = ({ onAddBlock, onClose, position }) 
                     <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center text-black">
                       {block.icon}
                     </div>
-                    <div className="text-sm font-medium">{block.title}</div>
+                    <div className="text-sm font-medium text-black">{block.title}</div>
                   </button>
                 ))}
               </div>

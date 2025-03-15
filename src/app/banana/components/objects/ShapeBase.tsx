@@ -14,6 +14,7 @@ export interface ShapeProps {
     xl: string;
   };
   customStyles?: React.CSSProperties;
+  isDraggingDisabled?: boolean;
 }
 
 export const getBaseStyles = (item: GridItem) => {
@@ -29,7 +30,7 @@ export const getBaseStyles = (item: GridItem) => {
     position: 'relative' as const,
     zIndex: item.layer,
     textAlign: (item.textAlign as 'left' | 'center' | 'right') || 'left',
-    border: item.borderWidth ? `${item.borderWidth}px solid ${item.borderColor || '#000000'}` : 'none',
+    border: 'none',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -52,63 +53,47 @@ export default function ShapeBase({
   isHovered, 
   shadowClasses, 
   customStyles,
-  children 
+  children,
+  isDraggingDisabled
 }: ShapeProps & { children?: React.ReactNode }) {
   const baseStyles = getBaseStyles(item);
   
-  // Get display name for the shape type
+  // Get shape type name for display
   const getShapeTypeName = () => {
-    if (item.type === 'textbox') return 'Text';
-    if (item.type === 'section') return 'Section';
-    if (item.type === 'square') return 'Shape';
-    return 'Shape';
+    switch (item.type) {
+      case 'square':
+        return item.shapeType || 'Square';
+      case 'textbox':
+        return 'Text';
+      case 'section':
+        return 'Section';
+      default:
+        return 'Shape';
+    }
   };
   
+  // Determine shadow class based on item's shadow property
+  const shadowClass = item.shadow && typeof shadowClasses[item.shadow as keyof typeof shadowClasses] === 'string' 
+    ? shadowClasses[item.shadow as keyof typeof shadowClasses] 
+    : '';
+  
   return (
-    <div className="relative h-full w-full">
-      {/* Main shape content */}
-      <div
-        className={`relative h-full w-full transition-shadow ${shadowClasses[item.shadow || 'none']} ${item.group ? 'ring-2 ring-purple-500' : ''} ${isBeingDragged ? 'ring-2 ring-blue-500 ring-opacity-70' : ''}`}
-        style={{
-          ...baseStyles,
-          ...customStyles
-        }}
-      >
-        {item.group && !isFocused && <GroupIndicator />}
-        {children}
-      </div>
-      
-      {/* Hover border with type label - only show when not focused */}
-      {isHovered && !isFocused && (
-        <>
-          <div 
-            className="absolute inset-0 border-2 border-blue-500 pointer-events-none z-10"
-            style={{ boxShadow: '0 0 0 1px rgba(59, 130, 246, 0.3)' }}
-          />
-          <div className="absolute -top-6 left-0 bg-blue-500 text-white text-xs py-1 px-2 rounded-t-md pointer-events-none z-10">
-            {getShapeTypeName()}
-          </div>
-        </>
-      )}
-      
-      {/* Focus border with resize handles */}
-      {isFocused && (
-        <>
-          <div className="absolute inset-0 border-2 border-blue-500 pointer-events-none z-10" />
-          
-          {/* Resize handles - 8 points */}
-          <div className="absolute -top-1 -left-1 w-2 h-2 bg-white border-2 border-blue-500 rounded-sm pointer-events-none z-10" />
-          <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-white border-2 border-blue-500 rounded-sm pointer-events-none z-10" />
-          <div className="absolute -top-1 -right-1 w-2 h-2 bg-white border-2 border-blue-500 rounded-sm pointer-events-none z-10" />
-          
-          <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-white border-2 border-blue-500 rounded-sm pointer-events-none z-10" />
-          <div className="absolute top-1/2 -right-1 -translate-y-1/2 w-2 h-2 bg-white border-2 border-blue-500 rounded-sm pointer-events-none z-10" />
-          
-          <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-white border-2 border-blue-500 rounded-sm pointer-events-none z-10" />
-          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-white border-2 border-blue-500 rounded-sm pointer-events-none z-10" />
-          <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-white border-2 border-blue-500 rounded-sm pointer-events-none z-10" />
-        </>
-      )}
+    <div 
+      id={item.i}
+      className={`
+        ${shadowClass}
+        ${isBeingDragged ? 'ring-2 ring-blue-500 ring-opacity-50' : ''}
+        ${isFocused ? 'ring-2 ring-blue-500' : ''}
+        ${isHovered && !isFocused ? 'ring-1 ring-blue-300' : ''}
+        ${isDraggingDisabled ? 'cursor-text ring-2 ring-yellow-400' : ''}
+        transition-shadow duration-200
+      `}
+      style={{
+        ...baseStyles,
+        ...customStyles
+      }}
+    >
+      {children}
     </div>
   );
 } 

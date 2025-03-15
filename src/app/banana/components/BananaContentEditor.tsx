@@ -4,6 +4,7 @@ import BananaContent from "./BananaContent";
 import BananaItemPanel from "./menus/BananaItemPanel";
 import GridSettingsMenu from "./GridSettingsMenu";
 import BlockMenu from "./menus/BlockMenu";
+import { ItemActionMenu } from "./objects";
 import { GridItem, BlockTemplate, GridSettings } from "../types";
 
 interface ContentProps {
@@ -70,6 +71,9 @@ export default function BananaContentEditor({ isFullscreen }: ContentProps) {
   const [editSectionButtonRef, setEditSectionButtonRef] = useState<HTMLButtonElement | null>(null);
   const [menuPosition, setMenuPosition] = useState({ top: 60, left: 0 });
   const [blockMenuPosition, setBlockMenuPosition] = useState({ top: 0, left: 0 });
+  const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
+  const [showItemToolbar, setShowItemToolbar] = useState(false);
+  const [focusedItemData, setFocusedItemData] = useState<GridItem | null>(null);
   const addBlockButtonRef = useRef<HTMLButtonElement>(null);
 
   // Handle ESC key press
@@ -186,6 +190,16 @@ export default function BananaContentEditor({ isFullscreen }: ContentProps) {
     if (focusedItemId !== null) {
       setShowBlockMenu(false);
       setShowGridSettings(false);
+      
+      // Find the focused item data
+      const item = layout.find(item => item.i === focusedItemId);
+      if (item) {
+        setFocusedItemData(item);
+        setShowItemToolbar(true);
+      }
+    } else {
+      setShowItemToolbar(false);
+      setFocusedItemData(null);
     }
   };
 
@@ -270,6 +284,62 @@ export default function BananaContentEditor({ isFullscreen }: ContentProps) {
     };
   }, [showEditSectionMenu, showBlockMenu]);
 
+  // Add a duplicate item function
+  const handleDuplicateItem = () => {
+    if (!focusedItemData) return;
+    
+    // Find the highest layer number and add 1 to put new block on top
+    const maxLayer = layout.length > 0 
+      ? Math.max(...layout.map(item => item.layer || 0))
+      : 0;
+    
+    // Create a duplicate with a new ID
+    const duplicatedItem: GridItem = {
+      ...focusedItemData,
+      i: `${focusedItemData.type}-${layout.length + 1}`,
+      x: focusedItemData.x + 1, // Offset slightly
+      y: focusedItemData.y + 1, // Offset slightly
+      layer: maxLayer + 1, // Place on top
+    };
+    
+    setLayout([...layout, duplicatedItem]);
+    setShowItemToolbar(false);
+    setFocusedItem(null);
+  };
+
+  // Handle edit item
+  const handleEditItem = () => {
+    if (!focusedItemData) return;
+    
+    // For textboxes, let BananaContent handle the edit with TextStyleMenu
+    if (focusedItemData.type === 'textbox') {
+      // We'll let the BananaContent component handle this
+      // The toolbar will be hidden automatically when clicking outside
+      setShowItemToolbar(false); // Hide the toolbar when showing the TextStyleMenu
+      return;
+    }
+    
+    // For non-textbox items, show the context menu
+    setSelectedItem(focusedItemData);
+    setContextMenuPosition({
+      x: toolbarPosition.left,
+      y: toolbarPosition.top + 50 // Position below the toolbar
+    });
+    
+    setShowItemToolbar(false);
+  };
+
+  // Handle delete item
+  const handleDeleteFocusedItem = () => {
+    if (!focusedItemData) return;
+    
+    // Filter out the focused item from layout
+    const updatedLayout = layout.filter(item => item.i !== focusedItemData.i);
+    setLayout(updatedLayout);
+    setShowItemToolbar(false);
+    setFocusedItem(null);
+  };
+
   return (
     <div className="relative flex-1">
       {/* Main Content Area */}
@@ -342,6 +412,9 @@ export default function BananaContentEditor({ isFullscreen }: ContentProps) {
             </div>
           )}
 
+          {/* Item Toolbar - Show when an item is focused */}
+          {/* ItemActionMenu is now rendered directly inside BananaContent */}
+
           {/* Scrollable Content */}
           <div
             className={`relative h-full overflow-auto ${isEditing ? "z-30" : ""}`}
@@ -351,6 +424,10 @@ export default function BananaContentEditor({ isFullscreen }: ContentProps) {
               // Close menus when clicking on the content area
               if (showBlockMenu) setShowBlockMenu(false);
               if (showEditSectionMenu) setShowEditSectionMenu(false);
+              if (!isDragging && !selectedItem) {
+                setShowItemToolbar(false);
+                setFocusedItem(null);
+              }
             }}
           >
             <BananaContent 
@@ -362,7 +439,8 @@ export default function BananaContentEditor({ isFullscreen }: ContentProps) {
               onDragStateChange={handleDragStateChange}
               onFocusChange={handleFocusChange}
               isEditing={isEditing}
-              isInteracting={showEditSectionMenu || showBlockMenu}
+              isInteracting={showEditSectionMenu || showBlockMenu || showItemToolbar}
+              onItemPanelClose={handleCloseContextMenu}
             />
           </div>
         </div>
@@ -376,6 +454,7 @@ export default function BananaContentEditor({ isFullscreen }: ContentProps) {
             left: contextMenuPosition.x,
             top: contextMenuPosition.y,
           }}
+          data-item-panel-container="true"
         >
           <div className="w-64 rounded-lg bg-white shadow-xl">
             <BananaItemPanel
@@ -384,6 +463,7 @@ export default function BananaContentEditor({ isFullscreen }: ContentProps) {
               onClose={handleCloseContextMenu}
               onDelete={handleDelete}
               layout={layout}
+              isDragging={isDragging}
             />
           </div>
         </div>

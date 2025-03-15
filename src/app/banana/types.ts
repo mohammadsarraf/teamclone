@@ -62,6 +62,25 @@ export interface GridItem {
   textStyle?: string;
   textDecoration?: string;
   fontFamily?: string;
+  fontStyle?: string;
+  textAlign?: 'left' | 'center' | 'right' | 'justify';
+  lineHeight?: number;
+  letterSpacing?: number;
+  stretch?: boolean;
+  blendMode?: string;
+  borderWidth?: number;
+  borderStyle?: string;
+  cornerMode?: 'uniform' | 'individual';
+  borderRadiusTopLeft?: number;
+  borderRadiusTopRight?: number;
+  borderRadiusBottomLeft?: number;
+  borderRadiusBottomRight?: number;
+  rounded?: string;
+  roundedTopLeft?: string;
+  roundedTopRight?: string;
+  roundedBottomLeft?: string;
+  roundedBottomRight?: string;
+  opacity?: number;
 }
 
 export interface BlockTemplate {

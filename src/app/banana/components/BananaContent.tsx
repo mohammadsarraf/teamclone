@@ -14,6 +14,8 @@ import {
   ItemActionMenu
 } from './objects';
 import { GridItem } from '../types';
+// Import TextStyleMenu component
+import TextStyleMenu from './menus/TextStyleMenu';
 
 interface GridSettings {
   rows: number;
@@ -40,6 +42,7 @@ interface BananaContentProps {
   onFocusChange?: (focusedItemId: string | null) => void;
   isEditing?: boolean;
   isInteracting?: boolean;
+  onItemPanelClose?: () => void;
 }
 
 const defaultGridSettings: GridSettings = {
@@ -63,7 +66,8 @@ export default function BananaContent({
   onDragStateChange,
   onFocusChange,
   isEditing = false,
-  isInteracting = false
+  isInteracting = false,
+  onItemPanelClose
 }: BananaContentProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState<number>(0);
@@ -87,6 +91,35 @@ export default function BananaContent({
   
   // State for same size indicators
   const [sameSizeItems, setSameSizeItems] = useState<string[]>([]);
+  
+  // Add state for text style menu
+  const [showTextStyleMenu, setShowTextStyleMenu] = useState(false);
+  
+  // Add state for item panel
+  const [showItemPanel, setShowItemPanel] = useState(false);
+  
+  // Track if an item is being dragged
+  const [isItemBeingDragged, setIsItemBeingDragged] = useState(false);
+  
+  // Track if the panel was open before dragging
+  const [panelWasOpen, setPanelWasOpen] = useState(false);
+  
+  // Effect to update showItemPanel based on drag state
+  useEffect(() => {
+    if (isItemBeingDragged) {
+      // Store the current panel state before hiding it
+      setPanelWasOpen(showItemPanel);
+      // Hide the panel during dragging
+      setShowItemPanel(false);
+    } else if (panelWasOpen) {
+      // If panel was open before dragging, reopen it after a short delay
+      const timer = setTimeout(() => {
+        setShowItemPanel(true);
+        setPanelWasOpen(false);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isItemBeingDragged, showItemPanel, panelWasOpen]);
   
   // Calculate square size based on container width
   const calculateSquareSize = (width: number) => {
@@ -175,6 +208,74 @@ export default function BananaContent({
     };
   }, []);
 
+  // Update TextStyleMenu position when the layout changes
+  useEffect(() => {
+    // This effect is no longer needed with the new positioning approach
+    // We'll keep it empty for now and remove it later
+  }, [layout, showTextStyleMenu, focusedItem]);
+
+  // Listen for external events that might close the ItemPanel
+  useEffect(() => {
+    // Handler for clicks outside the ItemPanel
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (!showItemPanel) return;
+      
+      // Check if the click is on the backdrop (which is designed to close the panel)
+      const backdrop = document.querySelector('.fixed.inset-0.z-20.bg-black\\/5.backdrop-blur-\\[2px\\]');
+      if (backdrop && backdrop.contains(e.target as Node)) {
+        console.log("Clicked on backdrop, closing ItemPanel");
+        setShowItemPanel(false);
+        // Clear focus
+        setFocusedItem(null);
+        onFocusChange?.(null);
+        // Notify parent component
+        if (onItemPanelClose) {
+          onItemPanelClose();
+        }
+        return;
+      }
+      
+      // Check if the click is on any element with the banana-item-panel class
+      const itemPanelElements = document.querySelectorAll('.banana-item-panel');
+      let clickedInsidePanel = false;
+      
+      itemPanelElements.forEach(panel => {
+        if (panel.contains(e.target as Node)) {
+          clickedInsidePanel = true;
+        }
+      });
+      
+      // If not clicked inside panel and not on action menu or text style menu, close the panel
+      if (!clickedInsidePanel) {
+        const actionMenu = document.querySelector('[data-action-menu="true"]');
+        const textStyleMenu = document.querySelector('[data-text-style-menu="true"]');
+        
+        const clickedActionMenu = actionMenu && actionMenu.contains(e.target as Node);
+        const clickedTextStyleMenu = textStyleMenu && textStyleMenu.contains(e.target as Node);
+        
+        if (!clickedActionMenu && !clickedTextStyleMenu) {
+          console.log("Clicked outside ItemPanel, action menu, and text style menu, closing ItemPanel");
+          setShowItemPanel(false);
+          // Clear focus
+          setFocusedItem(null);
+          onFocusChange?.(null);
+          // Notify parent component
+          if (onItemPanelClose) {
+            onItemPanelClose();
+          }
+        }
+      }
+    };
+
+    // Listen for clicks on the document
+    document.addEventListener('mousedown', handleOutsideClick);
+
+    return () => {
+      // Clean up event listeners
+      document.removeEventListener('mousedown', handleOutsideClick);
+    };
+  }, [showItemPanel, onFocusChange, onItemPanelClose]);
+
   const handleLayoutChange = (newLayout: RGLLayout[]) => {
     // First, prevent any items from being placed beyond available rows
     const adjustedLayout = newLayout.map(item => {
@@ -206,7 +307,7 @@ export default function BananaContent({
       }
       return {
         ...existingItem,
-        // Only update position and size properties
+        // Update position and size properties
         x: item.x,
         y: item.y,
         w: item.w,
@@ -226,6 +327,7 @@ export default function BananaContent({
   };
 
   const handleContentChange = (itemId: string, newContent: string) => {
+    // Update the layout with the new content, preserving HTML formatting
     const updatedLayout = layout.map(item => 
       item.i === itemId ? { ...item, content: newContent } : item
     );
@@ -392,6 +494,7 @@ export default function BananaContent({
             shadowClasses={shadowClasses}
             handleContentChange={handleContentChange}
             textboxContentRef={textboxContentRef}
+            isTextStyleMenuOpen={showTextStyleMenu && focusedItem === item.i}
           />
         );
       default: // 'section'
@@ -408,9 +511,50 @@ export default function BananaContent({
   };
 
   // Add a click handler to the container to clear focus when clicking outside items
-  const handleContainerClick = () => {
+  const handleContainerClick = (e: React.MouseEvent) => {
     if (isEditing) {
-      console.log("Container clicked, clearing focus");
+      // Check if the click is outside of the TextStyleMenu
+      const textStyleMenuElement = document.querySelector('[data-text-style-menu="true"]');
+      if (textStyleMenuElement && textStyleMenuElement.contains(e.target as Node)) {
+        // Click was inside the TextStyleMenu, don't clear focus
+        e.stopPropagation();
+        return;
+      }
+      
+      // Check if the click is outside of the ItemPanel
+      const itemPanelElement = document.querySelector('.banana-item-panel');
+      if (itemPanelElement && itemPanelElement.contains(e.target as Node)) {
+        // Click was inside the ItemPanel, don't clear focus
+        e.stopPropagation();
+        return;
+      }
+      
+      // Check if the click is outside of the action menu
+      const actionMenuElement = document.querySelector('[data-action-menu="true"]');
+      if (actionMenuElement && actionMenuElement.contains(e.target as Node)) {
+        // Click was inside the action menu, don't clear focus
+        e.stopPropagation();
+        return;
+      }
+      
+      console.log("Container clicked, clearing focus and menus");
+      
+      // First close menus
+      // Close text style menu when clicking outside
+      if (showTextStyleMenu) {
+        setShowTextStyleMenu(false);
+      }
+      
+      // Close item panel when clicking outside
+      if (showItemPanel) {
+        setShowItemPanel(false);
+        // Notify parent component
+        if (onItemPanelClose) {
+          onItemPanelClose();
+        }
+      }
+      
+      // Then clear focus
       setFocusedItem(null);
       onFocusChange?.(null);
     }
@@ -419,7 +563,18 @@ export default function BananaContent({
   // Action menu handlers
   const handleEditItem = (item: GridItem) => {
     console.log("Edit item clicked:", item.i);
-    // Open the style menu by calling onItemClick with the correct event
+    
+    // If it's a textbox, show the text style menu
+    if (item.type === 'textbox') {
+      console.log("Showing TextStyleMenu for textbox:", item.i);
+      setShowTextStyleMenu(true);
+      return;
+    }
+    
+    // For non-textbox items, show the item panel
+    setShowItemPanel(true);
+    
+    // Open the style menu by calling onItemClick
     if (onItemClick && item) {
       // Get the element position for the context menu
       const itemElement = document.querySelector(`[data-item-id="${item.i}"]`);
@@ -450,6 +605,18 @@ export default function BananaContent({
       }
     } else {
       console.warn("onItemClick is not defined or item is null");
+    }
+  };
+
+  // Handler to reset the ItemPanel state when it's closed
+  const handleItemPanelClose = () => {
+    setShowItemPanel(false);
+    // Clear focus
+    setFocusedItem(null);
+    onFocusChange?.(null);
+    // Call the parent's onItemPanelClose if provided
+    if (onItemPanelClose) {
+      onItemPanelClose();
     }
   };
 
@@ -511,6 +678,28 @@ export default function BananaContent({
     // Clear focus
     setFocusedItem(null);
     onFocusChange?.(null);
+  };
+
+  // Handle text style updates
+  const handleTextStyleUpdate = (updates: Partial<GridItem>) => {
+    if (!focusedItem) return;
+    
+    // Find the focused item
+    const updatedLayout = layout.map(item => 
+      item.i === focusedItem ? { ...item, ...updates } : item
+    );
+    
+    // Update layout directly without using handleLayoutChange
+    if (!externalLayout) {
+      setInternalLayout(updatedLayout);
+    }
+    
+    if (externalOnLayoutChange) {
+      externalOnLayoutChange(updatedLayout);
+    }
+    
+    // Log the updates for debugging
+    console.log("Applied text style updates:", updates, "to item:", focusedItem);
   };
 
   return (
@@ -742,8 +931,8 @@ export default function BananaContent({
           maxRows={gridSettings.rows}
           rowHeight={squareSize}
           width={containerWidth}
-          isDraggable={isEditing}
-          isResizable={isEditing}
+          isDraggable={isEditing && !(showTextStyleMenu && focusedItem)}
+          isResizable={isEditing && !(showTextStyleMenu && focusedItem)}
           containerPadding={[gridSettings.padding, gridSettings.padding]}
           margin={[gridSettings.horizontalMargin, gridSettings.verticalMargin]}
           onLayoutChange={handleLayoutChange}
@@ -756,6 +945,7 @@ export default function BananaContent({
             if (!isEditing) return;
             isDraggingRef.current = true;
             setIsInteracting(true);
+            setIsItemBeingDragged(true);
             onDragStateChange?.(true);
             setCurrentDragItem(newItem.i);
             // Set focus to the dragged item
@@ -783,6 +973,7 @@ export default function BananaContent({
             if (!isEditing) return;
             isDraggingRef.current = false;
             setIsInteracting(false);
+            setIsItemBeingDragged(false);
             onDragStateChange?.(false);
             handleLayoutChange(layout);
             
@@ -798,6 +989,7 @@ export default function BananaContent({
           onResizeStart={(layout, oldItem, newItem) => {
             if (!isEditing) return;
             setIsInteracting(true);
+            setIsItemBeingDragged(true);
             onDragStateChange?.(true);
             setCurrentResizeItem(newItem.i);
             
@@ -817,6 +1009,7 @@ export default function BananaContent({
           onResizeStop={(layout) => {
             if (!isEditing) return;
             setIsInteracting(false);
+            setIsItemBeingDragged(false);
             onDragStateChange?.(false);
             handleLayoutChange(layout);
             
@@ -915,17 +1108,35 @@ export default function BananaContent({
             >
               {renderGridItem(item)}
               {/* Add action menu directly inside the item when focused but not during drag or resize */}
-              {focusedItem === item.i && isEditing && !currentDragItem && !currentResizeItem && (
+              {focusedItem === item.i && isEditing && !currentDragItem && !currentResizeItem && !showTextStyleMenu && !showItemPanel && (
                 <div 
                   onClick={(e) => e.stopPropagation()} 
                   onMouseDown={(e) => e.stopPropagation()}
-                  className="pointer-events-auto"
+                  className={`absolute ${item.y <= 2 ? '-bottom-14' : '-top-14'} left-0 pointer-events-auto z-50`}
+                  data-action-menu="true"
                 >
                   <ItemActionMenu
+                    item={item}
                     onEdit={() => handleEditItem(item)}
                     onDuplicate={() => handleDuplicateItem(item)}
                     onDelete={() => handleDeleteItem(item)}
-                    isFirstRow={item.y === 0}
+                  />
+                </div>
+              )}
+              
+              {/* Add TextStyleMenu inside the item when it's focused and the menu should be shown */}
+              {focusedItem === item.i && isEditing && showTextStyleMenu && item.type === 'textbox' && (
+                <div 
+                  onClick={(e) => e.stopPropagation()} 
+                  onMouseDown={(e) => e.stopPropagation()}
+                  className="absolute -top-14 left-0 pointer-events-auto z-50"
+                  data-text-style-menu="true"
+                >
+                  <TextStyleMenu
+                    key={`text-style-menu-${Date.now()}`}
+                    item={item}
+                    onUpdate={handleTextStyleUpdate}
+                    onClose={() => setShowTextStyleMenu(false)}
                   />
                 </div>
               )}

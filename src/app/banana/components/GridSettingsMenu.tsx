@@ -24,8 +24,8 @@ const GridSettingsMenu: React.FC<GridSettingsMenuProps> = ({
     heightSetting: initialSettings.heightSetting as 'small' | 'medium' | 'large' | 'custom' || 'medium',
     customHeight: initialSettings.customHeight || 50
   });
-  const [moreGap, setMoreGap] = useState(false);
-  const [selectedGap, setSelectedGap] = useState('large');
+  const [moreGap, setMoreGap] = useState(true);
+  const [selectedGap, setSelectedGap] = useState('small');
   const [selectedAlignment, setSelectedAlignment] = useState('top');
 
   const handleChange = (key: keyof GridSettings, value: number) => {
@@ -151,7 +151,7 @@ const GridSettingsMenu: React.FC<GridSettingsMenuProps> = ({
                     </button>
                     <button 
                       className={`p-1.5 ${selectedGap === 'small' ? 'bg-indigo-50 border-indigo-300' : 'bg-white'} border rounded-md`}
-                      onClick={() => {setMoreGap(true); setSelectedGap('small')}}
+                      onClick={() => {setMoreGap(true); handleChange('margin', parseInt('8')); setSelectedGap('small')}}
                     >
                       <IoMdMore className='text-black'/>
                     </button>

@@ -97,7 +97,7 @@ export default function Banana() {
   };
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen bg-[#1b1b1b]">
       {/* Sidebar - Hide in fullscreen */}
       {!isFullscreen && <SideMenu />}
 
@@ -110,7 +110,7 @@ export default function Banana() {
           <div className="flex h-full flex-col">
             {/* Window Bar */}
             <div
-              className={`flex items-center justify-between ${isFullscreen ? "" : "rounded-t-lg"} bg-blue-800 p-3`}
+              className={`flex items-center justify-between ${isFullscreen ? "" : "rounded-t-lg"} bg-[#2a2a2a] p-3 border border-gray-700`}
             >
               {/* Left Side - Window Controls */}
               <div className="flex items-center space-x-4">
@@ -129,31 +129,31 @@ export default function Banana() {
                 {/* Undo/Redo */}
                 <div className="flex items-center space-x-2 text-white/80">
                   <button
-                    className="rounded p-1 transition-colors hover:bg-white/10 disabled:opacity-40"
+                    className="rounded p-1 transition-colors hover:bg-[#3a3a3a] disabled:opacity-40"
                     disabled={!canUndo}
                     onClick={handleUndo}
                   >
-                    <GrUndo className="size-4" />
+                    <GrUndo className="size-4 [&>path]:stroke-white" />
                   </button>
                   <button
-                    className="rounded p-1 transition-colors hover:bg-white/10 disabled:opacity-40"
+                    className="rounded p-1 transition-colors hover:bg-[#3a3a3a] disabled:opacity-40"
                     disabled={!canRedo}
                     onClick={handleRedo}
                   >
-                    <GrRedo className="size-4" />
+                    <GrRedo className="size-4 [&>path]:stroke-white" />
                   </button>
                 </div>
               </div>
 
               {/* Center - Project Title */}
-              <span className="text-sm text-white/80">My Project</span>
+              <span className="text-sm font-medium text-white/90">My Project</span>
 
               {/* Right Side - Save Button */}
               <div className="flex items-center space-x-2">
                 <button
                   onClick={handleSave}
                   disabled={isSaving}
-                  className="flex items-center gap-2 rounded-md bg-blue-600 px-3 py-1 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:bg-blue-800"
+                  className="flex items-center gap-2 rounded-md bg-indigo-600 px-3 py-1 text-sm font-medium text-white transition-colors hover:bg-indigo-700 disabled:opacity-40"
                 >
                   <FiSave className="size-4" />
                   {isSaving ? "Saving..." : "Save Changes"}
@@ -163,7 +163,7 @@ export default function Banana() {
 
             {/* Content Container */}
             <div
-              className={`flex-1 ${isFullscreen ? "" : "rounded-b-lg"} overflow-hidden`}
+              className={`flex-1 ${isFullscreen ? "" : "rounded-b-lg"} overflow-hidden bg-[#2a2a2a] border border-t-0 border-gray-700`}
             >
               <Edit isFullscreen={isFullscreen} />
             </div>

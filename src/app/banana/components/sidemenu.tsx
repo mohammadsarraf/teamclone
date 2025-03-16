@@ -19,7 +19,7 @@ export default function BananaSidebar() {
   ];
   return (
     <div>
-      <aside className="h-full w-[280px] bg-[#2d2d2d] text-[#e8e8e8] shadow-2xl transition-all duration-500">
+      <aside className="h-full w-[280px] bg-[#2d2d2d] text-[#e8e8e8] shadow-2xl transition-all duration-400">
         {/* Header */}
         <div className="border-b border-[#404040] px-6 py-5">
           <div className="flex items-center justify-between">
@@ -27,7 +27,7 @@ export default function BananaSidebar() {
               <div className="size-8 rounded-sm bg-white/90"></div>
               <span className="text-sm font-medium text-white">My Website</span>
             </div>
-            <button className="rounded-full p-2 text-[#999999] hover:bg-[#404040] hover:text-white">
+            <button className="rounded-full p-2 text-[#999999] hover:bg-[#404040] hover:text-indigo-400">
               <FaSearch className="text-lg" />
             </button>
           </div>
@@ -43,8 +43,8 @@ export default function BananaSidebar() {
                 className={`group flex w-full items-center py-2 text-left transition-all
                   ${
                     activeItem === item.text
-                      ? "text-white"
-                      : "text-[#999999] hover:text-white"
+                      ? "text-indigo-400"
+                      : "text-[#999999] hover:text-indigo-400"
                   }`}
               >
                 <span className="relative">
@@ -52,10 +52,10 @@ export default function BananaSidebar() {
                     {item.text}
                   </span>
                   {/* Hover underline */}
-                  <span className="absolute inset-x-0 bottom-[-3px] h-[2px] scale-x-0 bg-white transition-transform duration-200 group-hover:scale-x-100" />
+                  <span className="absolute inset-x-0 bottom-[-3px] h-[2px] scale-x-0 bg-indigo-400 transition-transform duration-200 group-hover:scale-x-100" />
                   {/* Active underline */}
                   {activeItem === item.text && (
-                    <span className="absolute inset-x-0 bottom-[-3px] h-[2px] bg-white" />
+                    <span className="absolute inset-x-0 bottom-[-3px] h-[2px] bg-indigo-400" />
                   )}
                 </span>
               </button>

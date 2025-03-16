@@ -86,6 +86,8 @@ export interface GridItem {
   roundedBottomLeft?: string;
   roundedBottomRight?: string;
   opacity?: number;
+  blur?: boolean;
+  blurAmount?: 'sm' | 'md' | 'lg';
 }
 
 export interface BlockTemplate {

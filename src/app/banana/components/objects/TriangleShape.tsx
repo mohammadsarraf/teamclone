@@ -10,12 +10,12 @@ export default function TriangleShape({ item, isBeingDragged, isFocused, isHover
   
   // Determine blur filter based on object-blur values
   let blurFilter = '';
-  if (item.shadow) {
-    if (item.shadow === 'object-blur-sm') {
+  if (item.blur) {
+    if (item.blurAmount === 'sm') {
       blurFilter = 'blur(4px)';
-    } else if (item.shadow === 'object-blur') {
+    } else if (item.blurAmount === 'md' || !item.blurAmount) {
       blurFilter = 'blur(8px)';
-    } else if (item.shadow === 'object-blur-lg') {
+    } else if (item.blurAmount === 'lg') {
       blurFilter = 'blur(16px)';
     }
   }

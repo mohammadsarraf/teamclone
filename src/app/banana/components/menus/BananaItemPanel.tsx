@@ -251,14 +251,15 @@ export default function BananaItemPanel({
   // Initialize shadow state from selectedItem
   useEffect(() => {
     if (selectedItem) {
-      setDropShadow(selectedItem.shadow === 'custom');
+      // Check if the shadow property contains 'custom' for drop shadow
+      setDropShadow(selectedItem.shadow?.includes('custom') || false);
       setShadowAngle(selectedItem.shadowAngle ?? 0);
       setShadowDistance(selectedItem.shadowDistance ?? 54);
       setShadowBlur(selectedItem.shadowBlur ?? 20);
       setShadowColor(selectedItem.shadowColor ?? 'rgba(0, 0, 0, 0.5)');
       
-      // Initialize blur state based on object-blur values
-      setBlur(selectedItem.shadow?.startsWith('object-blur') || false);
+      // Initialize blur state based on blur property
+      setBlur(selectedItem.blur || false);
     }
   }, [selectedItem]);
 
@@ -545,7 +546,7 @@ export default function BananaItemPanel({
             )}
             
             {/* Corner Radius Controls Only for Square Shapes */}
-            {selectedShape === 'square' && (
+            {/* {selectedShape === 'square' && (
                         <div className="flex mb-3">
               <div className="flex gap-1 mr-2">
                 <button 
@@ -578,9 +579,9 @@ export default function BananaItemPanel({
                 </div>
               </div>
             </div>)}
-          
+           */}
             {/* Stretch Toggle */}
-            <div className="flex items-center justify-between py-2 border-gray-200">
+            {/* <div className="flex items-center justify-between py-2 border-gray-200">
               <span className="text-sm font-medium text-gray-900">Stretch</span>
               <label className="relative inline-flex items-center">
                 <input 
@@ -594,7 +595,7 @@ export default function BananaItemPanel({
                 />
                 <div className="w-9 h-5 bg-gray-200 rounded-full peer peer-checked:bg-indigo-600 peer-checked:after:translate-x-4 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all"></div>
               </label>
-            </div>
+            </div> */}
           </div>
           
           <div className="border-t border-gray-200 my-3"></div>
@@ -838,8 +839,8 @@ export default function BananaItemPanel({
               </div>
             </div>
             
-                      {/* Blend Mode */}
-          <div className="flex items-center justify-between py-2 border-b border-gray-200">
+          {/* Blend Mode */}
+          {/* <div className="flex items-center justify-between py-2 border-b border-gray-200">
             <span className="text-sm font-medium text-gray-900">Blend Mode</span>
             <div className="relative">
               <select
@@ -856,7 +857,7 @@ export default function BananaItemPanel({
                 <IoMdArrowDropdown size={16} />
               </div>
             </div>
-          </div>
+          </div> */}
 
             {/* Stroke */}
             <div className="py-3 ">
@@ -977,7 +978,9 @@ export default function BananaItemPanel({
                         shadowColor: shadowColor
                       });
                     } else {
-                      onUpdate({ shadow: 'none' });
+                      onUpdate({ 
+                        shadow: 'none'
+                      });
                     }
                   }}
                 />
@@ -1215,10 +1218,20 @@ export default function BananaItemPanel({
                   className="sr-only peer" 
                   checked={blur}
                   onChange={() => {
-                    setBlur(!blur);
-                    onUpdate({ 
-                      shadow: !blur ? 'object-blur' : 'none' 
-                    });
+                    const newBlurState = !blur;
+                    setBlur(newBlurState);
+                    
+                    if (newBlurState) {
+                      // @ts-ignore - Ignoring type error for now
+                      onUpdate({ 
+                        blur: true,
+                        blurAmount: 'md'
+                      });
+                    } else {
+                      onUpdate({ 
+                        blur: false
+                      });
+                    }
                   }}
                 />
                 <div className="w-9 h-5 bg-gray-200 rounded-full peer peer-checked:bg-indigo-600 peer-checked:after:translate-x-4 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all"></div>
@@ -1233,9 +1246,9 @@ export default function BananaItemPanel({
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-sm font-medium text-gray-700">Blur Amount</span>
                     <span className="text-sm text-gray-500">
-                      {selectedItem.shadow === 'object-blur-sm' ? '5px' : 
-                       selectedItem.shadow === 'object-blur' ? '15px' : 
-                       selectedItem.shadow === 'object-blur-lg' ? '100px' : '15px'}
+                      {selectedItem.blurAmount === 'sm' ? '5px' : 
+                       selectedItem.blurAmount === 'md' || !selectedItem.blurAmount ? '15px' : 
+                       selectedItem.blurAmount === 'lg' ? '100px' : '15px'}
                     </span>
                   </div>
                   
@@ -1245,36 +1258,39 @@ export default function BananaItemPanel({
                     <div 
                       className="absolute h-2 bg-indigo-500 rounded-lg top-1/2 -translate-y-1/2" 
                       style={{ 
-                        width: `${selectedItem.shadow === 'object-blur-sm' ? 16.7 : 
-                                selectedItem.shadow === 'object-blur' ? 50 : 
-                                selectedItem.shadow === 'object-blur-lg' ? 83.3 : 50}%` 
+                        width: `${selectedItem.blurAmount === 'sm' ? 16.7 : 
+                                selectedItem.blurAmount === 'md' || !selectedItem.blurAmount ? 50 : 
+                                selectedItem.blurAmount === 'lg' ? 83.3 : 50}%` 
                       }}
                     ></div>
                     <input
                       type="range"
                       min="0"
                       max="30"
-                      value={selectedItem.shadow === 'object-blur-sm' ? 5 : 
-                             selectedItem.shadow === 'object-blur' ? 15 : 
-                             selectedItem.shadow === 'object-blur-lg' ? 100 : 100}
+                      value={selectedItem.blurAmount === 'sm' ? 5 : 
+                             selectedItem.blurAmount === 'md' || !selectedItem.blurAmount ? 15 : 
+                             selectedItem.blurAmount === 'lg' ? 100 : 15}
                       onChange={(e) => {
                         const blurAmount = parseInt(e.target.value);
+                        let amount;
                         if (blurAmount < 10) {
-                          onUpdate({ shadow: 'object-blur-sm' });
+                          amount = 'sm';
                         } else if (blurAmount < 20) {
-                          onUpdate({ shadow: 'object-blur' });
+                          amount = 'md';
                         } else {
-                          onUpdate({ shadow: 'object-blur-lg' });
+                          amount = 'lg';
                         }
+                        // @ts-ignore - Ignoring type error for now
+                        onUpdate({ blurAmount: amount });
                       }}
                       className="w-full h-6 appearance-none cursor-pointer opacity-0 z-10 relative"
                     />
                     <div 
                       className="absolute w-4 h-4 bg-white rounded-full border border-gray-300 shadow-sm pointer-events-none" 
                       style={{ 
-                        left: `calc(${selectedItem.shadow === 'object-blur-sm' ? 16.7 : 
-                                selectedItem.shadow === 'object-blur' ? 50 : 
-                                selectedItem.shadow === 'object-blur-lg' ? 83.3 : 50}% - 8px)`,
+                        left: `calc(${selectedItem.blurAmount === 'sm' ? 16.7 : 
+                                selectedItem.blurAmount === 'md' || !selectedItem.blurAmount ? 50 : 
+                                selectedItem.blurAmount === 'lg' ? 83.3 : 50}% - 8px)`,
                         top: '50%',
                         transform: 'translateY(-50%)'
                       }}

@@ -51,8 +51,8 @@ const defaultGridSettings: GridSettings = {
   rows: 20,
   columns: 50,
   margin: 8, // For backward compatibility
-  horizontalMargin: 8,
-  verticalMargin: 8,
+  horizontalMargin: 0,
+  verticalMargin: 0,
   padding: 16
 };
 
@@ -431,7 +431,7 @@ export default function BananaContentEditor({ isFullscreen }: ContentProps) {
             }}
           >
             <BananaContent 
-              className="bg-gray-700" 
+              className="bg-red-700" 
               layout={layout}
               onLayoutChange={setLayout}
               gridSettings={gridSettings}

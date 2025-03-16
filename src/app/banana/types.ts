@@ -57,8 +57,13 @@ export interface GridItem {
   fontSize?: number;
   fontWeight?: string;
   shadow?: string;
+  shadowAngle?: number;
+  shadowDistance?: number;
+  shadowBlur?: number;
+  shadowColor?: string;
   layer?: number;
   shapeType?: string;
+  shape?: 'square' | 'circle' | 'triangle';
   textStyle?: string;
   textDecoration?: string;
   fontFamily?: string;

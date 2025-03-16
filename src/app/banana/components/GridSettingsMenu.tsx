@@ -24,8 +24,8 @@ const GridSettingsMenu: React.FC<GridSettingsMenuProps> = ({
     heightSetting: initialSettings.heightSetting as 'small' | 'medium' | 'large' | 'custom' || 'medium',
     customHeight: initialSettings.customHeight || 50
   });
-  const [moreGap, setMoreGap] = useState(true);
-  const [selectedGap, setSelectedGap] = useState('small');
+  const [moreGap, setMoreGap] = useState(false);
+  const [selectedGap, setSelectedGap] = useState('large');
   const [selectedAlignment, setSelectedAlignment] = useState('top');
 
   const handleChange = (key: keyof GridSettings, value: number) => {

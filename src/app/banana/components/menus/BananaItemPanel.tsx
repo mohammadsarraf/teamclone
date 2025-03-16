@@ -491,9 +491,6 @@ export default function BananaItemPanel({
                   {selectedShape === 'square' && (
                     <div 
                       className="w-full h-full bg-gray-500" 
-                      style={{ 
-                        borderRadius: selectedItem.borderRadius ? `${selectedItem.borderRadius}%` : '0'
-                      }}
                     />
                   )}
                   {selectedShape === 'circle' && (
@@ -578,7 +575,6 @@ export default function BananaItemPanel({
                     }}
                     className="w-full h-10 px-2 text-center text-base border border-gray-200 rounded text-black pr-8"
                   />
-                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">%</span>
                 </div>
               </div>
             </div>)}
@@ -880,8 +876,8 @@ export default function BananaItemPanel({
                     <BsDashLg />
                   </button>
                   <button 
-                    className={`h-10 w-10 flex items-center justify-center rounded-md border ${(selectedItem?.borderWidth ?? 0) > 0 && selectedItem.borderStyle === 'dash' ? 'bg-gray-200 text-black' : 'text-black'}`}
-                    onClick={() => onUpdate({ borderWidth: 2, borderStyle: 'dash' })}
+                    className={`h-10 w-10 flex items-center justify-center rounded-md border ${(selectedShape === "triangle") ? "cursor-not-allowed" : ""} ${(selectedItem?.borderWidth ?? 0) > 0 && selectedItem.borderStyle === 'dash' ? 'bg-gray-200 text-black' : 'text-black'}`}
+                    onClick={() => {if (selectedShape !== "triangle") onUpdate({ borderWidth: 2, borderStyle: 'dash' })}}
                   >
                     <AiOutlineDash />
                   </button>
@@ -1239,7 +1235,7 @@ export default function BananaItemPanel({
                     <span className="text-sm text-gray-500">
                       {selectedItem.shadow === 'object-blur-sm' ? '5px' : 
                        selectedItem.shadow === 'object-blur' ? '15px' : 
-                       selectedItem.shadow === 'object-blur-lg' ? '25px' : '15px'}
+                       selectedItem.shadow === 'object-blur-lg' ? '100px' : '15px'}
                     </span>
                   </div>
                   
@@ -1260,7 +1256,7 @@ export default function BananaItemPanel({
                       max="30"
                       value={selectedItem.shadow === 'object-blur-sm' ? 5 : 
                              selectedItem.shadow === 'object-blur' ? 15 : 
-                             selectedItem.shadow === 'object-blur-lg' ? 25 : 15}
+                             selectedItem.shadow === 'object-blur-lg' ? 100 : 100}
                       onChange={(e) => {
                         const blurAmount = parseInt(e.target.value);
                         if (blurAmount < 10) {
@@ -1289,8 +1285,6 @@ export default function BananaItemPanel({
               )}
             </div>
           </div>
-          
-
         </div>
       </div>
     </div>

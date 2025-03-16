@@ -431,7 +431,7 @@ export default function BananaContentEditor({ isFullscreen }: ContentProps) {
             }}
           >
             <BananaContent 
-              className="bg-red-700" 
+              className="bg-gray-700" 
               layout={layout}
               onLayoutChange={setLayout}
               gridSettings={gridSettings}

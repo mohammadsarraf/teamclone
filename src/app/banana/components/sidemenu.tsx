@@ -19,7 +19,7 @@ export default function BananaSidebar() {
   ];
   return (
     <div>
-      <aside className="h-full w-[280px] bg-[#2d2d2d] text-[#e8e8e8] shadow-2xl transition-all duration-400">
+      <aside className="duration-400 h-full w-[280px] bg-[#2d2d2d] text-[#e8e8e8] shadow-2xl transition-all">
         {/* Header */}
         <div className="border-b border-[#404040] px-6 py-5">
           <div className="flex items-center justify-between">

@@ -110,7 +110,7 @@ export default function Banana() {
           <div className="flex h-full flex-col">
             {/* Window Bar */}
             <div
-              className={`flex items-center justify-between ${isFullscreen ? "" : "rounded-t-lg"} bg-[#2a2a2a] p-3 border border-gray-700`}
+              className={`flex items-center justify-between ${isFullscreen ? "" : "rounded-t-lg"} border border-gray-700 bg-[#2a2a2a] p-3`}
             >
               {/* Left Side - Window Controls */}
               <div className="flex items-center space-x-4">
@@ -146,7 +146,9 @@ export default function Banana() {
               </div>
 
               {/* Center - Project Title */}
-              <span className="text-sm font-medium text-white/90">My Project</span>
+              <span className="text-sm font-medium text-white/90">
+                My Project
+              </span>
 
               {/* Right Side - Save Button */}
               <div className="flex items-center space-x-2">
@@ -163,7 +165,7 @@ export default function Banana() {
 
             {/* Content Container */}
             <div
-              className={`flex-1 ${isFullscreen ? "" : "rounded-b-lg"} overflow-hidden bg-[#2a2a2a] border border-t-0 border-gray-700`}
+              className={`flex-1 ${isFullscreen ? "" : "rounded-b-lg"} overflow-hidden border border-t-0 border-gray-700 bg-[#2a2a2a]`}
             >
               <Edit isFullscreen={isFullscreen} />
             </div>

@@ -183,7 +183,7 @@ export default function BananaDesignPanel({
 
   // Helper function to combine class names
   const getTabClass = (isActive: boolean) => {
-    return `py-3 px-3 text-center font-medium text-sm ${isActive ? 'border-b-2 border-indigo-600 text-indigo-600' : 'text-black hover:text-indigo-500'}`;
+    return `py-3 px-3 text-center font-medium text-sm ${isActive ? "border-b-2 border-indigo-600 text-indigo-600" : "text-black hover:text-indigo-500"}`;
   };
 
   const handleClose = () => {
@@ -199,24 +199,30 @@ export default function BananaDesignPanel({
     <>
       {/* Main Toolbar */}
       <div
-        className={`fixed shadow-lg z-50 overflow-hidden bg-white rounded-lg border border-gray-200 transition-all duration-150 ${
+        className={`fixed z-50 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg transition-all duration-150 ${
           isClosing ? "translate-x-2 opacity-0" : "opacity-100"
         }`}
-        style={{ 
-          top: '150px', 
-          right: '16px',
-          width: '320px',
-          maxHeight: '85vh'
+        style={{
+          top: "150px",
+          right: "16px",
+          width: "320px",
+          maxHeight: "85vh",
         }}
       >
         {/* Close button */}
-        <button 
+        <button
           onClick={handleClose}
-          className="absolute bottom-3 right-3 p-1 rounded-full hover:bg-gray-100 z-10"
+          className="absolute bottom-3 right-3 z-10 rounded-full p-1 hover:bg-gray-100"
           aria-label="Close menu"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            viewBox="0 0 16 16"
+          >
+            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
           </svg>
         </button>
 
@@ -239,113 +245,123 @@ export default function BananaDesignPanel({
         </div>
 
         {/* Content */}
-        <div className="overflow-y-auto" style={{ maxHeight: 'calc(85vh - 48px)' }}>
+        <div
+          className="overflow-y-auto"
+          style={{ maxHeight: "calc(85vh - 48px)" }}
+        >
           {currentView === "design" ? (
             <>
-            <div className="p-4">
-              {/* Layout Section */}
-              <div className="mb-6">
-                <h3 className="text-xs font-semibold text-black uppercase mb-3">Layout</h3>
-                <div className="relative">
-                  <button
-                    onClick={() => setShowLayoutDropdown(!showLayoutDropdown)}
-                    className="flex w-full flex-col rounded-md border border-gray-200 bg-white p-3 text-left transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  >
-                    <div className="mb-2 flex items-center justify-between">
-                      <span className="text-black">{selectedLayout}</span>
-                      <HiChevronDown
-                        className={`transition-transform ${showLayoutDropdown ? "rotate-180" : ""}`}
-                      />
-                    </div>
-                    {/* Preview of selected layout */}
-                    <div className="overflow-hidden rounded">
-                      {
-                        layoutOptions.find((opt) => opt.name === selectedLayout)
-                          ?.preview
-                      }
-                    </div>
-                  </button>
-                </div>
-              </div>
-
-              {/* Spacing Section */}
-              <div className="mb-6">
-                <h3 className="text-xs font-semibold text-black uppercase mb-3">Spacing</h3>
-
-                {/* Link Spacing Slider */}
-                <div className="mb-4">
-                  <div className="flex justify-between items-center mb-1">
-                    <label className="text-sm font-medium text-black">
-                      Link Spacing
-                    </label>
-                    <div className="bg-gray-100 rounded-md px-3 py-1 w-16 text-center">
-                      <span className="text-black">{linkSpacing}px</span>
-                    </div>
+              <div className="p-4">
+                {/* Layout Section */}
+                <div className="mb-6">
+                  <h3 className="mb-3 text-xs font-semibold uppercase text-black">
+                    Layout
+                  </h3>
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowLayoutDropdown(!showLayoutDropdown)}
+                      className="flex w-full flex-col rounded-md border border-gray-200 bg-white p-3 text-left transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    >
+                      <div className="mb-2 flex items-center justify-between">
+                        <span className="text-black">{selectedLayout}</span>
+                        <HiChevronDown
+                          className={`transition-transform ${showLayoutDropdown ? "rotate-180" : ""}`}
+                        />
+                      </div>
+                      {/* Preview of selected layout */}
+                      <div className="overflow-hidden rounded">
+                        {
+                          layoutOptions.find(
+                            (opt) => opt.name === selectedLayout,
+                          )?.preview
+                        }
+                      </div>
+                    </button>
                   </div>
-                  <input
-                    type="range"
-                    min={12}
-                    max={48}
-                    value={linkSpacing}
-                    onChange={handleLinkSpacingChange}
-                    onMouseUp={handleLinkSpacingChangeComplete}
-                    onTouchEnd={handleLinkSpacingChangeComplete}
-                    className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
-                  />
                 </div>
 
-                {/* Element Spacing Slider */}
-                <div className="mb-4">
-                  <div className="flex justify-between items-center mb-1">
-                    <label className="text-sm font-medium text-black">
-                      Element Spacing
-                    </label>
-                    <div className="bg-gray-100 rounded-md px-3 py-1 w-16 text-center">
-                      <span className="text-black">{elementSpacing}px</span>
+                {/* Spacing Section */}
+                <div className="mb-6">
+                  <h3 className="mb-3 text-xs font-semibold uppercase text-black">
+                    Spacing
+                  </h3>
+
+                  {/* Link Spacing Slider */}
+                  <div className="mb-4">
+                    <div className="mb-1 flex items-center justify-between">
+                      <label className="text-sm font-medium text-black">
+                        Link Spacing
+                      </label>
+                      <div className="w-16 rounded-md bg-gray-100 px-3 py-1 text-center">
+                        <span className="text-black">{linkSpacing}px</span>
+                      </div>
                     </div>
+                    <input
+                      type="range"
+                      min={12}
+                      max={48}
+                      value={linkSpacing}
+                      onChange={handleLinkSpacingChange}
+                      onMouseUp={handleLinkSpacingChangeComplete}
+                      onTouchEnd={handleLinkSpacingChangeComplete}
+                      className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 accent-indigo-600"
+                    />
                   </div>
-                  <input
-                    type="range"
-                    min={8}
-                    max={32}
-                    value={elementSpacing}
-                    onChange={handleElementSpacingChange}
-                    onMouseUp={handleElementSpacingChangeComplete}
-                    onTouchEnd={handleElementSpacingChangeComplete}
-                    className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
-                  />
-                </div>
-              </div>
 
-              {/* Size Section */}
-              <div className="mb-6">
-                <h3 className="text-xs font-semibold text-black uppercase mb-3">Size</h3>
-
-                {/* Height Slider */}
-                <div className="mb-4">
-                  <div className="flex justify-between items-center mb-1">
-                    <label className="text-sm font-medium text-black">
-                      Height
-                    </label>
-                    <div className="bg-gray-100 rounded-md px-3 py-1 w-16 text-center">
-                      <span className="text-black">{headerHeight}px</span>
+                  {/* Element Spacing Slider */}
+                  <div className="mb-4">
+                    <div className="mb-1 flex items-center justify-between">
+                      <label className="text-sm font-medium text-black">
+                        Element Spacing
+                      </label>
+                      <div className="w-16 rounded-md bg-gray-100 px-3 py-1 text-center">
+                        <span className="text-black">{elementSpacing}px</span>
+                      </div>
                     </div>
+                    <input
+                      type="range"
+                      min={8}
+                      max={32}
+                      value={elementSpacing}
+                      onChange={handleElementSpacingChange}
+                      onMouseUp={handleElementSpacingChangeComplete}
+                      onTouchEnd={handleElementSpacingChangeComplete}
+                      className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 accent-indigo-600"
+                    />
                   </div>
-                  <input
-                    type="range"
-                    min={80}
-                    max={200}
-                    value={headerHeight}
-                    onChange={handleHeightChange}
-                    onMouseUp={handleHeightChangeComplete}
-                    onTouchEnd={handleHeightChangeComplete}
-                    className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
-                  />
                 </div>
-              </div>
 
-              {/* Style Section */}
-              {/* <div className="mb-6">
+                {/* Size Section */}
+                <div className="mb-6">
+                  <h3 className="mb-3 text-xs font-semibold uppercase text-black">
+                    Size
+                  </h3>
+
+                  {/* Height Slider */}
+                  <div className="mb-4">
+                    <div className="mb-1 flex items-center justify-between">
+                      <label className="text-sm font-medium text-black">
+                        Height
+                      </label>
+                      <div className="w-16 rounded-md bg-gray-100 px-3 py-1 text-center">
+                        <span className="text-black">{headerHeight}px</span>
+                      </div>
+                    </div>
+                    <input
+                      type="range"
+                      min={80}
+                      max={200}
+                      value={headerHeight}
+                      onChange={handleHeightChange}
+                      onMouseUp={handleHeightChangeComplete}
+                      onTouchEnd={handleHeightChangeComplete}
+                      className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 accent-indigo-600"
+                    />
+                  </div>
+                </div>
+
+                {/* Style Section */}
+                {/* <div className="mb-6">
                 <h3 className="text-xs font-semibold text-black uppercase mb-3">Style</h3>
                 <div className="grid grid-cols-2 gap-1.5">
                   {["Default", "Minimal", "Modern", "Classic"].map((style) => (
@@ -358,61 +374,63 @@ export default function BananaDesignPanel({
                   ))}
                 </div>
               </div> */}
-            </div>
+              </div>
             </>
           ) : (
             <>
-            <div className="p-4">
-              {/* Color Section */}
-              <div className="mb-6">
-                <h3 className="text-xs font-semibold text-black uppercase mb-3">Background</h3>
-                <button
-                  onClick={() => setShowColorPicker(!showColorPicker)}
-                  className="flex w-full items-center justify-between rounded-md border border-gray-200 bg-white px-3 py-2 text-black hover:bg-gray-50"
-                >
-                  <div className="flex items-center gap-2">
-                    <div className="size-4 rounded bg-black" />
-                    <span>Color</span>
-                  </div>
-                  <HiChevronDown />
-                </button>
+              <div className="p-4">
+                {/* Color Section */}
+                <div className="mb-6">
+                  <h3 className="mb-3 text-xs font-semibold uppercase text-black">
+                    Background
+                  </h3>
+                  <button
+                    onClick={() => setShowColorPicker(!showColorPicker)}
+                    className="flex w-full items-center justify-between rounded-md border border-gray-200 bg-white px-3 py-2 text-black hover:bg-gray-50"
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="size-4 rounded bg-black" />
+                      <span>Color</span>
+                    </div>
+                    <HiChevronDown />
+                  </button>
 
-                {showColorPicker && (
-                  <div className="mt-2 rounded-md border border-gray-200 bg-white p-3">
-                    <div className="mb-3 flex flex-col gap-1">
-                      {[
-                        { label: "Solid", icon: IoColorPaletteOutline },
-                        { label: "Gradient", icon: HiOutlineColorSwatch },
-                        { label: "Transparent", icon: RxTransparencyGrid },
-                      ].map((option) => (
-                        <button
-                          key={option.label}
-                          className="flex items-center gap-2 rounded px-2 py-1.5 text-black hover:bg-gray-100"
-                        >
-                          <option.icon className="text-lg" />
-                          <span>{option.label}</span>
-                        </button>
-                      ))}
+                  {showColorPicker && (
+                    <div className="mt-2 rounded-md border border-gray-200 bg-white p-3">
+                      <div className="mb-3 flex flex-col gap-1">
+                        {[
+                          { label: "Solid", icon: IoColorPaletteOutline },
+                          { label: "Gradient", icon: HiOutlineColorSwatch },
+                          { label: "Transparent", icon: RxTransparencyGrid },
+                        ].map((option) => (
+                          <button
+                            key={option.label}
+                            className="flex items-center gap-2 rounded px-2 py-1.5 text-black hover:bg-gray-100"
+                          >
+                            <option.icon className="text-lg" />
+                            <span>{option.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                      <div className="grid grid-cols-5 gap-1">
+                        {[
+                          "#000000",
+                          "#FFFFFF",
+                          "#808080",
+                          "#FF0000",
+                          "#0000FF",
+                        ].map((color) => (
+                          <button
+                            key={color}
+                            className="group relative size-8 rounded border border-gray-200"
+                            style={{ backgroundColor: color }}
+                          />
+                        ))}
+                      </div>
                     </div>
-                    <div className="grid grid-cols-5 gap-1">
-                      {[
-                        "#000000",
-                        "#FFFFFF",
-                        "#808080",
-                        "#FF0000",
-                        "#0000FF",
-                      ].map((color) => (
-                        <button
-                          key={color}
-                          className="group relative size-8 rounded border border-gray-200"
-                          style={{ backgroundColor: color }}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
-            </div>
             </>
           )}
         </div>

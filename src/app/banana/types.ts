@@ -38,7 +38,7 @@ declare global {
 }
 
 import { Layout } from "react-grid-layout";
-import { ReactNode } from 'react';
+import { ReactNode } from "react";
 
 export interface GridItem {
   i: string;
@@ -63,19 +63,19 @@ export interface GridItem {
   shadowColor?: string;
   layer?: number;
   shapeType?: string;
-  shape?: 'square' | 'circle' | 'triangle';
+  shape?: "square" | "circle" | "triangle";
   textStyle?: string;
   textDecoration?: string;
   fontFamily?: string;
   fontStyle?: string;
-  textAlign?: 'left' | 'center' | 'right' | 'justify';
+  textAlign?: "left" | "center" | "right" | "justify";
   lineHeight?: number;
   letterSpacing?: number;
   stretch?: boolean;
   blendMode?: string;
   borderWidth?: number;
   borderStyle?: string;
-  cornerMode?: 'uniform' | 'individual';
+  cornerMode?: "uniform" | "individual";
   borderRadiusTopLeft?: number;
   borderRadiusTopRight?: number;
   borderRadiusBottomLeft?: number;
@@ -87,14 +87,34 @@ export interface GridItem {
   roundedBottomRight?: string;
   opacity?: number;
   blur?: boolean;
-  blurAmount?: 'sm' | 'md' | 'lg';
+  blurAmount?: "sm" | "md" | "lg";
 }
 
 export interface BlockTemplate {
   title: string;
   description: string;
   height: number;
-  type: 'section' | 'square' | 'textbox' | 'image' | 'video' | 'button' | 'form' | 'audio' | 'newsletter' | 'accordion' | 'shape' | 'scrolling' | 'line' | 'quote' | 'map' | 'embed' | 'markdown' | 'code' | 'summary' | 'calendar';
+  type:
+    | "section"
+    | "square"
+    | "textbox"
+    | "image"
+    | "video"
+    | "button"
+    | "form"
+    | "audio"
+    | "newsletter"
+    | "accordion"
+    | "shape"
+    | "scrolling"
+    | "line"
+    | "quote"
+    | "map"
+    | "embed"
+    | "markdown"
+    | "code"
+    | "summary"
+    | "calendar";
   width?: number;
   icon?: ReactNode;
 }
@@ -107,13 +127,13 @@ export interface GridSettings {
   verticalMargin: number;
   padding: number;
   fillScreen?: boolean;
-  heightSetting?: 'small' | 'medium' | 'large' | 'custom';
+  heightSetting?: "small" | "medium" | "large" | "custom";
   customHeight?: number;
   minHeight?: number;
   maxHeight?: number;
-  contentWidth?: 'narrow' | 'medium' | 'wide' | 'full';
-  contentAlignment?: 'left' | 'center' | 'right';
-  verticalAlignment?: 'top' | 'middle' | 'bottom';
+  contentWidth?: "narrow" | "medium" | "wide" | "full";
+  contentAlignment?: "left" | "center" | "right";
+  verticalAlignment?: "top" | "middle" | "bottom";
 }
 
 export {};

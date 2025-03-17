@@ -1,11 +1,13 @@
 "use client";
 
+import ContentEditable from "react-contenteditable";
 import {
   HiOutlineShoppingCart,
   HiOutlineTemplate,
   HiOutlineUser,
 } from "react-icons/hi";
 import { TiSocialSkypeOutline } from "react-icons/ti";
+import { useRef } from "react";
 
 export type HeaderLayout = "Option 1" | "Option 2" | "Option 3" | "Option 4";
 
@@ -15,6 +17,12 @@ interface HeaderProps {
   height?: number;
   linkSpacing?: number;
   elementSpacing?: number;
+  bgColor ?: string;
+  gradientEndColor?: string;
+  isGradient?: boolean;
+  textColor?: string;
+  bgOpacity?: string;
+  isEditing?:boolean;
   enabledElements?: {
     isButton: boolean;
     isSocial: boolean;
@@ -30,28 +38,68 @@ export default function BananaHeader({
     isCart: false,
     isAccount: false,
   },
+  isEditing,
   layout = "Option 1",
   height = 80,
-  linkSpacing = 24,
-  elementSpacing = 16,
+  linkSpacing = 12,
+  elementSpacing = 8,
+  bgColor = `bg-black`,
+  gradientEndColor,
+  isGradient = false,
+  textColor = `#ffffff`,
+  bgOpacity,
 }: HeaderProps) {
-  const headerStyle = {
-    height: `${height}px`,
-    minHeight: `${height}px`,
-  };
+  // Add state for ContentEditable text
+  const button1 = useRef("Menu");
+  const button2 = useRef("Reservation");
+  const button3 = useRef("YourWebsiteTitle");
+
+  // Extract the actual color from the Tailwind class if needed
+  const extractedBgColor = bgColor.startsWith('bg-[') && bgColor.endsWith(']') 
+    ? bgColor.substring(4, bgColor.length - 1) 
+    : bgColor.startsWith('bg-') 
+      ? 'black' // Default for non-dynamic Tailwind classes
+      : bgColor;
+  
+  const headerStyle = isGradient && gradientEndColor
+    ? {
+        height: `${height}px`,
+        minHeight: `${height}px`,
+        backgroundImage: `linear-gradient(to right, ${extractedBgColor}, ${gradientEndColor})`,
+      }
+    : {
+        height: `${height}px`,
+        minHeight: `${height}px`,
+        backgroundColor: extractedBgColor,
+      };
 
   const Logo = () => (
-    <h1 className="text-2xl font-bold text-white">YourWebsiteTitle</h1>
+    <ContentEditable 
+      html={button3.current} 
+      onChange={(e) => button3.current = e.target.value}
+      disabled={!isEditing}
+      className="text-2xl font-bold"
+      style={{ color: textColor }}
+    />
   );
 
   const Navigation = () => (
     <nav style={{ gap: `${linkSpacing}px` }} className="flex">
-      <button className="text-lg font-medium text-white/90 transition-colors hover:text-white">
-        Menu
-      </button>
-      <button className="text-lg font-medium text-white/90 transition-colors hover:text-white">
-        Reservation
-      </button>
+      <ContentEditable 
+        html={button1.current} 
+        onChange={(e) => button1.current = e.target.value}
+        disabled={!isEditing}
+        className="text-lg font-medium text-white/90 transition-colors hover:text-white" 
+        style={{ color: textColor }}
+      />
+        
+        <ContentEditable 
+        html={button2.current} 
+        onChange={(e) => button2.current = e.target.value}
+        disabled={!isEditing}
+        className="text-lg font-medium text-white/90 transition-colors hover:text-white" 
+        style={{ color: textColor }}
+      />
     </nav>
   );
 
@@ -63,17 +111,17 @@ export default function BananaHeader({
         </button>
       )}
       {enabledElements.isSocial && (
-        <button className="rounded-full p-2 text-white/90 hover:bg-white/10">
+        <button className="rounded-full p-2 hover:bg-white/10" style={{ color: textColor }}>
           <TiSocialSkypeOutline className="size-5" />
         </button>
       )}
       {enabledElements.isCart && (
-        <button className="rounded-full p-2 text-white/90 hover:bg-white/10">
+        <button className="rounded-full p-2 hover:bg-white/10" style={{ color: textColor }}>
           <HiOutlineShoppingCart className="size-5" />
         </button>
       )}
       {enabledElements.isAccount && (
-        <button className="rounded-full p-2 text-white/90 hover:bg-white/10">
+        <button className="rounded-full p-2 hover:bg-white/10" style={{ color: textColor }}>
           <HiOutlineUser className="size-5" />
         </button>
       )}
@@ -84,7 +132,7 @@ export default function BananaHeader({
   if (layout === "Option 1") {
     return (
       <header
-        className="flex w-full items-center justify-between bg-black px-6 transition-[height] duration-75"
+        className="flex w-full items-center justify-between px-6 transition-[height] duration-75"
         style={headerStyle}
       >
         <div style={{ gap: `${linkSpacing}px` }} className="flex items-center">
@@ -100,7 +148,7 @@ export default function BananaHeader({
   if (layout === "Option 2") {
     return (
       <header
-        className="flex w-full items-center justify-between bg-black px-6 transition-[height] duration-75"
+        className="flex w-full items-center justify-between px-6 transition-[height] duration-75"
         style={headerStyle}
       >
         <Navigation />
@@ -116,7 +164,7 @@ export default function BananaHeader({
   if (layout === "Option 3") {
     return (
       <header
-        className="flex w-full flex-col items-center justify-center bg-black px-6 transition-[height] duration-75"
+        className="flex w-full flex-col items-center justify-center px-6 transition-[height] duration-75"
         style={headerStyle}
       >
         <Logo />
@@ -135,7 +183,7 @@ export default function BananaHeader({
   if (layout === "Option 4") {
     return (
       <header
-        className="relative flex w-full items-center justify-between bg-black px-6 transition-[height] duration-75"
+        className="relative flex w-full items-center justify-between px-6 transition-[height] duration-75"
         style={headerStyle}
       >
         <div className="flex-1">

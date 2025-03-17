@@ -19,6 +19,16 @@ interface DesignToolbarProps {
   initialHeight: number;
   initialLinkSpacing: number;
   initialElementSpacing: number;
+  initialBackgroundColor: string;
+  initialTextColor: string;
+  initialBackgroundType: 'solid' | 'gradient' | 'adaptive';
+  initialOpacity: number;
+  initialBlurBackground: boolean;
+  onBackgroundColorChange: (color: string) => void;
+  onTextColorChange: (color: string) => void;
+  onBackgroundTypeChange: (type: 'solid' | 'gradient' | 'adaptive') => void;
+  onOpacityChange: (opacity: number) => void;
+  onBlurBackgroundChange: (blur: boolean) => void;
 }
 
 type MenuView = "design" | "color";
@@ -125,6 +135,16 @@ export default function BananaDesignPanel({
   initialHeight,
   initialLinkSpacing,
   initialElementSpacing,
+  initialBackgroundColor,
+  initialTextColor,
+  initialBackgroundType = "solid",
+  initialOpacity,
+  initialBlurBackground,
+  onBackgroundColorChange,
+  onTextColorChange,
+  onBackgroundTypeChange,
+  onOpacityChange,
+  onBlurBackgroundChange,
 }: DesignToolbarProps) {
   const [currentView, setCurrentView] = useState<MenuView>("design");
   const [showColorPicker, setShowColorPicker] = useState(false);
@@ -135,6 +155,27 @@ export default function BananaDesignPanel({
   const [linkSpacing, setLinkSpacing] = useState(initialLinkSpacing);
   const [elementSpacing, setElementSpacing] = useState(initialElementSpacing);
   const [isClosing, setIsClosing] = useState(false);
+  
+  // Color tab state
+  const [backgroundType, setBackgroundType] = useState<'solid' | 'gradient' | 'adaptive'>(initialBackgroundType);
+  const [backgroundColor, setBackgroundColor] = useState(initialBackgroundColor);
+  const [gradientEndColor, setGradientEndColor] = useState('#4f46e5'); // Default indigo color for gradient end
+  const [navigationColor, setNavigationColor] = useState(initialTextColor);
+  const [opacity, setOpacity] = useState(initialOpacity);
+  const [blurBackground, setBlurBackground] = useState(initialBlurBackground);
+  const [activeColorTab, setActiveColorTab] = useState<'color' | 'theme'>('color');
+  const [showBackgroundTypeDropdown, setShowBackgroundTypeDropdown] = useState(false);
+  
+  // Color picker state
+  const [showColorPickerModal, setShowColorPickerModal] = useState(false);
+  const [colorPickerTab, setColorPickerTab] = useState<'palette' | 'custom'>('palette');
+  const [activeColorField, setActiveColorField] = useState<'background' | 'navigation' | 'gradientEnd'>('background');
+  const [selectedHexColor, setSelectedHexColor] = useState(initialBackgroundColor);
+  const [colorPickerPosition, setColorPickerPosition] = useState({ x: 0, y: 0 });
+  const [huePosition, setHuePosition] = useState(0);
+  
+  // Color palette
+  const colorPalette = ['#FFF6ED', '#F3F169', '#D9D6FF', '#E07A5F', '#1A3A21'];
 
   const handleLayoutChange = (newLayout: HeaderLayout) => {
     setSelectedLayout(newLayout);
@@ -195,6 +236,290 @@ export default function BananaDesignPanel({
     }, 150);
   };
 
+  // Handle color selection
+  const handleColorSelect = (color: string | undefined | null) => {
+    // Ensure color is a valid string for Tailwind's bg-[string] format
+    const formattedColor = ensureValidColorString(color);
+    
+    if (activeColorField === 'background') {
+      setBackgroundColor(formattedColor);
+      document.documentElement.style.setProperty('--header-bg-color', formattedColor);
+      onBackgroundColorChange(formattedColor);
+    } else if (activeColorField === 'gradientEnd') {
+      setGradientEndColor(formattedColor);
+      document.documentElement.style.setProperty('--header-gradient-end-color', formattedColor);
+      // Pass both colors for gradient
+      if (backgroundType === 'gradient') {
+        onBackgroundColorChange(`gradient:${backgroundColor}:${formattedColor}`);
+      }
+    } else {
+      setNavigationColor(formattedColor);
+      document.documentElement.style.setProperty('--header-text-color', formattedColor);
+      onTextColorChange(formattedColor);
+    }
+    setSelectedHexColor(formattedColor);
+  };
+  
+  // Handle color picker interactions
+  const handleColorPickerMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    const y = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+    
+    setColorPickerPosition({ x, y });
+    updateColorFromPosition(x, y, huePosition);
+    
+    const handleMouseMove = (e: MouseEvent) => {
+      const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      const y = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+      
+      setColorPickerPosition({ x, y });
+      updateColorFromPosition(x, y, huePosition);
+    };
+    
+    const handleMouseUp = () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+    
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
+  
+  const handleHueSliderMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    
+    setHuePosition(x);
+    updateColorFromPosition(colorPickerPosition.x, colorPickerPosition.y, x);
+    
+    const handleMouseMove = (e: MouseEvent) => {
+      const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      
+      setHuePosition(x);
+      updateColorFromPosition(colorPickerPosition.x, colorPickerPosition.y, x);
+    };
+    
+    const handleMouseUp = () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+    
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
+  
+  const updateColorFromPosition = (x: number, y: number, hue: number) => {
+    // Convert HSV to RGB
+    const h = hue * 360;
+    const s = x * 100;
+    const v = (1 - y) * 100;
+    
+    // HSV to RGB conversion
+    const c = v * s / 10000;
+    const x1 = c * (1 - Math.abs((h / 60) % 2 - 1));
+    const m = v / 100 - c;
+    
+    let r = 0, g = 0, b = 0;
+    
+    if (h < 60) {
+      r = c; g = x1; b = 0;
+    } else if (h < 120) {
+      r = x1; g = c; b = 0;
+    } else if (h < 180) {
+      r = 0; g = c; b = x1;
+    } else if (h < 240) {
+      r = 0; g = x1; b = c;
+    } else if (h < 300) {
+      r = x1; g = 0; b = c;
+    } else {
+      r = c; g = 0; b = x1;
+    }
+    
+    // Convert to hex
+    const toHex = (value: number) => {
+      const hex = Math.round((value + m) * 255).toString(16);
+      return hex.length === 1 ? '0' + hex : hex;
+    };
+    
+    const hexColor = `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+    const formattedColor = ensureValidColorString(hexColor);
+    
+    setSelectedHexColor(formattedColor);
+    
+    // Apply to the active field
+    if (activeColorField === 'background') {
+      setBackgroundColor(formattedColor);
+      document.documentElement.style.setProperty('--header-bg-color', formattedColor);
+      onBackgroundColorChange(formattedColor);
+    } else if (activeColorField === 'gradientEnd') {
+      setGradientEndColor(formattedColor);
+      document.documentElement.style.setProperty('--header-gradient-end-color', formattedColor);
+      // Pass both colors for gradient
+      if (backgroundType === 'gradient') {
+        onBackgroundColorChange(`gradient:${backgroundColor}:${formattedColor}`);
+      }
+    } else {
+      setNavigationColor(formattedColor);
+      document.documentElement.style.setProperty('--header-text-color', formattedColor);
+      onTextColorChange(formattedColor);
+    }
+  };
+
+  // Helper function to ensure color is a valid string for Tailwind's bg-[string]
+  const ensureValidColorString = (color: string | undefined | null): string => {
+    if (!color) return '#ffffff'; // Default to white if no color
+    
+    // If it's already a valid hex color with # prefix, return as is
+    if (/^#([0-9A-F]{3}){1,2}$/i.test(color)) {
+      return color;
+    }
+    
+    // If it's a valid hex without #, add the #
+    if (/^([0-9A-F]{3}){1,2}$/i.test(color)) {
+      return `#${color}`;
+    }
+    
+    // If it's 'transparent', return as is
+    if (color === 'transparent') {
+      return color;
+    }
+    
+    // For other formats (rgb, rgba, hsl, etc.), ensure they're properly formatted
+    if (color.startsWith('rgb') || color.startsWith('hsl')) {
+      return color;
+    }
+    
+    // If we can't determine the format, default to a safe color
+    return '#ffffff';
+  };
+
+  // Add useEffect to apply colors on component mount and when they change
+  useEffect(() => {
+    document.documentElement.style.setProperty('--header-bg-color', backgroundColor);
+    document.documentElement.style.setProperty('--header-text-color', navigationColor);
+  }, [backgroundColor, navigationColor]);
+
+  // Handle background type change
+  const handleBackgroundTypeChange = (type: 'solid' | 'gradient' | 'adaptive') => {
+    setBackgroundType(type);
+    
+    // Update the background color based on the type
+    if (type === 'solid') {
+      onBackgroundColorChange(backgroundColor);
+    } else if (type === 'gradient') {
+      onBackgroundColorChange(`gradient:${backgroundColor}:${gradientEndColor}`);
+    } else if (type === 'adaptive') {
+      // For adaptive, we'll just use a placeholder for now
+      onBackgroundColorChange('adaptive');
+    }
+    
+    onBackgroundTypeChange(type);
+  };
+
+  // Handle opacity change
+  const handleOpacityChange = (value: number) => {
+    setOpacity(value);
+    onOpacityChange(value);
+  };
+
+  // Handle blur background change
+  const handleBlurBackgroundChange = (value: boolean) => {
+    setBlurBackground(value);
+    onBlurBackgroundChange(value);
+  };
+
+  // Add useEffect to initialize color picker with initial colors
+  useEffect(() => {
+    // Set initial colors with validation
+    // Remove 'bg-[' and ']' if present in initialBackgroundColor
+    let cleanBgColor = initialBackgroundColor;
+    
+    // Check if it's a gradient format
+    if (cleanBgColor && cleanBgColor.startsWith('gradient:')) {
+      const parts = cleanBgColor.split(':');
+      if (parts.length === 3) {
+        cleanBgColor = parts[1];
+        setGradientEndColor(ensureValidColorString(parts[2]));
+        setBackgroundType('gradient');
+      }
+    } else if (cleanBgColor && cleanBgColor.startsWith('bg-[') && cleanBgColor.endsWith(']')) {
+      cleanBgColor = cleanBgColor.substring(4, cleanBgColor.length - 1);
+    }
+    
+    const validBgColor = ensureValidColorString(cleanBgColor);
+    const validTextColor = ensureValidColorString(initialTextColor);
+    
+    setBackgroundColor(validBgColor);
+    setNavigationColor(validTextColor);
+    
+    // Set initial background type
+    setBackgroundType(initialBackgroundType || 'solid');
+    
+    // Set initial opacity and blur
+    setOpacity(initialOpacity || 100);
+    setBlurBackground(initialBlurBackground || false);
+    
+    // Apply colors to CSS variables
+    document.documentElement.style.setProperty('--header-bg-color', validBgColor);
+    document.documentElement.style.setProperty('--header-gradient-end-color', gradientEndColor);
+    document.documentElement.style.setProperty('--header-text-color', validTextColor);
+  }, [initialBackgroundColor, initialTextColor, initialBackgroundType, initialOpacity, initialBlurBackground]);
+
+  // Handle opening the color picker
+  const handleOpenColorPicker = (field: 'background' | 'navigation' | 'gradientEnd') => {
+    setActiveColorField(field);
+    const color = field === 'background' 
+      ? backgroundColor 
+      : field === 'gradientEnd'
+        ? gradientEndColor
+        : navigationColor;
+    setSelectedHexColor(color || '#ffffff');
+    setShowColorPickerModal(true);
+    
+    // Set the appropriate color picker tab based on the color
+    // Check if the color is in the palette
+    if (color && colorPalette.includes(color)) {
+      setColorPickerTab('palette');
+    } else {
+      setColorPickerTab('custom');
+      
+      // Try to set the hue position and color picker position based on the color
+      try {
+        if (color && color.startsWith('#')) {
+          // Convert hex to HSV
+          const r = parseInt(color.slice(1, 3), 16) / 255;
+          const g = parseInt(color.slice(3, 5), 16) / 255;
+          const b = parseInt(color.slice(5, 7), 16) / 255;
+          
+          const max = Math.max(r, g, b);
+          const min = Math.min(r, g, b);
+          const d = max - min;
+          
+          let h = 0;
+          if (d === 0) h = 0;
+          else if (max === r) h = ((g - b) / d) % 6;
+          else if (max === g) h = (b - r) / d + 2;
+          else if (max === b) h = (r - g) / d + 4;
+          
+          h = h * 60;
+          if (h < 0) h += 360;
+          
+          const s = max === 0 ? 0 : d / max;
+          const v = max;
+          
+          // Set the hue position (0-1)
+          setHuePosition(h / 360);
+          
+          // Set the color picker position (x=saturation, y=1-value)
+          setColorPickerPosition({ x: s, y: 1 - v });
+        }
+      } catch (error) {
+        console.error('Error setting color picker position:', error);
+      }
+    }
+  };
+
   return (
     <>
       {/* Main Toolbar */}
@@ -253,16 +578,16 @@ export default function BananaDesignPanel({
             <>
               <div className="p-4">
                 {/* Layout Section */}
-                <div className="mb-6">
-                  <h3 className="mb-3 text-xs font-semibold uppercase text-black">
+                <div className="mb-4">
+                  <h3 className="mb-2 text-xs font-semibold uppercase text-black">
                     Layout
                   </h3>
                   <div className="relative">
                     <button
                       onClick={() => setShowLayoutDropdown(!showLayoutDropdown)}
-                      className="flex w-full flex-col rounded-md border border-gray-200 bg-white p-3 text-left transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="flex w-full flex-col rounded-md border border-gray-200 bg-white p-2 text-left transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     >
-                      <div className="mb-2 flex items-center justify-between">
+                      <div className="mb-1 flex items-center justify-between">
                         <span className="text-black">{selectedLayout}</span>
                         <HiChevronDown
                           className={`transition-transform ${showLayoutDropdown ? "rotate-180" : ""}`}
@@ -281,18 +606,18 @@ export default function BananaDesignPanel({
                 </div>
 
                 {/* Spacing Section */}
-                <div className="mb-6">
-                  <h3 className="mb-3 text-xs font-semibold uppercase text-black">
+                <div className="mb-4">
+                  <h3 className="mb-2 text-xs font-semibold uppercase text-black">
                     Spacing
                   </h3>
 
                   {/* Link Spacing Slider */}
-                  <div className="mb-4">
+                  <div className="mb-3">
                     <div className="mb-1 flex items-center justify-between">
                       <label className="text-sm font-medium text-black">
                         Link Spacing
                       </label>
-                      <div className="w-16 rounded-md bg-gray-100 px-3 py-1 text-center">
+                      <div className="w-16 rounded-md bg-gray-100 px-2 py-1 text-center">
                         <span className="text-black">{linkSpacing}px</span>
                       </div>
                     </div>
@@ -309,12 +634,12 @@ export default function BananaDesignPanel({
                   </div>
 
                   {/* Element Spacing Slider */}
-                  <div className="mb-4">
+                  <div className="mb-3">
                     <div className="mb-1 flex items-center justify-between">
                       <label className="text-sm font-medium text-black">
                         Element Spacing
                       </label>
-                      <div className="w-16 rounded-md bg-gray-100 px-3 py-1 text-center">
+                      <div className="w-16 rounded-md bg-gray-100 px-2 py-1 text-center">
                         <span className="text-black">{elementSpacing}px</span>
                       </div>
                     </div>
@@ -332,18 +657,18 @@ export default function BananaDesignPanel({
                 </div>
 
                 {/* Size Section */}
-                <div className="mb-6">
-                  <h3 className="mb-3 text-xs font-semibold uppercase text-black">
+                <div className="mb-4">
+                  <h3 className="mb-2 text-xs font-semibold uppercase text-black">
                     Size
                   </h3>
 
                   {/* Height Slider */}
-                  <div className="mb-4">
+                  <div className="mb-3">
                     <div className="mb-1 flex items-center justify-between">
                       <label className="text-sm font-medium text-black">
                         Height
                       </label>
-                      <div className="w-16 rounded-md bg-gray-100 px-3 py-1 text-center">
+                      <div className="w-16 rounded-md bg-gray-100 px-2 py-1 text-center">
                         <span className="text-black">{headerHeight}px</span>
                       </div>
                     </div>
@@ -359,74 +684,212 @@ export default function BananaDesignPanel({
                     />
                   </div>
                 </div>
-
-                {/* Style Section */}
-                {/* <div className="mb-6">
-                <h3 className="text-xs font-semibold text-black uppercase mb-3">Style</h3>
-                <div className="grid grid-cols-2 gap-1.5">
-                  {["Default", "Minimal", "Modern", "Classic"].map((style) => (
-                    <button
-                      key={style}
-                      className="rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-black transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    >
-                      {style}
-                    </button>
-                  ))}
-                </div>
-              </div> */}
               </div>
             </>
           ) : (
             <>
               <div className="p-4">
-                {/* Color Section */}
-                <div className="mb-6">
-                  <h3 className="mb-3 text-xs font-semibold uppercase text-black">
-                    Background
-                  </h3>
-                  <button
-                    onClick={() => setShowColorPicker(!showColorPicker)}
-                    className="flex w-full items-center justify-between rounded-md border border-gray-200 bg-white px-3 py-2 text-black hover:bg-gray-50"
-                  >
-                    <div className="flex items-center gap-2">
-                      <div className="size-4 rounded bg-black" />
-                      <span>Color</span>
-                    </div>
-                    <HiChevronDown />
-                  </button>
-
-                  {showColorPicker && (
-                    <div className="mt-2 rounded-md border border-gray-200 bg-white p-3">
-                      <div className="mb-3 flex flex-col gap-1">
-                        {[
-                          { label: "Solid", icon: IoColorPaletteOutline },
-                          { label: "Gradient", icon: HiOutlineColorSwatch },
-                          { label: "Transparent", icon: RxTransparencyGrid },
-                        ].map((option) => (
-                          <button
-                            key={option.label}
-                            className="flex items-center gap-2 rounded px-2 py-1.5 text-black hover:bg-gray-100"
-                          >
-                            <option.icon className="text-lg" />
-                            <span>{option.label}</span>
-                          </button>
-                        ))}
+                {/* Background Type Selection */}
+                <div className="mb-4">
+                  {/* Background Type Dropdown */}
+                  <div className="relative mb-3">
+                    <button
+                      onClick={() => setShowBackgroundTypeDropdown(!showBackgroundTypeDropdown)}
+                      className="flex w-full items-center justify-between rounded-lg border border-gray-200 bg-gray-100 p-3 text-left"
+                    >
+                      <div className="flex items-center gap-3">
+                        {backgroundType === 'solid' && (
+                          <div className="w-10 h-10 rounded-lg" style={{ backgroundColor: ensureValidColorString(backgroundColor) }}></div>
+                        )}
+                        {backgroundType === 'gradient' && (
+                          <div className="w-10 h-10 rounded-lg bg-gradient-to-r" style={{ 
+                            backgroundImage: `linear-gradient(to right, ${ensureValidColorString(backgroundColor)}, ${ensureValidColorString(gradientEndColor)})` 
+                          }}></div>
+                        )}
+                        {backgroundType === 'adaptive' && (
+                          <div className="w-10 h-10 rounded-lg bg-gray-200 border border-gray-300"></div>
+                        )}
+                        <span className="text-black font-medium">
+                          {backgroundType ? backgroundType.charAt(0).toUpperCase() + backgroundType.slice(1) : 'Solid'}
+                        </span>
                       </div>
-                      <div className="grid grid-cols-5 gap-1">
-                        {[
-                          "#000000",
-                          "#FFFFFF",
-                          "#808080",
-                          "#FF0000",
-                          "#0000FF",
-                        ].map((color) => (
-                          <button
-                            key={color}
-                            className="group relative size-8 rounded border border-gray-200"
-                            style={{ backgroundColor: color }}
-                          />
-                        ))}
+                      <svg 
+                        className={`transition-transform ${showBackgroundTypeDropdown ? 'rotate-180' : ''}`}
+                        width="20" 
+                        height="20" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path d="M7 10l5 5 5-5H7z" fill="currentColor"/>
+                      </svg>
+                    </button>
+                    
+                    {/* Dropdown Menu */}
+                    {showBackgroundTypeDropdown && (
+                      <div className="absolute z-10 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg">
+                        {/* Solid Option */}
+                        <div 
+                          className="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50"
+                          onClick={() => {
+                            handleBackgroundTypeChange('solid');
+                            setShowBackgroundTypeDropdown(false);
+                          }}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-lg" style={{ backgroundColor: ensureValidColorString(backgroundColor) }}></div>
+                            <span className="text-black font-medium">Solid</span>
+                          </div>
+                          {backgroundType === 'solid' && (
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="currentColor"/>
+                            </svg>
+                          )}
+                        </div>
+                        
+                        {/* Gradient Option */}
+                        <div 
+                          className="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50"
+                          onClick={() => {
+                            handleBackgroundTypeChange('gradient');
+                            setShowBackgroundTypeDropdown(false);
+                          }}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-lg bg-gradient-to-r" style={{ 
+                              backgroundImage: `linear-gradient(to right, ${ensureValidColorString(backgroundColor)}, ${ensureValidColorString(gradientEndColor)})` 
+                            }}></div>
+                            <span className="text-black font-medium">Gradient</span>
+                          </div>
+                          {backgroundType === 'gradient' && (
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="currentColor"/>
+                            </svg>
+                          )}
+                        </div>
+                        
+                        {/* Adaptive Option */}
+                        <div 
+                          className="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50"
+                          onClick={() => {
+                            handleBackgroundTypeChange('adaptive');
+                            setShowBackgroundTypeDropdown(false);
+                          }}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-lg bg-gray-200 border border-gray-300"></div>
+                            <span className="text-black font-medium">Adaptive</span>
+                          </div>
+                          {backgroundType === 'adaptive' && (
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="currentColor"/>
+                            </svg>
+                          )}
+                        </div>
                       </div>
+                    )}
+                  </div>
+                  
+                  {/* Solid and Gradient Settings */}
+                  {(backgroundType === 'solid' || backgroundType === 'gradient') && (
+                    <>
+                      {/* Color/Theme Tabs */}
+                      <div className="flex w-full mb-3 border-b">
+                        <button
+                          className={`flex-1 py-2 text-center text-sm font-medium ${activeColorTab === 'color' ? 'border-b-2 border-black text-black' : 'text-gray-500'}`}
+                          onClick={() => setActiveColorTab('color')}
+                        >
+                          Color
+                        </button>
+                        <button
+                          className={`flex-1 py-2 text-center text-sm font-medium ${activeColorTab === 'theme' ? 'border-b-2 border-black text-black' : 'text-gray-500'}`}
+                          onClick={() => setActiveColorTab('theme')}
+                        >
+                          Theme
+                        </button>
+                      </div>
+                      
+                      {activeColorTab === 'color' && (
+                        <>
+                          {/* Background Color */}
+                          <div className="flex items-center justify-between py-3 border-b border-gray-200">
+                            <span className="text-sm font-medium text-black">Background color</span>
+                            <div 
+                              className="w-7 h-7 rounded-full border border-gray-300 cursor-pointer"
+                              style={{ backgroundColor: ensureValidColorString(backgroundColor) }}
+                              onClick={() => handleOpenColorPicker('background')}
+                            ></div>
+                          </div>
+                          
+                          {/* Gradient End Color - Only show for gradient type */}
+                          {backgroundType === 'gradient' && (
+                            <div className="flex items-center justify-between py-3 border-b border-gray-200">
+                              <span className="text-sm font-medium text-black">Gradient end color</span>
+                              <div 
+                                className="w-7 h-7 rounded-full border border-gray-300 cursor-pointer"
+                                style={{ backgroundColor: ensureValidColorString(gradientEndColor) }}
+                                onClick={() => handleOpenColorPicker('gradientEnd')}
+                              ></div>
+                            </div>
+                          )}
+                          
+                          {/* Navigation Color */}
+                          <div className="flex items-center justify-between py-3 border-b border-gray-200">
+                            <span className="text-sm font-medium text-black">Text color</span>
+                            <div 
+                              className="w-7 h-7 rounded-full border border-gray-300 cursor-pointer"
+                              style={{ backgroundColor: ensureValidColorString(navigationColor) }}
+                              onClick={() => handleOpenColorPicker('navigation')}
+                            ></div>
+                          </div>
+                          
+                          {/* Opacity */}
+                          {/* <div className="py-3 border-b border-gray-200">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-sm font-medium text-black">Opacity</span>
+                              <span className="text-sm text-black">{opacity}%</span>
+                            </div>
+                            <input
+                              type="range"
+                              min="0"
+                              max="100"
+                              value={opacity}
+                              onChange={(e) => handleOpacityChange(parseInt(e.target.value))}
+                              className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                            />
+                          </div> */}
+                          
+                          {/* Blur Background */}
+                          {/* <div className="flex items-center justify-between py-3 border-b border-gray-200">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-medium text-black">Blur background</span>
+                              <button className="text-gray-500 rounded-full">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" fill="currentColor"/>
+                                </svg>
+                              </button>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                              <input 
+                                type="checkbox" 
+                                checked={blurBackground}
+                                onChange={() => handleBlurBackgroundChange(!blurBackground)}
+                                className="sr-only peer" 
+                              />
+                              <div className="w-10 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-gray-500"></div>
+                            </label>
+                          </div> */}
+                        </>
+                      )}
+                    </>
+                  )}
+                  
+                  {/* Adaptive Settings */}
+                  {backgroundType === 'adaptive' && (
+                    <div className="mt-3 p-3 bg-gray-100 rounded-lg">
+                      <p className="text-gray-700 text-sm">
+                        Use the color theme of the first section on each page. Go to Styles &gt; Colors to customize the color of the site title and navigation link for each color theme.
+                      </p>
                     </div>
                   )}
                 </div>
@@ -435,6 +898,174 @@ export default function BananaDesignPanel({
           )}
         </div>
       </div>
+
+      {/* Color Picker Modal */}
+      {showColorPickerModal && (
+        <div 
+          className="fixed inset-0 z-50"
+          onClick={() => setShowColorPickerModal(false)}
+        >
+          <div
+            className="absolute z-50 w-[320px] rounded-lg border border-gray-200 bg-white shadow-lg"
+            style={{
+              top: "120px",
+              right: "300px",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Color Picker Tabs */}
+            <div className="flex w-full border-b">
+              <button
+                className={`flex-1 py-3 text-center text-sm font-medium ${colorPickerTab === 'palette' ? 'border-b-2 border-black text-black' : 'text-gray-500'}`}
+                onClick={() => setColorPickerTab('palette')}
+              >
+                Palette
+              </button>
+              <button
+                className={`flex-1 py-3 text-center text-sm font-medium ${colorPickerTab === 'custom' ? 'border-b-2 border-black text-black' : 'text-gray-500'}`}
+                onClick={() => setColorPickerTab('custom')}
+              >
+                Custom
+              </button>
+            </div>
+            
+            {/* Color Picker Content */}
+            <div className="p-4">
+              {colorPickerTab === 'palette' ? (
+                <>
+                  {/* Color Palette */}
+                  <div className="flex justify-center gap-4 mb-4">
+                    {colorPalette.map((color, index) => {
+                      const formattedColor = ensureValidColorString(color);
+                      return (
+                        <button
+                          key={index}
+                          className={`w-12 h-12 rounded-full hover:scale-110 transition-transform ${formattedColor === selectedHexColor ? 'ring-2 ring-black' : 'border border-gray-200'}`}
+                          style={{ backgroundColor: formattedColor }}
+                          onClick={() => handleColorSelect(formattedColor)}
+                        />
+                      );
+                    })}
+                  </div>
+                  
+                  {/* Transparent Color Option */}
+                  <div className="flex items-center justify-center mb-4">
+                    <button 
+                      className="w-full h-10 border border-gray-200 rounded bg-[url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAGElEQVQYlWNgYGCQwoKxgqGgcJA5h3yFAAs8BRWVSwooAAAAAElFTkSuQmCC')] bg-repeat"
+                      onClick={() => handleColorSelect('transparent')}
+                    >
+                      <div className="flex justify-end pr-2">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none"/>
+                        </svg>
+                      </div>
+                    </button>
+                  </div>
+                  
+                  {/* Edit Sitewide Palette Button */}
+                  <button
+                    className="w-full py-2 text-center text-sm font-medium text-black border-t border-gray-200 mt-2 pt-4"
+                  >
+                    EDIT SITEWIDE PALETTE
+                  </button>
+                </>
+              ) : (
+                <>
+                  {/* Custom Color Picker */}
+                  <div className="mb-4">
+                    {/* Color Selection Area */}
+                    <div 
+                      className="relative w-full h-[250px] rounded overflow-hidden mb-3 cursor-crosshair"
+                      onMouseDown={handleColorPickerMouseDown}
+                    >
+                      <div 
+                        className="absolute inset-0"
+                        style={{ 
+                          backgroundColor: `hsl(${huePosition * 360}, 100%, 50%)`
+                        }}
+                      ></div>
+                      <div 
+                        className="absolute inset-0"
+                        style={{ 
+                          background: 'linear-gradient(to right, #fff, rgba(255,255,255,0))',
+                          backgroundBlendMode: 'multiply'
+                        }}
+                      ></div>
+                      <div 
+                        className="absolute inset-0"
+                        style={{ 
+                          background: 'linear-gradient(to top, #000, rgba(0,0,0,0))',
+                          backgroundBlendMode: 'multiply'
+                        }}
+                      ></div>
+                      <div 
+                        className="absolute w-6 h-6 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                        style={{ 
+                          left: `${colorPickerPosition.x * 100}%`, 
+                          top: `${colorPickerPosition.y * 100}%`,
+                          backgroundColor: ensureValidColorString(selectedHexColor)
+                        }}
+                      ></div>
+                    </div>
+                    
+                    {/* Hue Slider */}
+                    <div 
+                      className="relative h-8 mb-3 rounded overflow-hidden cursor-pointer"
+                      onMouseDown={handleHueSliderMouseDown}
+                    >
+                      <div className="absolute inset-0" style={{ 
+                        background: 'linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%)'
+                      }}></div>
+                      <div 
+                        className="absolute top-0 bottom-0 w-1 bg-white border border-gray-300 transform -translate-x-1/2 pointer-events-none" 
+                        style={{ left: `${huePosition * 100}%` }}
+                      ></div>
+                    </div>
+                    
+                    {/* Hex Input */}
+                    <div className="flex items-center text-black">
+                      <div className="flex-1">
+                        <select className="bg-white border border-gray-300 rounded-md px-2 py-1 text-sm">
+                          <option>Hex</option>
+                          <option>RGB</option>
+                          <option>HSL</option>
+                        </select>
+                      </div>
+                      <div className="flex-1">
+                        <input 
+                          type="text" 
+                          value={selectedHexColor && selectedHexColor.startsWith('#') ? selectedHexColor : `#${selectedHexColor || ''}`}
+                          onChange={(e) => {
+                            const inputValue = e.target.value;
+                            // Don't immediately apply the color - wait for onBlur
+                            setSelectedHexColor(inputValue);
+                          }}
+                          onBlur={(e) => {
+                            // Apply the color when the input loses focus
+                            const formattedColor = ensureValidColorString(e.target.value);
+                            setSelectedHexColor(formattedColor);
+                            handleColorSelect(formattedColor);
+                          }}
+                          onKeyDown={(e) => {
+                            // Apply the color when Enter key is pressed
+                            if (e.key === 'Enter') {
+                              const formattedColor = ensureValidColorString(e.currentTarget.value);
+                              setSelectedHexColor(formattedColor);
+                              handleColorSelect(formattedColor);
+                              e.currentTarget.blur();
+                            }
+                          }}
+                          className="w-full bg-white border border-gray-300 rounded-md px-2 py-1 text-sm"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Layout Dropdown Backdrop - Only show if not closing */}
       {showLayoutDropdown && !isClosing && (

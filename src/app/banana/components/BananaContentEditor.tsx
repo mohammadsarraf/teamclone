@@ -53,7 +53,7 @@ const defaultGridSettings: GridSettings = {
   margin: 8, // For backward compatibility
   horizontalMargin: 0,
   verticalMargin: 0,
-  padding: 16,
+  padding: 0,
 };
 
 export default function BananaContentEditor({ isFullscreen }: ContentProps) {

@@ -4,8 +4,6 @@ import HeaderEditMenu from "./BananaHeaderControls";
 import ElementToolbar from "./menus/BananaElementPanel";
 import DesignToolbar from "./menus/BananaDesignPanel";
 import BananaHeader, { HeaderLayout } from "./BananaHeader";
-import { GrRedo, GrUndo } from "react-icons/gr";
-// Import types
 import "../types";
 
 interface HeaderEditProps {
@@ -28,13 +26,21 @@ interface HeaderState {
   linkSpacing: number;
   elementSpacing: number;
   enabledElements: EnabledElements;
+  backgroundColor: string;
+  gradientEndColor?: string;
+  isGradient?: boolean;
+  textColor: string;
 }
 
 export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [activeMenu, setActiveMenu] = useState<MenuType>("none");
-
+  const [headerBgColor, setHeaderBgColor] = useState(`#000000`);
+  const [headerBgOpacity, setHeaderBgOpacity] = useState(`bg-opacity-100 `)
+  const [headerGradientEndColor, setHeaderGradientEndColor] = useState(`#4f46e5`);
+  const [isGradient, setIsGradient] = useState(false);
+  const [headerTextColor, setHeaderTextColor] = useState(`#ffffff`);
   // Current state
   const [enabledElements, setEnabledElements] = useState<EnabledElements>({
     isButton: false,
@@ -52,7 +58,7 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
     {
       layout: "Option 1",
       height: 80,
-      linkSpacing: 24,
+      linkSpacing: 12,
       elementSpacing: 16,
       enabledElements: {
         isButton: false,
@@ -60,43 +66,13 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
         isCart: false,
         isAccount: false,
       },
+      backgroundColor: "#e30404",
+      gradientEndColor: "#4f46e5",
+      isGradient: false,
+      textColor: "#ffffff",
     },
   ]);
   const [currentHistoryIndex, setCurrentHistoryIndex] = useState(0);
-
-  // Load saved state from localStorage on mount
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const savedState = localStorage.getItem("bananaHeaderState");
-        const savedIndex = localStorage.getItem("bananaHeaderHistoryIndex");
-
-        if (savedState) {
-          const parsedState = JSON.parse(savedState) as HeaderState;
-
-          // Apply the saved state
-          applyState(parsedState);
-
-          // Update history
-          const newHistory = [...history];
-          newHistory[0] = parsedState; // Replace initial state
-          setHistory(newHistory);
-
-          // Set history index if available
-          if (savedIndex) {
-            const index = parseInt(savedIndex, 10);
-            if (!isNaN(index) && index >= 0) {
-              setCurrentHistoryIndex(index);
-            }
-          }
-
-          console.log("Loaded saved header state:", parsedState);
-        }
-      } catch (error) {
-        console.error("Error loading saved header state:", error);
-      }
-    }
-  }, []);
 
   // Derived state for undo/redo availability
   const canUndo = currentHistoryIndex > 0;
@@ -122,6 +98,10 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
     linkSpacing: linkSpacing,
     elementSpacing: elementSpacing,
     enabledElements: { ...enabledElements },
+    backgroundColor: headerBgColor,
+    gradientEndColor: headerGradientEndColor,
+    isGradient: isGradient,
+    textColor: headerTextColor,
   });
 
   // Apply a state from history
@@ -131,6 +111,21 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
     setLinkSpacing(state.linkSpacing);
     setElementSpacing(state.elementSpacing);
     setEnabledElements(state.enabledElements);
+    
+    // Make sure we're storing just the hex color, not the Tailwind class
+    let bgColor = state.backgroundColor;
+    if (bgColor && bgColor.startsWith('bg-[') && bgColor.endsWith(']')) {
+      bgColor = bgColor.substring(4, bgColor.length - 1);
+    }
+    setHeaderBgColor(bgColor);
+    
+    // Set gradient state if available
+    if (state.gradientEndColor) {
+      setHeaderGradientEndColor(state.gradientEndColor);
+    }
+    setIsGradient(state.isGradient || false);
+    
+    setHeaderTextColor(state.textColor);
 
     // Reset menu state when applying a state from history
     setActiveMenu("none");
@@ -239,6 +234,91 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
     addToHistory(newState);
   };
 
+  const handleBackgroundColorChange = (color: string) => {
+    // Check if it's a gradient format (gradient:color1:color2)
+    if (color.startsWith('gradient:')) {
+      const parts = color.split(':');
+      if (parts.length === 3) {
+        // Extract the two colors
+        const startColor = parts[1];
+        const endColor = parts[2];
+        
+        // Update state
+        setHeaderBgColor(startColor);
+        setHeaderGradientEndColor(endColor);
+        setIsGradient(true);
+        
+        // Add to history
+        const newState = {
+          ...getCurrentState(),
+          backgroundColor: startColor,
+          gradientEndColor: endColor,
+          isGradient: true,
+        };
+        addToHistory(newState);
+      }
+    } else if (color === 'adaptive') {
+      // Handle adaptive background (not implemented yet)
+      // For now, just use a default color
+      setHeaderBgColor('#f8fafc');
+      setIsGradient(false);
+      
+      // Add to history
+      const newState = {
+        ...getCurrentState(),
+        backgroundColor: '#f8fafc',
+        isGradient: false,
+      };
+      addToHistory(newState);
+    } else {
+      // Regular solid color
+      // Store the color without the bg-[] wrapper
+      setHeaderBgColor(color);
+      setIsGradient(false);
+      
+      // Add to history
+      const newState = {
+        ...getCurrentState(),
+        backgroundColor: color,
+        isGradient: false,
+      };
+      addToHistory(newState);
+    }
+  };
+
+  const handleTextColorChange = (color: string) => {
+    setHeaderTextColor(color);
+    
+    // Add to history
+    const newState = {
+      ...getCurrentState(),
+      textColor: color,
+    };
+    addToHistory(newState);
+  };
+
+  const handleBackgroundTypeChange = (type: 'solid' | 'gradient' | 'adaptive') => {
+    // Update the background type
+    if (type === 'solid') {
+      setIsGradient(false);
+    } else if (type === 'gradient') {
+      setIsGradient(true);
+    } else if (type === 'adaptive') {
+      // For now, we're not handling adaptive
+      setIsGradient(false);
+    }
+  };
+
+  const handleOpacityChange = (opacity: number) => {
+    // For now, we're not handling opacity
+    // We can expand this later
+  };
+
+  const handleBlurBackgroundChange = (blur: boolean) => {
+    // For now, we're not handling blur
+    // We can expand this later
+  };
+
   // Add keyboard event listener for undo/redo and expose functions to window
   useEffect(() => {
     // Expose undo/redo functions to window for the top buttons
@@ -311,11 +391,17 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
       >
         {/* Actual Header Content */}
         <BananaHeader
+          isEditing={isEditing}
           enabledElements={enabledElements}
           layout={headerLayout}
           height={headerHeight}
           linkSpacing={linkSpacing}
           elementSpacing={elementSpacing}
+          bgColor={headerBgColor}
+          gradientEndColor={isGradient ? headerGradientEndColor : undefined}
+          isGradient={isGradient}
+          bgOpacity={headerBgOpacity}
+          textColor={headerTextColor || '#ffffff'}
         />
 
         {/* Edit Overlay */}
@@ -372,6 +458,16 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
                 onElementSpacingChangeComplete={
                   handleElementSpacingChangeComplete
                 }
+                initialBackgroundColor={headerBgColor}
+                initialTextColor={headerTextColor}
+                initialBackgroundType="solid"
+                initialOpacity={100}
+                initialBlurBackground={false}
+                onBackgroundColorChange={handleBackgroundColorChange}
+                onTextColorChange={handleTextColorChange}
+                onBackgroundTypeChange={handleBackgroundTypeChange}
+                onOpacityChange={handleOpacityChange}
+                onBlurBackgroundChange={handleBlurBackgroundChange}
               />
             </div>
           )}

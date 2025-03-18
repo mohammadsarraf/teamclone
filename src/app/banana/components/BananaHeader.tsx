@@ -66,11 +66,13 @@ export default function BananaHeader({
         height: `${height}px`,
         minHeight: `${height}px`,
         backgroundImage: `linear-gradient(to right, ${extractedBgColor}, ${gradientEndColor})`,
+        transition: 'all 0.2s ease',
       }
     : {
         height: `${height}px`,
         minHeight: `${height}px`,
         backgroundColor: extractedBgColor,
+        transition: 'all 0.2s ease',
       };
 
   const Logo = () => (
@@ -78,7 +80,7 @@ export default function BananaHeader({
       html={button3.current} 
       onChange={(e) => button3.current = e.target.value}
       disabled={!isEditing}
-      className="text-2xl font-bold"
+      className={`text-2xl font-bold ${isEditing ? 'focus:outline-dashed focus:outline-1 focus:outline-white/30 cursor-text' : ''}`}
       style={{ color: textColor }}
     />
   );
@@ -89,15 +91,15 @@ export default function BananaHeader({
         html={button1.current} 
         onChange={(e) => button1.current = e.target.value}
         disabled={!isEditing}
-        className="text-lg font-medium text-white/90 transition-colors hover:text-white" 
+        className={`text-lg font-medium text-white/90 transition-colors hover:text-white ${isEditing ? 'focus:outline-dashed focus:outline-1 focus:outline-white/30 cursor-text' : ''}`}
         style={{ color: textColor }}
       />
         
-        <ContentEditable 
+      <ContentEditable 
         html={button2.current} 
         onChange={(e) => button2.current = e.target.value}
         disabled={!isEditing}
-        className="text-lg font-medium text-white/90 transition-colors hover:text-white" 
+        className={`text-lg font-medium text-white/90 transition-colors hover:text-white ${isEditing ? 'focus:outline-dashed focus:outline-1 focus:outline-white/30 cursor-text' : ''}`}
         style={{ color: textColor }}
       />
     </nav>

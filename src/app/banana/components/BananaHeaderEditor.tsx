@@ -5,9 +5,11 @@ import ElementToolbar from "./menus/BananaElementPanel";
 import DesignToolbar from "./menus/BananaDesignPanel";
 import BananaHeader, { HeaderLayout } from "./BananaHeader";
 import "../types";
+import useHistory from "../hooks/useHistory";
 
 interface HeaderEditProps {
   isFullscreen: boolean;
+  onStateChange?: (state: HeaderState) => void;
 }
 
 type MenuType = "none" | "element" | "design";
@@ -32,127 +34,62 @@ interface HeaderState {
   textColor: string;
 }
 
-export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
+export default function BananaHeaderEditor({ 
+  isFullscreen,
+  onStateChange 
+}: HeaderEditProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [activeMenu, setActiveMenu] = useState<MenuType>("none");
-  const [headerBgColor, setHeaderBgColor] = useState(`#000000`);
-  const [headerBgOpacity, setHeaderBgOpacity] = useState(`bg-opacity-100 `)
-  const [headerGradientEndColor, setHeaderGradientEndColor] = useState(`#4f46e5`);
-  const [isGradient, setIsGradient] = useState(false);
-  const [headerTextColor, setHeaderTextColor] = useState(`#ffffff`);
-  // Current state
-  const [enabledElements, setEnabledElements] = useState<EnabledElements>({
-    isButton: false,
-    isSocial: false,
-    isCart: false,
-    isAccount: false,
-  });
-  const [headerLayout, setHeaderLayout] = useState<HeaderLayout>("Option 1");
-  const [headerHeight, setHeaderHeight] = useState(80);
-  const [linkSpacing, setLinkSpacing] = useState(24);
-  const [elementSpacing, setElementSpacing] = useState(16);
-
-  // History management
-  const [history, setHistory] = useState<HeaderState[]>([
-    {
-      layout: "Option 1",
-      height: 80,
-      linkSpacing: 12,
-      elementSpacing: 16,
-      enabledElements: {
-        isButton: false,
-        isSocial: false,
-        isCart: false,
-        isAccount: false,
-      },
-      backgroundColor: "#e30404",
-      gradientEndColor: "#4f46e5",
-      isGradient: false,
-      textColor: "#ffffff",
+  
+  // Initial header state
+  const initialState: HeaderState = {
+    layout: "Option 1",
+    height: 80,
+    linkSpacing: 12,
+    elementSpacing: 16,
+    enabledElements: {
+      isButton: false,
+      isSocial: false,
+      isCart: false,
+      isAccount: false,
     },
-  ]);
-  const [currentHistoryIndex, setCurrentHistoryIndex] = useState(0);
-
-  // Derived state for undo/redo availability
-  const canUndo = currentHistoryIndex > 0;
-  const canRedo = currentHistoryIndex < history.length - 1;
-
-  // Add a new state to history
-  const addToHistory = (newState: HeaderState) => {
-    // Remove any future states if we've gone back in history and then made a change
-    const newHistory = history.slice(0, currentHistoryIndex + 1);
-
-    // Add the new state
-    newHistory.push(newState);
-
-    // Update history and move pointer to the end
-    setHistory(newHistory);
-    setCurrentHistoryIndex(newHistory.length - 1);
+    backgroundColor: "#000000",
+    gradientEndColor: "#4f46e5",
+    isGradient: false,
+    textColor: "#ffffff",
   };
-
-  // Get current state as an object
-  const getCurrentState = (): HeaderState => ({
+  
+  // Use the history hook
+  const {
+    state: headerState,
+    addState,
+    debouncedAddState,
+    undo,
+    redo,
+    canUndo,
+    canRedo
+  } = useHistory<HeaderState>(initialState, {
+    onStateChange, // Pass through to parent if provided
+    debounceTime: 300,
+    exposeToWindow: { key: "bananaHeaderEditor" }
+  });
+  
+  // Destructure current state values from headerState
+  const {
     layout: headerLayout,
     height: headerHeight,
-    linkSpacing: linkSpacing,
-    elementSpacing: elementSpacing,
-    enabledElements: { ...enabledElements },
+    linkSpacing,
+    elementSpacing,
+    enabledElements,
     backgroundColor: headerBgColor,
     gradientEndColor: headerGradientEndColor,
-    isGradient: isGradient,
-    textColor: headerTextColor,
-  });
-
-  // Apply a state from history
-  const applyState = (state: HeaderState) => {
-    setHeaderLayout(state.layout);
-    setHeaderHeight(state.height);
-    setLinkSpacing(state.linkSpacing);
-    setElementSpacing(state.elementSpacing);
-    setEnabledElements(state.enabledElements);
-    
-    // Make sure we're storing just the hex color, not the Tailwind class
-    let bgColor = state.backgroundColor;
-    if (bgColor && bgColor.startsWith('bg-[') && bgColor.endsWith(']')) {
-      bgColor = bgColor.substring(4, bgColor.length - 1);
-    }
-    setHeaderBgColor(bgColor);
-    
-    // Set gradient state if available
-    if (state.gradientEndColor) {
-      setHeaderGradientEndColor(state.gradientEndColor);
-    }
-    setIsGradient(state.isGradient || false);
-    
-    setHeaderTextColor(state.textColor);
-
-    // Reset menu state when applying a state from history
-    setActiveMenu("none");
-  };
-
-  // Undo/Redo handlers
-  const handleUndo = () => {
-    if (canUndo && history[currentHistoryIndex - 1]) {
-      const newIndex = currentHistoryIndex - 1;
-      setCurrentHistoryIndex(newIndex);
-      const stateToApply = history[newIndex];
-      if (stateToApply) {
-        applyState(stateToApply);
-      }
-    }
-  };
-
-  const handleRedo = () => {
-    if (canRedo && history[currentHistoryIndex + 1]) {
-      const newIndex = currentHistoryIndex + 1;
-      setCurrentHistoryIndex(newIndex);
-      const stateToApply = history[newIndex];
-      if (stateToApply) {
-        applyState(stateToApply);
-      }
-    }
-  };
+    isGradient,
+    textColor: headerTextColor
+  } = headerState;
+  
+  // Header background opacity (not in history)
+  const [headerBgOpacity, setHeaderBgOpacity] = useState(`bg-opacity-100`);
 
   const handleMenuClick = (menuType: MenuType) => {
     const newMenuType = menuType === activeMenu ? "none" : menuType;
@@ -167,175 +104,127 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
   const handleElementToggle = (elements: EnabledElements) => {
     // Only update if the elements have actually changed
     if (JSON.stringify(elements) !== JSON.stringify(enabledElements)) {
-      setEnabledElements(elements);
-
-      // Add to history
-      const newState = {
-        ...getCurrentState(),
+      addState({
+        ...headerState,
         enabledElements: elements,
-      };
-      addToHistory(newState);
+      });
     }
   };
 
   const handleLayoutChange = (layout: HeaderLayout) => {
     // Only update if the layout has actually changed
     if (layout !== headerLayout) {
-      setHeaderLayout(layout);
-
-      // Add to history
-      const newState = {
-        ...getCurrentState(),
+      addState({
+        ...headerState,
         layout,
-      };
-      addToHistory(newState);
+      });
     }
   };
 
   const handleHeightChange = (height: number) => {
-    setHeaderHeight(height);
-
-    // For slider changes, we don't want to add to history on every pixel change
-    // We'll handle this in the design panel component
+    // For continuous slider changes, use debounced version
+    debouncedAddState({
+      ...headerState,
+      height,
+    });
   };
 
   const handleHeightChangeComplete = (height: number) => {
-    // Add to history when slider interaction is complete
-    const newState = {
-      ...getCurrentState(),
+    // On slider completion, add immediately to history
+    addState({
+      ...headerState,
       height,
-    };
-    addToHistory(newState);
+    });
   };
 
   const handleLinkSpacingChange = (spacing: number) => {
-    setLinkSpacing(spacing);
-    // For slider changes, handled in design panel
+    debouncedAddState({
+      ...headerState,
+      linkSpacing: spacing,
+    });
   };
 
   const handleLinkSpacingChangeComplete = (spacing: number) => {
-    const newState = {
-      ...getCurrentState(),
+    addState({
+      ...headerState,
       linkSpacing: spacing,
-    };
-    addToHistory(newState);
+    });
   };
 
   const handleElementSpacingChange = (spacing: number) => {
-    setElementSpacing(spacing);
-    // For slider changes, handled in design panel
+    debouncedAddState({
+      ...headerState,
+      elementSpacing: spacing,
+    });
   };
 
   const handleElementSpacingChangeComplete = (spacing: number) => {
-    const newState = {
-      ...getCurrentState(),
+    addState({
+      ...headerState,
       elementSpacing: spacing,
-    };
-    addToHistory(newState);
+    });
   };
 
   const handleBackgroundColorChange = (color: string) => {
-    // Check if it's a gradient format (gradient:color1:color2)
     if (color.startsWith('gradient:')) {
       const parts = color.split(':');
       if (parts.length === 3) {
-        // Extract the two colors
         const startColor = parts[1];
         const endColor = parts[2];
         
-        // Update state
-        setHeaderBgColor(startColor);
-        setHeaderGradientEndColor(endColor);
-        setIsGradient(true);
-        
-        // Add to history
-        const newState = {
-          ...getCurrentState(),
+        addState({
+          ...headerState,
           backgroundColor: startColor,
           gradientEndColor: endColor,
           isGradient: true,
-        };
-        addToHistory(newState);
+        });
       }
     } else if (color === 'adaptive') {
-      // Handle adaptive background (not implemented yet)
-      // For now, just use a default color
-      setHeaderBgColor('#f8fafc');
-      setIsGradient(false);
-      
-      // Add to history
-      const newState = {
-        ...getCurrentState(),
+      addState({
+        ...headerState,
         backgroundColor: '#f8fafc',
         isGradient: false,
-      };
-      addToHistory(newState);
+      });
     } else {
-      // Regular solid color
-      // Store the color without the bg-[] wrapper
-      setHeaderBgColor(color);
-      setIsGradient(false);
-      
-      // Add to history
-      const newState = {
-        ...getCurrentState(),
+      addState({
+        ...headerState,
         backgroundColor: color,
         isGradient: false,
-      };
-      addToHistory(newState);
+      });
     }
   };
 
   const handleTextColorChange = (color: string) => {
-    setHeaderTextColor(color);
-    
-    // Add to history
-    const newState = {
-      ...getCurrentState(),
+    addState({
+      ...headerState,
       textColor: color,
-    };
-    addToHistory(newState);
+    });
   };
 
   const handleBackgroundTypeChange = (type: 'solid' | 'gradient' | 'adaptive') => {
-    // Update the background type
     if (type === 'solid') {
-      setIsGradient(false);
+      addState({
+        ...headerState,
+        isGradient: false,
+      });
     } else if (type === 'gradient') {
-      setIsGradient(true);
-    } else if (type === 'adaptive') {
-      // For now, we're not handling adaptive
-      setIsGradient(false);
+      addState({
+        ...headerState,
+        isGradient: true,
+      });
     }
   };
 
   const handleOpacityChange = (opacity: number) => {
-    // For now, we're not handling opacity
-    // We can expand this later
+    // Not stored in history for now
   };
 
   const handleBlurBackgroundChange = (blur: boolean) => {
-    // For now, we're not handling blur
-    // We can expand this later
+    // Not stored in history for now
   };
 
-  // Add keyboard event listener for undo/redo and expose functions to window
+  // Add keyboard shortcut handler
   useEffect(() => {
-    // Expose undo/redo functions to window for the top buttons
-    if (typeof window !== "undefined") {
-      // Make sure we have a valid state to expose
-      const currentState = history[currentHistoryIndex];
-
-      window.bananaHeaderEditor = {
-        undo: canUndo && history[currentHistoryIndex - 1] ? handleUndo : null,
-        redo: canRedo && history[currentHistoryIndex + 1] ? handleRedo : null,
-        canUndo: canUndo && !!history[currentHistoryIndex - 1],
-        canRedo: canRedo && !!history[currentHistoryIndex + 1],
-        currentState: currentState || null,
-        currentHistoryIndex,
-      };
-    }
-
     const handleKeyDown = (e: KeyboardEvent) => {
       // Only handle keyboard shortcuts when in edit mode
       if (!isEditing) return;
@@ -346,9 +235,7 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
       // Undo: Cmd+Z or Ctrl+Z
       if (cmdOrCtrl && e.key === "z" && !e.shiftKey) {
         e.preventDefault();
-        if (canUndo && history[currentHistoryIndex - 1]) {
-          handleUndo();
-        }
+        undo();
       }
 
       // Redo: Cmd+Shift+Z or Ctrl+Y
@@ -357,118 +244,158 @@ export default function BananaHeaderEditor({ isFullscreen }: HeaderEditProps) {
         (cmdOrCtrl && e.key === "y")
       ) {
         e.preventDefault();
-        if (canRedo && history[currentHistoryIndex + 1]) {
-          handleRedo();
-        }
+        redo();
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
-      // Clean up the window object when component unmounts
-      if (typeof window !== "undefined") {
-        delete window.bananaHeaderEditor;
+    };
+  }, [isEditing, undo, redo]);
+
+  // Add keyframes for the fade-in animation
+  useEffect(() => {
+    // Insert the keyframes for the fadeIn animation
+    const styleSheet = document.createElement('style');
+    styleSheet.id = 'banana-header-editor-styles';
+    styleSheet.textContent = `
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+    `;
+    document.head.appendChild(styleSheet);
+    
+    return () => {
+      // Clean up the style element when component unmounts
+      const styleElement = document.getElementById('banana-header-editor-styles');
+      if (styleElement) {
+        styleElement.remove();
       }
     };
-  }, [
-    isEditing,
-    canUndo,
-    canRedo,
-    handleUndo,
-    handleRedo,
-    history,
-    currentHistoryIndex,
-  ]);
+  }, []);
 
   return (
     <div className="relative">
       {/* Header Container with hover detection */}
       <div
-        className={`relative ${isEditing ? "z-30" : ""}`}
+        className={`relative ${isEditing ? "z-40" : "z-10"}`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        {/* Actual Header Content */}
-        <BananaHeader
-          isEditing={isEditing}
-          enabledElements={enabledElements}
-          layout={headerLayout}
-          height={headerHeight}
-          linkSpacing={linkSpacing}
-          elementSpacing={elementSpacing}
-          bgColor={headerBgColor}
-          gradientEndColor={isGradient ? headerGradientEndColor : undefined}
-          isGradient={isGradient}
-          bgOpacity={headerBgOpacity}
-          textColor={headerTextColor || '#ffffff'}
-        />
+        {/* Create a double highlight effect - an outer highlight container + inner ring */}
+        <div className={`
+          ${isEditing 
+            ? "p-[4px] bg-gradient-to-r from-indigo-500 to-blue-500 rounded-md shadow-lg" 
+            : isHovered 
+              ? "p-[2px] bg-indigo-200 rounded-md shadow-md" 
+              : "p-0"
+          } 
+          transition-all duration-200 ease-in-out
+          relative
+        `}>
+          {/* Editing indicator label */}
+          {isEditing && (
+            <div className="absolute -top-6 right-2 bg-indigo-600 text-white text-xs font-semibold py-1 px-2 rounded shadow-md z-50">
+              Editing Header
+            </div>
+          )}
+          <div className={`
+            relative rounded-sm overflow-hidden
+          `}>
+            {/* Actual Header Content */}
+            <div className={`${isEditing 
+              ? "ring-2 ring-indigo-500 ring-offset-2" 
+              : isHovered 
+                ? "ring-1 ring-indigo-300 ring-offset-1" 
+                : ""} transition-all`}>
+              <BananaHeader
+                isEditing={isEditing}
+                enabledElements={enabledElements}
+                layout={headerLayout}
+                height={headerHeight}
+                linkSpacing={linkSpacing}
+                elementSpacing={elementSpacing}
+                bgColor={headerBgColor}
+                gradientEndColor={isGradient ? headerGradientEndColor : undefined}
+                isGradient={isGradient}
+                bgOpacity={headerBgOpacity}
+                textColor={headerTextColor || '#ffffff'}
+              />
+            </div>
+          </div>
+        </div>
 
         {/* Edit Overlay */}
         {isFullscreen && (isHovered || isEditing) && (
-          <>
-            {isHovered && !isEditing && (
-              <div className="absolute inset-0 bg-black/20 transition-opacity" />
-            )}
-            <HeaderEditMenu
-              isEditing={isEditing}
-              onEditClick={() => setIsEditing(true)}
-              isHovered={isHovered}
-              onElementClick={() => handleMenuClick("element")}
-              onDesignClick={() => handleMenuClick("design")}
-              activeMenu={activeMenu}
-            />
-          </>
+          <HeaderEditMenu
+            isEditing={isEditing}
+            onEditClick={() => setIsEditing(true)}
+            isHovered={isHovered}
+            onElementClick={() => handleMenuClick("element")}
+            onDesignClick={() => handleMenuClick("design")}
+            activeMenu={activeMenu}
+          />
         )}
       </div>
 
       {/* Edit Mode UI */}
       {isEditing && (
         <>
-          {/* Backdrop */}
+          {/* Page dimming overlay */}
           <div
-            className="fixed inset-0 z-20 bg-black/5 backdrop-blur-[2px]"
+            className="fixed left-0 right-0 bottom-0 bg-black/60 backdrop-blur-sm transition-all duration-300 animate-in fade-in" 
+            style={{ 
+              zIndex: 20,
+              animation: 'fadeIn 0.3s ease-out',
+              top: '48px' // Start below the top toolbar
+            }} 
             onClick={handleExitEdit}
           />
-
+          
           {/* Toolbars */}
           {activeMenu === "element" && (
-            <div className="absolute left-0 top-full z-40 mt-3">
-              <ElementToolbar
-                onClose={() => handleMenuClick("none")}
-                onElementsChange={handleElementToggle}
-                initialElements={enabledElements}
-              />
+            <div className="absolute left-8 top-full z-40 mt-3">
+              <div className="relative">
+                <ElementToolbar
+                  onClose={() => handleMenuClick("none")}
+                  onElementsChange={handleElementToggle}
+                  initialElements={enabledElements}
+                />
+              </div>
             </div>
           )}
           {activeMenu === "design" && (
-            <div className="absolute right-0 top-full z-40 mt-3">
-              <DesignToolbar
-                onClose={() => handleMenuClick("none")}
-                onLayoutChange={handleLayoutChange}
-                initialLayout={headerLayout}
-                onHeightChange={handleHeightChange}
-                initialHeight={headerHeight}
-                onLinkSpacingChange={handleLinkSpacingChange}
-                initialLinkSpacing={linkSpacing}
-                onElementSpacingChange={handleElementSpacingChange}
-                initialElementSpacing={elementSpacing}
-                onHeightChangeComplete={handleHeightChangeComplete}
-                onLinkSpacingChangeComplete={handleLinkSpacingChangeComplete}
-                onElementSpacingChangeComplete={
-                  handleElementSpacingChangeComplete
-                }
-                initialBackgroundColor={headerBgColor}
-                initialTextColor={headerTextColor}
-                initialBackgroundType="solid"
-                initialOpacity={100}
-                initialBlurBackground={false}
-                onBackgroundColorChange={handleBackgroundColorChange}
-                onTextColorChange={handleTextColorChange}
-                onBackgroundTypeChange={handleBackgroundTypeChange}
-                onOpacityChange={handleOpacityChange}
-                onBlurBackgroundChange={handleBlurBackgroundChange}
-              />
+            <div className="absolute right-8 top-full z-40 mt-3">
+              <div className="relative">
+                <DesignToolbar
+                  onClose={() => handleMenuClick("none")}
+                  onLayoutChange={handleLayoutChange}
+                  initialLayout={headerLayout}
+                  onHeightChange={handleHeightChange}
+                  initialHeight={headerHeight}
+                  onLinkSpacingChange={handleLinkSpacingChange}
+                  initialLinkSpacing={linkSpacing}
+                  onElementSpacingChange={handleElementSpacingChange}
+                  initialElementSpacing={elementSpacing}
+                  onHeightChangeComplete={handleHeightChangeComplete}
+                  onLinkSpacingChangeComplete={handleLinkSpacingChangeComplete}
+                  onElementSpacingChangeComplete={
+                    handleElementSpacingChangeComplete
+                  }
+                  initialBackgroundColor={headerBgColor}
+                  initialTextColor={headerTextColor}
+                  initialBackgroundType={isGradient ? "gradient" : "solid"}
+                  initialOpacity={100}
+                  initialBlurBackground={false}
+                  onBackgroundColorChange={handleBackgroundColorChange}
+                  onTextColorChange={handleTextColorChange}
+                  onBackgroundTypeChange={handleBackgroundTypeChange}
+                  onOpacityChange={handleOpacityChange}
+                  onBlurBackgroundChange={handleBlurBackgroundChange}
+                />
+              </div>
             </div>
           )}
         </>

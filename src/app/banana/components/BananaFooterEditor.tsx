@@ -1,14 +1,24 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import BananaFooter from "./BananaFooter";
 import BananaItemPanel from "./menus/BananaItemPanel";
 import GridSettingsMenu from "./GridSettingsMenu";
 import BlockMenu from "./menus/BlockMenu";
 import { ItemActionMenu } from "./objects";
 import { GridItem, BlockTemplate, GridSettings } from "../types";
+import useHistory from "../hooks/useHistory";
 
 interface ContentProps {
   isFullscreen: boolean;
+  onStateChange?: (state: any) => void;
+}
+
+// Define footer state here until types are correctly resolved
+interface FooterState {
+  layout: GridItem[];
+  gridSettings: GridSettings;
+  backgroundColor?: string;
+  textColor?: string;
 }
 
 interface ContextMenuPosition {
@@ -56,15 +66,38 @@ const defaultGridSettings: GridSettings = {
   padding: 16,
 };
 
-export default function BananaFooterEditor({ isFullscreen }: ContentProps) {
+export default function BananaFooterEditor({ isFullscreen, onStateChange }: ContentProps) {
+  // Initialize with default footer state
+  const initialState: FooterState = {
+    layout: [],
+    gridSettings: defaultGridSettings,
+    backgroundColor: "#000000",
+    textColor: "#ffffff"
+  };
+  
+  // Use history hook for state management
+  const {
+    state: footerState,
+    addState,
+    debouncedAddState,
+    undo,
+    redo,
+    canUndo,
+    canRedo
+  } = useHistory<FooterState>(initialState, {
+    onStateChange, // Pass through to parent if provided
+    debounceTime: 300,
+    exposeToWindow: { key: "bananaFooterEditor" }
+  });
+  
+  // Extract current values from history state
+  const { layout = [], gridSettings = defaultGridSettings } = footerState;
+
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [showBlockMenu, setShowBlockMenu] = useState(false);
   const [showGridSettings, setShowGridSettings] = useState(false);
   const [showEditSectionMenu, setShowEditSectionMenu] = useState(false);
-  const [layout, setLayout] = useState<GridItem[]>([]);
-  const [gridSettings, setGridSettings] =
-    useState<GridSettings>(defaultGridSettings);
   const [selectedItem, setSelectedItem] = useState<GridItem | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [contextMenuPosition, setContextMenuPosition] =
@@ -81,6 +114,37 @@ export default function BananaFooterEditor({ isFullscreen }: ContentProps) {
   const [showItemToolbar, setShowItemToolbar] = useState(false);
   const [focusedItemData, setFocusedItemData] = useState<GridItem | null>(null);
   const addBlockButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Add keyboard shortcuts for undo/redo
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Only handle keyboard shortcuts when in edit mode
+      if (!isEditing) return;
+
+      const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
+      const cmdOrCtrl = isMac ? e.metaKey : e.ctrlKey;
+
+      // Undo: Cmd+Z or Ctrl+Z
+      if (cmdOrCtrl && e.key === "z" && !e.shiftKey) {
+        e.preventDefault();
+        undo();
+      }
+
+      // Redo: Cmd+Shift+Z or Ctrl+Y
+      if (
+        (cmdOrCtrl && e.key === "z" && e.shiftKey) ||
+        (cmdOrCtrl && e.key === "y")
+      ) {
+        e.preventDefault();
+        redo();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isEditing, undo, redo]);
 
   // Handle ESC key press
   useEffect(() => {
@@ -129,7 +193,8 @@ export default function BananaFooterEditor({ isFullscreen }: ContentProps) {
       fontFamily: undefined,
     };
 
-    setLayout([...layout, newBlock]);
+    const newLayout = [...layout, newBlock];
+    handleLayoutChange(newLayout);
     setShowBlockMenu(false);
   };
 
@@ -153,8 +218,9 @@ export default function BananaFooterEditor({ isFullscreen }: ContentProps) {
   ) => {
     if ("_tempLayout" in updates) {
       // Handle layout reordering
-      setLayout(updates._tempLayout);
-      const updatedItem = updates._tempLayout.find(
+      const newLayout = updates._tempLayout;
+      handleLayoutChange(newLayout);
+      const updatedItem = newLayout.find(
         (item: GridItem) => item.i === selectedItem?.i,
       );
       if (updatedItem) {
@@ -165,7 +231,7 @@ export default function BananaFooterEditor({ isFullscreen }: ContentProps) {
       const updatedLayout = layout.map((item) =>
         item.i === selectedItem?.i ? { ...item, ...updates } : item,
       );
-      setLayout(updatedLayout);
+      handleLayoutChange(updatedLayout);
       setSelectedItem({ ...selectedItem, ...updates } as GridItem);
     }
   };
@@ -173,15 +239,17 @@ export default function BananaFooterEditor({ isFullscreen }: ContentProps) {
   const handleDelete = () => {
     // Filter out the selected item from layout
     const updatedLayout = layout.filter((item) => item.i !== selectedItem?.i);
-    setLayout(updatedLayout);
+    handleLayoutChange(updatedLayout);
     setSelectedItem(null); // Close the panel
   };
 
   const handleGridSettingChange = (key: keyof GridSettings, value: number) => {
-    setGridSettings((prev) => ({
-      ...prev,
+    const updatedSettings: GridSettings = {
+      ...gridSettings,
       [key]: value,
-    }));
+    };
+
+    handleGridSettingsChange(updatedSettings);
   };
 
   const handleDragStateChange = (dragging: boolean) => {
@@ -216,22 +284,11 @@ export default function BananaFooterEditor({ isFullscreen }: ContentProps) {
   };
 
   const handleGridSettingsChange = (newSettings: GridSettings) => {
-    // Ensure all required properties are present
-    const updatedSettings: GridSettings = {
-      ...gridSettings,
-      ...newSettings,
-      // Make sure horizontalMargin and verticalMargin are set even if they weren't in newSettings
-      horizontalMargin:
-        newSettings.horizontalMargin ??
-        newSettings.margin ??
-        gridSettings.horizontalMargin,
-      verticalMargin:
-        newSettings.verticalMargin ??
-        newSettings.margin ??
-        gridSettings.verticalMargin,
-    };
-
-    setGridSettings(updatedSettings);
+    // Add to history
+    addState({
+      ...footerState,
+      gridSettings: newSettings
+    });
   };
 
   const handleCloseContextMenu = () => {
@@ -321,7 +378,8 @@ export default function BananaFooterEditor({ isFullscreen }: ContentProps) {
       layer: maxLayer + 1, // Place on top
     };
 
-    setLayout([...layout, duplicatedItem]);
+    const newLayout = [...layout, duplicatedItem];
+    handleLayoutChange(newLayout);
     setShowItemToolbar(false);
     setFocusedItem(null);
   };
@@ -354,9 +412,17 @@ export default function BananaFooterEditor({ isFullscreen }: ContentProps) {
 
     // Filter out the focused item from layout
     const updatedLayout = layout.filter((item) => item.i !== focusedItemData.i);
-    setLayout(updatedLayout);
+    handleLayoutChange(updatedLayout);
     setShowItemToolbar(false);
     setFocusedItem(null);
+  };
+
+  const handleLayoutChange = (newLayout: GridItem[]) => {
+    // Add to history
+    addState({
+      ...footerState,
+      layout: newLayout
+    });
   };
 
   return (
@@ -464,20 +530,48 @@ export default function BananaFooterEditor({ isFullscreen }: ContentProps) {
               }
             }}
           >
-            <BananaFooter
-              className="bg-gray-500"
-              layout={layout}
-              onLayoutChange={setLayout}
-              gridSettings={gridSettings}
-              onItemClick={handleItemClick}
-              onDragStateChange={handleDragStateChange}
-              onFocusChange={handleFocusChange}
-              isEditing={isEditing}
-              isInteracting={
-                showEditSectionMenu || showBlockMenu || showItemToolbar
-              }
-              onItemPanelClose={handleCloseContextMenu}
-            />
+            {/* Highlight ring container */}
+            <div className={`
+              ${isEditing 
+                ? "p-[4px] bg-gradient-to-r from-indigo-500 to-blue-500 rounded-md shadow-lg" 
+                : isHovered 
+                  ? "p-[2px] bg-indigo-200 rounded-md shadow-md" 
+                  : "p-0"
+              } 
+              transition-all duration-200 ease-in-out
+              relative
+            `}>
+              {/* Editing indicator label */}
+              {isEditing && (
+                <div className="absolute -top-6 right-2 bg-indigo-600 text-white text-xs font-semibold py-1 px-2 rounded shadow-md z-50">
+                  Editing Footer
+                </div>
+              )}
+              <div className={`
+                relative rounded-sm overflow-hidden
+                ${isEditing 
+                  ? "ring-2 ring-white/80" 
+                  : isHovered 
+                    ? "ring-1 ring-white/60" 
+                    : ""
+                } transition-all
+              `}>
+                <BananaFooter
+                  className="bg-gray-500"
+                  layout={layout}
+                  onLayoutChange={handleLayoutChange}
+                  gridSettings={gridSettings}
+                  onItemClick={handleItemClick}
+                  onDragStateChange={handleDragStateChange}
+                  onFocusChange={handleFocusChange}
+                  isEditing={isEditing}
+                  isInteracting={
+                    showEditSectionMenu || showBlockMenu || showItemToolbar
+                  }
+                  onItemPanelClose={handleCloseContextMenu}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -508,7 +602,7 @@ export default function BananaFooterEditor({ isFullscreen }: ContentProps) {
       {/* Backdrop blur when item is selected */}
       {selectedItem && !isDragging && (
         <div
-          className="fixed inset-0 z-20 bg-black/5 backdrop-blur-[2px]"
+          className="fixed inset-0 z-20 bg-black/30"
           onClick={handleCloseContextMenu}
         />
       )}
@@ -516,10 +610,11 @@ export default function BananaFooterEditor({ isFullscreen }: ContentProps) {
       {/* Edit mode overlay blur */}
       {isEditing && (
         <div
-          className="fixed inset-0 z-10 cursor-pointer"
+          className="fixed left-0 right-0 bottom-0 z-10 cursor-pointer"
+          style={{ top: '48px' }} // Start below the top toolbar
           onClick={() => setIsEditing(false)}
         >
-          <div className="absolute inset-0 bg-black/10 backdrop-blur-[1px]" />
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-all duration-300" />
         </div>
       )}
 

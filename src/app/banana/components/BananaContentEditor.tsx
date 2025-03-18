@@ -1,14 +1,24 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import BananaContent from "./BananaContent";
 import BananaItemPanel from "./menus/BananaItemPanel";
 import GridSettingsMenu from "./GridSettingsMenu";
 import BlockMenu from "./menus/BlockMenu";
 import { ItemActionMenu } from "./objects";
 import { GridItem, BlockTemplate, GridSettings } from "../types";
+import useHistory from "../hooks/useHistory";
 
 interface ContentProps {
   isFullscreen: boolean;
+  onStateChange?: (state: any) => void;
+}
+
+// Define content state here until types are correctly resolved
+interface ContentState {
+  layout: GridItem[];
+  gridSettings: GridSettings;
+  backgroundColor?: string;
+  textColor?: string;
 }
 
 interface ContextMenuPosition {
@@ -56,15 +66,38 @@ const defaultGridSettings: GridSettings = {
   padding: 0,
 };
 
-export default function BananaContentEditor({ isFullscreen }: ContentProps) {
+export default function BananaContentEditor({ isFullscreen, onStateChange }: ContentProps) {
+  // Initialize with default content state
+  const initialState: ContentState = {
+    layout: [],
+    gridSettings: defaultGridSettings,
+    backgroundColor: "#ffffff",
+    textColor: "#000000"
+  };
+  
+  // Use history hook for state management
+  const {
+    state: contentState,
+    addState,
+    debouncedAddState,
+    undo,
+    redo,
+    canUndo,
+    canRedo
+  } = useHistory<ContentState>(initialState, {
+    onStateChange, // Pass through to parent if provided
+    debounceTime: 300,
+    exposeToWindow: { key: "bananaContentEditor" }
+  });
+  
+  // Extract current values from history state
+  const { layout = [], gridSettings = defaultGridSettings } = contentState;
+
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [showBlockMenu, setShowBlockMenu] = useState(false);
   const [showGridSettings, setShowGridSettings] = useState(false);
   const [showEditSectionMenu, setShowEditSectionMenu] = useState(false);
-  const [layout, setLayout] = useState<GridItem[]>([]);
-  const [gridSettings, setGridSettings] =
-    useState<GridSettings>(defaultGridSettings);
   const [selectedItem, setSelectedItem] = useState<GridItem | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [contextMenuPosition, setContextMenuPosition] =
@@ -96,11 +129,42 @@ export default function BananaContentEditor({ isFullscreen }: ContentProps) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  // Add keyboard shortcuts for undo/redo
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Only handle keyboard shortcuts when in edit mode
+      if (!isEditing) return;
+
+      const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
+      const cmdOrCtrl = isMac ? e.metaKey : e.ctrlKey;
+
+      // Undo: Cmd+Z or Ctrl+Z
+      if (cmdOrCtrl && e.key === "z" && !e.shiftKey) {
+        e.preventDefault();
+        undo();
+      }
+
+      // Redo: Cmd+Shift+Z or Ctrl+Y
+      if (
+        (cmdOrCtrl && e.key === "z" && e.shiftKey) ||
+        (cmdOrCtrl && e.key === "y")
+      ) {
+        e.preventDefault();
+        redo();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isEditing, undo, redo]);
+
   const handleAddBlock = (template: BlockTemplate) => {
     // Find the highest layer number and add 1 to put new block on top
     const maxLayer =
       layout.length > 0
-        ? Math.max(...layout.map((item) => item.layer || 0))
+        ? Math.max(...layout.map((item: GridItem) => item.layer || 0))
         : 0;
 
     const newBlock: GridItem = {
@@ -129,13 +193,20 @@ export default function BananaContentEditor({ isFullscreen }: ContentProps) {
       fontFamily: undefined,
     };
 
-    setLayout([...layout, newBlock]);
+    const newLayout = [...layout, newBlock];
+    
+    // Add to history
+    addState({
+      ...contentState,
+      layout: newLayout
+    });
+    
     setShowBlockMenu(false);
   };
 
   const handleItemClick = (itemId: string, e?: React.MouseEvent) => {
     // Find the item by id
-    const item = layout.find((item) => item.i === itemId);
+    const item = layout.find((item: GridItem) => item.i === itemId);
     if (!item) return;
 
     if (e) {
@@ -151,37 +222,56 @@ export default function BananaContentEditor({ isFullscreen }: ContentProps) {
   const handleItemUpdate = (
     updates: Partial<GridItem> | { _tempLayout: GridItem[] },
   ) => {
+    let updatedLayout: GridItem[];
+    let updatedSelectedItem: GridItem | null = selectedItem;
+    
     if ("_tempLayout" in updates) {
       // Handle layout reordering
-      setLayout(updates._tempLayout);
-      const updatedItem = updates._tempLayout.find(
+      updatedLayout = updates._tempLayout;
+      updatedSelectedItem = updates._tempLayout.find(
         (item: GridItem) => item.i === selectedItem?.i,
-      );
-      if (updatedItem) {
-        setSelectedItem(updatedItem);
-      }
+      ) || null;
     } else {
       // For non-layer updates, just update normally
-      const updatedLayout = layout.map((item) =>
+      updatedLayout = layout.map((item: GridItem) =>
         item.i === selectedItem?.i ? { ...item, ...updates } : item,
       );
-      setLayout(updatedLayout);
-      setSelectedItem({ ...selectedItem, ...updates } as GridItem);
+      updatedSelectedItem = selectedItem ? { ...selectedItem, ...updates } as GridItem : null;
     }
+    
+    // Add to history
+    addState({
+      ...contentState,
+      layout: updatedLayout
+    });
+    
+    setSelectedItem(updatedSelectedItem);
   };
 
   const handleDelete = () => {
     // Filter out the selected item from layout
-    const updatedLayout = layout.filter((item) => item.i !== selectedItem?.i);
-    setLayout(updatedLayout);
+    const updatedLayout = layout.filter((item: GridItem) => item.i !== selectedItem?.i);
+    
+    // Add to history
+    addState({
+      ...contentState,
+      layout: updatedLayout
+    });
+    
     setSelectedItem(null); // Close the panel
   };
 
   const handleGridSettingChange = (key: keyof GridSettings, value: number) => {
-    setGridSettings((prev) => ({
-      ...prev,
+    const updatedSettings = {
+      ...gridSettings,
       [key]: value,
-    }));
+    };
+    
+    // Add to history (debounced for slider values)
+    debouncedAddState({
+      ...contentState,
+      gridSettings: updatedSettings
+    });
   };
 
   const handleDragStateChange = (dragging: boolean) => {
@@ -195,7 +285,6 @@ export default function BananaContentEditor({ isFullscreen }: ContentProps) {
   };
 
   const handleFocusChange = (focusedItemId: string | null) => {
-    console.log("Focus changed to:", focusedItemId);
     setFocusedItem(focusedItemId);
 
     // Hide menus when an item is focused
@@ -204,7 +293,7 @@ export default function BananaContentEditor({ isFullscreen }: ContentProps) {
       setShowGridSettings(false);
 
       // Find the focused item data
-      const item = layout.find((item) => item.i === focusedItemId);
+      const item = layout.find((item: GridItem) => item.i === focusedItemId);
       if (item) {
         setFocusedItemData(item);
         setShowItemToolbar(true);
@@ -230,13 +319,25 @@ export default function BananaContentEditor({ isFullscreen }: ContentProps) {
         newSettings.margin ??
         gridSettings.verticalMargin,
     };
-
-    setGridSettings(updatedSettings);
+    
+    // Add to history
+    addState({
+      ...contentState,
+      gridSettings: updatedSettings
+    });
   };
 
   const handleCloseContextMenu = () => {
     setSelectedItem(null);
     setContextMenuPosition(null);
+  };
+
+  const handleLayoutChange = (newLayout: GridItem[]) => {
+    // Add to history
+    addState({
+      ...contentState,
+      layout: newLayout
+    });
   };
 
   // Update menu position when the edit section button is clicked
@@ -309,7 +410,7 @@ export default function BananaContentEditor({ isFullscreen }: ContentProps) {
     // Find the highest layer number and add 1 to put new block on top
     const maxLayer =
       layout.length > 0
-        ? Math.max(...layout.map((item) => item.layer || 0))
+        ? Math.max(...layout.map((item: GridItem) => item.layer || 0))
         : 0;
 
     // Create a duplicate with a new ID
@@ -321,7 +422,12 @@ export default function BananaContentEditor({ isFullscreen }: ContentProps) {
       layer: maxLayer + 1, // Place on top
     };
 
-    setLayout([...layout, duplicatedItem]);
+    // Add duplicated item to layout via history
+    addState({
+      ...contentState,
+      layout: [...layout, duplicatedItem]
+    });
+    
     setShowItemToolbar(false);
     setFocusedItem(null);
   };
@@ -353,8 +459,14 @@ export default function BananaContentEditor({ isFullscreen }: ContentProps) {
     if (!focusedItemData) return;
 
     // Filter out the focused item from layout
-    const updatedLayout = layout.filter((item) => item.i !== focusedItemData.i);
-    setLayout(updatedLayout);
+    const updatedLayout = layout.filter((item: GridItem) => item.i !== focusedItemData.i);
+    
+    // Add to history
+    addState({
+      ...contentState,
+      layout: updatedLayout
+    });
+    
     setShowItemToolbar(false);
     setFocusedItem(null);
   };
@@ -464,20 +576,48 @@ export default function BananaContentEditor({ isFullscreen }: ContentProps) {
               }
             }}
           >
-            <BananaContent
-              className="bg-gray-700"
-              layout={layout}
-              onLayoutChange={setLayout}
-              gridSettings={gridSettings}
-              onItemClick={handleItemClick}
-              onDragStateChange={handleDragStateChange}
-              onFocusChange={handleFocusChange}
-              isEditing={isEditing}
-              isInteracting={
-                showEditSectionMenu || showBlockMenu || showItemToolbar
-              }
-              onItemPanelClose={handleCloseContextMenu}
-            />
+            {/* Highlight ring container */}
+            <div className={`
+              ${isEditing 
+                ? "p-[4px] bg-gradient-to-r from-indigo-500 to-blue-500 rounded-md shadow-lg" 
+                : isHovered 
+                  ? "p-[2px] bg-indigo-200 rounded-md shadow-md" 
+                  : "p-0"
+              } 
+              transition-all duration-200 ease-in-out
+              relative
+            `}>
+              {/* Editing indicator label */}
+              {isEditing && (
+                <div className="absolute -top-6 right-2 bg-indigo-600 text-white text-xs font-semibold py-1 px-2 rounded shadow-md z-50">
+                  Editing Content
+                </div>
+              )}
+              <div className={`
+                relative rounded-sm overflow-hidden
+                ${isEditing 
+                  ? "ring-2 ring-white/80" 
+                  : isHovered 
+                    ? "ring-1 ring-white/60" 
+                    : ""
+                } transition-all
+              `}>
+                <BananaContent
+                  className="bg-gray-700"
+                  layout={layout}
+                  onLayoutChange={handleLayoutChange}
+                  gridSettings={gridSettings}
+                  onItemClick={handleItemClick}
+                  onDragStateChange={handleDragStateChange}
+                  onFocusChange={handleFocusChange}
+                  isEditing={isEditing}
+                  isInteracting={
+                    showEditSectionMenu || showBlockMenu || showItemToolbar
+                  }
+                  onItemPanelClose={handleCloseContextMenu}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -516,10 +656,11 @@ export default function BananaContentEditor({ isFullscreen }: ContentProps) {
       {/* Edit mode overlay blur */}
       {isEditing && (
         <div
-          className="fixed inset-0 z-10 cursor-pointer"
+          className="fixed left-0 right-0 bottom-0 z-10 cursor-pointer"
+          style={{ top: '48px' }} // Start below the top toolbar
           onClick={() => setIsEditing(false)}
         >
-          <div className="absolute inset-0 bg-black/10 backdrop-blur-[1px]" />
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-all duration-300" />
         </div>
       )}
 

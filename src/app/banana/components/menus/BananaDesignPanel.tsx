@@ -769,7 +769,7 @@ export default function BananaDesignPanel({
                         </div>
                         
                         {/* Adaptive Option */}
-                        <div 
+                        {/* <div 
                           className="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50"
                           onClick={() => {
                             handleBackgroundTypeChange('adaptive');
@@ -785,7 +785,7 @@ export default function BananaDesignPanel({
                               <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="currentColor"/>
                             </svg>
                           )}
-                        </div>
+                        </div> */}
                       </div>
                     )}
                   </div>
@@ -885,13 +885,13 @@ export default function BananaDesignPanel({
                   )}
                   
                   {/* Adaptive Settings */}
-                  {backgroundType === 'adaptive' && (
+                  {/* {backgroundType === 'adaptive' && (
                     <div className="mt-3 p-3 bg-gray-100 rounded-lg">
                       <p className="text-gray-700 text-sm">
                         Use the color theme of the first section on each page. Go to Styles &gt; Colors to customize the color of the site title and navigation link for each color theme.
                       </p>
                     </div>
-                  )}
+                  )} */}
                 </div>
               </div>
             </>

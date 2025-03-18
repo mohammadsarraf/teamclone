@@ -1,4 +1,8 @@
 // Type declarations for global window object extensions
+import { Layout } from "react-grid-layout";
+import { ReactNode } from "react";
+import { ContentState, FooterState } from "./types/index";
+
 declare global {
   // Define MenuType here to match the one in BananaHeaderEditor.tsx
   type MenuType = "none" | "element" | "design";
@@ -24,21 +28,7 @@ declare global {
     activeMenu: MenuType;
     isEditing: boolean;
   }
-
-  interface Window {
-    bananaHeaderEditor?: {
-      undo: (() => void) | null;
-      redo: (() => void) | null;
-      canUndo: boolean;
-      canRedo: boolean;
-      currentState?: any; // The current state of the header
-      currentHistoryIndex?: number; // The current index in the history
-    };
-  }
 }
-
-import { Layout } from "react-grid-layout";
-import { ReactNode } from "react";
 
 export interface GridItem {
   i: string;

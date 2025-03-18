@@ -6,34 +6,39 @@ export default function useHistory<T>(
     onStateChange?: (state: T) => void;
     debounceTime?: number;
     exposeToWindow?: { key: string };
-  }
+  },
 ) {
   // Added logging to confirm hook initialization
-  console.log(`useHistory initialized with key: ${options?.exposeToWindow?.key || 'none'}`);
-  
+  console.log(
+    `useHistory initialized with key: ${options?.exposeToWindow?.key || "none"}`,
+  );
+
   const [history, setHistory] = useState<T[]>([initialState]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const canUndo = currentIndex > 0;
   const canRedo = currentIndex < history.length - 1;
-  
+
   // Current state always comes from history at current index
   const currentState = history[currentIndex];
 
   // Add a new state to history
-  const addState = useCallback((newState: T) => {
-    // Only add if different from current state
-    if (JSON.stringify(newState) !== JSON.stringify(history[currentIndex])) {
-      const updatedHistory = history.slice(0, currentIndex + 1);
-      setHistory([...updatedHistory, newState]);
-      setCurrentIndex(updatedHistory.length);
-      
-      // Notify parent if callback provided
-      if (options?.onStateChange) {
-        options.onStateChange(newState);
+  const addState = useCallback(
+    (newState: T) => {
+      // Only add if different from current state
+      if (JSON.stringify(newState) !== JSON.stringify(history[currentIndex])) {
+        const updatedHistory = history.slice(0, currentIndex + 1);
+        setHistory([...updatedHistory, newState]);
+        setCurrentIndex(updatedHistory.length);
+
+        // Notify parent if callback provided
+        if (options?.onStateChange) {
+          options.onStateChange(newState);
+        }
       }
-    }
-  }, [history, currentIndex, options?.onStateChange]);
+    },
+    [history, currentIndex, options?.onStateChange],
+  );
 
   // Debounced version for sliders and frequent changes
   const debouncedAddState = useCallback(
@@ -42,10 +47,10 @@ export default function useHistory<T>(
       const timeoutId = setTimeout(() => {
         addState(newState);
       }, options?.debounceTime || 300);
-      
+
       return () => clearTimeout(timeoutId);
     },
-    [addState, options?.debounceTime]
+    [addState, options?.debounceTime],
   );
 
   // Undo function
@@ -53,7 +58,7 @@ export default function useHistory<T>(
     if (canUndo) {
       const newIndex = currentIndex - 1;
       setCurrentIndex(newIndex);
-      
+
       // Notify parent if callback provided
       if (options?.onStateChange) {
         options.onStateChange(history[newIndex]);
@@ -66,19 +71,22 @@ export default function useHistory<T>(
     if (canRedo) {
       const newIndex = currentIndex + 1;
       setCurrentIndex(newIndex);
-      
+
       // Notify parent if callback provided
       if (options?.onStateChange) {
         options.onStateChange(history[newIndex]);
       }
     }
   }, [canRedo, currentIndex, history, options?.onStateChange]);
-  
+
   // Apply an external state (e.g., from parent component)
-  const applyExternalState = useCallback((state: T) => {
-    // Add the external state to history
-    addState(state);
-  }, [addState]);
+  const applyExternalState = useCallback(
+    (state: T) => {
+      // Add the external state to history
+      addState(state);
+    },
+    [addState],
+  );
 
   // Expose functions to window object if requested
   useEffect(() => {
@@ -90,24 +98,24 @@ export default function useHistory<T>(
         canRedo,
         currentState,
         currentHistoryIndex: currentIndex,
-        applyExternalState
+        applyExternalState,
       };
     }
-    
+
     return () => {
       if (options?.exposeToWindow?.key && typeof window !== "undefined") {
         delete (window as any)[options.exposeToWindow.key];
       }
     };
   }, [
-    canUndo, 
-    canRedo, 
-    undo, 
-    redo, 
-    currentState, 
-    currentIndex, 
-    applyExternalState, 
-    options?.exposeToWindow?.key
+    canUndo,
+    canRedo,
+    undo,
+    redo,
+    currentState,
+    currentIndex,
+    applyExternalState,
+    options?.exposeToWindow?.key,
   ]);
 
   return {
@@ -118,6 +126,6 @@ export default function useHistory<T>(
     redo,
     canUndo,
     canRedo,
-    applyExternalState
+    applyExternalState,
   };
-} 
+}

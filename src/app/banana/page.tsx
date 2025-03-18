@@ -9,92 +9,6 @@ import "./types";
 
 export default function Banana() {
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [canUndo, setCanUndo] = useState(false);
-  const [canRedo, setCanRedo] = useState(false);
-
-  // Check for undo/redo availability periodically
-  useEffect(() => {
-    const checkUndoRedoStatus = () => {
-      if (typeof window !== "undefined" && window.bananaHeaderEditor) {
-        setCanUndo(!!window.bananaHeaderEditor.canUndo);
-        setCanRedo(!!window.bananaHeaderEditor.canRedo);
-      }
-    };
-
-    // Check immediately and then every 100ms
-    checkUndoRedoStatus();
-    const interval = setInterval(checkUndoRedoStatus, 100);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const handleUndo = () => {
-    if (
-      typeof window !== "undefined" &&
-      window.bananaHeaderEditor &&
-      window.bananaHeaderEditor.undo &&
-      window.bananaHeaderEditor.canUndo
-    ) {
-      window.bananaHeaderEditor.undo();
-    }
-  };
-
-  const handleRedo = () => {
-    if (
-      typeof window !== "undefined" &&
-      window.bananaHeaderEditor &&
-      window.bananaHeaderEditor.redo &&
-      window.bananaHeaderEditor.canRedo
-    ) {
-      window.bananaHeaderEditor.redo();
-    }
-  };
-
-  const handleSave = async () => {
-    setIsSaving(true);
-
-    // Get the current state from the header editor
-    if (
-      typeof window !== "undefined" &&
-      window.bananaHeaderEditor &&
-      window.bananaHeaderEditor.currentState
-    ) {
-      try {
-        // Save to localStorage
-        localStorage.setItem(
-          "bananaHeaderState",
-          JSON.stringify(window.bananaHeaderEditor.currentState),
-        );
-        localStorage.setItem(
-          "bananaHeaderHistoryIndex",
-          String(window.bananaHeaderEditor.currentHistoryIndex || 0),
-        );
-
-        console.log(
-          "Saved header state:",
-          window.bananaHeaderEditor.currentState,
-        );
-        console.log(
-          "Saved at history index:",
-          window.bananaHeaderEditor.currentHistoryIndex,
-        );
-
-        // Simulate network delay
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        // Success message
-        alert("Header state saved successfully!");
-      } catch (error) {
-        console.error("Error saving header state:", error);
-        alert("Failed to save header state. Please try again.");
-      }
-    } else {
-      alert("No header state available to save.");
-    }
-
-    setIsSaving(false);
-  };
 
   return (
     <div className="flex h-screen bg-[#1b1b1b]">
@@ -130,15 +44,13 @@ export default function Banana() {
                 <div className="flex items-center space-x-2 text-white/80">
                   <button
                     className="rounded p-1 transition-colors hover:bg-[#3a3a3a] disabled:opacity-40"
-                    disabled={!canUndo}
-                    onClick={handleUndo}
+                    disabled={true}
                   >
                     <GrUndo className="size-4 [&>path]:stroke-white" />
                   </button>
                   <button
                     className="rounded p-1 transition-colors hover:bg-[#3a3a3a] disabled:opacity-40"
-                    disabled={!canRedo}
-                    onClick={handleRedo}
+                    disabled={true}
                   >
                     <GrRedo className="size-4 [&>path]:stroke-white" />
                   </button>
@@ -153,12 +65,11 @@ export default function Banana() {
               {/* Right Side - Save Button */}
               <div className="flex items-center space-x-2">
                 <button
-                  onClick={handleSave}
-                  disabled={isSaving}
                   className="flex items-center gap-2 rounded-md bg-indigo-600 px-3 py-1 text-sm font-medium text-white transition-colors hover:bg-indigo-700 disabled:opacity-40"
+                  disabled={true}
                 >
                   <FiSave className="size-4" />
-                  {isSaving ? "Saving..." : "Save Changes"}
+                  {false ? "Saving..." : "Save Changes"}
                 </button>
               </div>
             </div>

@@ -10,7 +10,7 @@ export interface HeaderState {
     isCart: boolean;
     isAccount: boolean;
   };
-  backgroundColor: string;
+  gradientStartColor: string;
   gradientEndColor?: string;
   isGradient?: boolean;
   textColor: string;
@@ -113,4 +113,4 @@ declare global {
       history: any[];
     };
   }
-} 
+}

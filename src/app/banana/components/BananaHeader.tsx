@@ -17,12 +17,12 @@ interface HeaderProps {
   height?: number;
   linkSpacing?: number;
   elementSpacing?: number;
-  bgColor ?: string;
+  bgColor?: string;
   gradientEndColor?: string;
   isGradient?: boolean;
   textColor?: string;
   bgOpacity?: string;
-  isEditing?:boolean;
+  isEditing?: boolean;
   enabledElements?: {
     isButton: boolean;
     isSocial: boolean;
@@ -55,51 +55,53 @@ export default function BananaHeader({
   const button3 = useRef("YourWebsiteTitle");
 
   // Extract the actual color from the Tailwind class if needed
-  const extractedBgColor = bgColor.startsWith('bg-[') && bgColor.endsWith(']') 
-    ? bgColor.substring(4, bgColor.length - 1) 
-    : bgColor.startsWith('bg-') 
-      ? 'black' // Default for non-dynamic Tailwind classes
-      : bgColor;
-  
-  const headerStyle = isGradient && gradientEndColor
-    ? {
-        height: `${height}px`,
-        minHeight: `${height}px`,
-        backgroundImage: `linear-gradient(to right, ${extractedBgColor}, ${gradientEndColor})`,
-        transition: 'all 0.2s ease',
-      }
-    : {
-        height: `${height}px`,
-        minHeight: `${height}px`,
-        backgroundColor: extractedBgColor,
-        transition: 'all 0.2s ease',
-      };
+  const extractedBgColor =
+    bgColor.startsWith("bg-[") && bgColor.endsWith("]")
+      ? bgColor.substring(4, bgColor.length - 1)
+      : bgColor.startsWith("bg-")
+        ? "black" // Default for non-dynamic Tailwind classes
+        : bgColor;
+
+  const headerStyle =
+    isGradient && gradientEndColor
+      ? {
+          height: `${height}px`,
+          minHeight: `${height}px`,
+          backgroundImage: `linear-gradient(to right, ${extractedBgColor}, ${gradientEndColor})`,
+          transition: "all 0.2s ease",
+        }
+      : {
+          height: `${height}px`,
+          minHeight: `${height}px`,
+          backgroundColor: extractedBgColor,
+          transition: "all 0.2s ease",
+        };
 
   const Logo = () => (
-    <ContentEditable 
-      html={button3.current} 
-      onChange={(e) => button3.current = e.target.value}
+    <ContentEditable
+      html={button3.current}
+      onChange={(e) => (button3.current = e.target.value)}
       disabled={!isEditing}
-      className={`text-2xl font-bold ${isEditing ? 'focus:outline-dashed focus:outline-1 focus:outline-white/30 cursor-text' : ''}`}
+      className={`text-2xl font-bold ${isEditing ? "cursor-text focus:outline-dashed focus:outline-1 focus:outline-white/30" : ""}`}
       style={{ color: textColor }}
     />
   );
 
   const Navigation = () => (
     <nav style={{ gap: `${linkSpacing}px` }} className="flex">
-      <ContentEditable 
-        html={button1.current} 
-        onChange={(e) => button1.current = e.target.value}
+      <ContentEditable
+        html={button1.current}
+        onChange={(e) => (button1.current = e.target.value)}
         disabled={!isEditing}
-        className={`text-lg font-medium text-white/90 transition-colors hover:text-white ${isEditing ? 'focus:outline-dashed focus:outline-1 focus:outline-white/30 cursor-text' : ''}`}
+        className={`text-lg font-medium text-white/90 transition-colors hover:text-white ${isEditing ? "cursor-text focus:outline-dashed focus:outline-1 focus:outline-white/30" : ""}`}
         style={{ color: textColor }}
       />
-        
-      <ContentEditable 
-        html={button2.current} 
-        onChange={(e) => button2.current = e.target.value}
+
+      <ContentEditable
+        html={button2.current}
+        onChange={(e) => (button2.current = e.target.value)}
         disabled={!isEditing}
-        className={`text-lg font-medium text-white/90 transition-colors hover:text-white ${isEditing ? 'focus:outline-dashed focus:outline-1 focus:outline-white/30 cursor-text' : ''}`}
+        className={`text-lg font-medium text-white/90 transition-colors hover:text-white ${isEditing ? "cursor-text focus:outline-dashed focus:outline-1 focus:outline-white/30" : ""}`}
         style={{ color: textColor }}
       />
     </nav>
@@ -113,17 +115,26 @@ export default function BananaHeader({
         </button>
       )}
       {enabledElements.isSocial && (
-        <button className="rounded-full p-2 hover:bg-white/10" style={{ color: textColor }}>
+        <button
+          className="rounded-full p-2 hover:bg-white/10"
+          style={{ color: textColor }}
+        >
           <TiSocialSkypeOutline className="size-5" />
         </button>
       )}
       {enabledElements.isCart && (
-        <button className="rounded-full p-2 hover:bg-white/10" style={{ color: textColor }}>
+        <button
+          className="rounded-full p-2 hover:bg-white/10"
+          style={{ color: textColor }}
+        >
           <HiOutlineShoppingCart className="size-5" />
         </button>
       )}
       {enabledElements.isAccount && (
-        <button className="rounded-full p-2 hover:bg-white/10" style={{ color: textColor }}>
+        <button
+          className="rounded-full p-2 hover:bg-white/10"
+          style={{ color: textColor }}
+        >
           <HiOutlineUser className="size-5" />
         </button>
       )}

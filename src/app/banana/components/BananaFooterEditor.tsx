@@ -66,15 +66,18 @@ const defaultGridSettings: GridSettings = {
   padding: 16,
 };
 
-export default function BananaFooterEditor({ isFullscreen, onStateChange }: ContentProps) {
+export default function BananaFooterEditor({
+  isFullscreen,
+  onStateChange,
+}: ContentProps) {
   // Initialize with default footer state
   const initialState: FooterState = {
     layout: [],
     gridSettings: defaultGridSettings,
     backgroundColor: "#000000",
-    textColor: "#ffffff"
+    textColor: "#ffffff",
   };
-  
+
   // Use history hook for state management
   const {
     state: footerState,
@@ -83,13 +86,13 @@ export default function BananaFooterEditor({ isFullscreen, onStateChange }: Cont
     undo,
     redo,
     canUndo,
-    canRedo
+    canRedo,
   } = useHistory<FooterState>(initialState, {
     onStateChange, // Pass through to parent if provided
     debounceTime: 300,
-    exposeToWindow: { key: "bananaFooterEditor" }
+    exposeToWindow: { key: "bananaFooterEditor" },
   });
-  
+
   // Extract current values from history state
   const { layout = [], gridSettings = defaultGridSettings } = footerState;
 
@@ -287,7 +290,7 @@ export default function BananaFooterEditor({ isFullscreen, onStateChange }: Cont
     // Add to history
     addState({
       ...footerState,
-      gridSettings: newSettings
+      gridSettings: newSettings,
     });
   };
 
@@ -421,7 +424,7 @@ export default function BananaFooterEditor({ isFullscreen, onStateChange }: Cont
     // Add to history
     addState({
       ...footerState,
-      layout: newLayout
+      layout: newLayout,
     });
   };
 
@@ -531,31 +534,37 @@ export default function BananaFooterEditor({ isFullscreen, onStateChange }: Cont
             }}
           >
             {/* Highlight ring container */}
-            <div className={`
-              ${isEditing 
-                ? "p-[4px] bg-gradient-to-r from-indigo-500 to-blue-500 rounded-md shadow-lg" 
-                : isHovered 
-                  ? "p-[2px] bg-indigo-200 rounded-md shadow-md" 
-                  : "p-0"
+            <div
+              className={`
+              ${
+                isEditing
+                  ? "rounded-md bg-gradient-to-r from-indigo-500 to-blue-500 p-[4px] shadow-lg"
+                  : isHovered
+                    ? "rounded-md bg-indigo-200 p-[2px] shadow-md"
+                    : "p-0"
               } 
-              transition-all duration-200 ease-in-out
-              relative
-            `}>
+              relative transition-all duration-200
+              ease-in-out
+            `}
+            >
               {/* Editing indicator label */}
               {isEditing && (
-                <div className="absolute -top-6 right-2 bg-indigo-600 text-white text-xs font-semibold py-1 px-2 rounded shadow-md z-50">
+                <div className="absolute -top-6 right-2 z-50 rounded bg-indigo-600 px-2 py-1 text-xs font-semibold text-white shadow-md">
                   Editing Footer
                 </div>
               )}
-              <div className={`
-                relative rounded-sm overflow-hidden
-                ${isEditing 
-                  ? "ring-2 ring-white/80" 
-                  : isHovered 
-                    ? "ring-1 ring-white/60" 
-                    : ""
+              <div
+                className={`
+                relative overflow-hidden rounded-sm
+                ${
+                  isEditing
+                    ? "ring-2 ring-white/80"
+                    : isHovered
+                      ? "ring-1 ring-white/60"
+                      : ""
                 } transition-all
-              `}>
+              `}
+              >
                 <BananaFooter
                   className="bg-gray-500"
                   layout={layout}
@@ -610,8 +619,8 @@ export default function BananaFooterEditor({ isFullscreen, onStateChange }: Cont
       {/* Edit mode overlay blur */}
       {isEditing && (
         <div
-          className="fixed left-0 right-0 bottom-0 z-10 cursor-pointer"
-          style={{ top: '48px' }} // Start below the top toolbar
+          className="fixed inset-x-0 bottom-0 z-10 cursor-pointer"
+          style={{ top: "48px" }} // Start below the top toolbar
           onClick={() => setIsEditing(false)}
         >
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-all duration-300" />

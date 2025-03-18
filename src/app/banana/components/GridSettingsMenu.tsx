@@ -7,6 +7,7 @@ import {
 import { BsGrid3X3, BsGrid3X3Gap, BsGrid3X3GapFill } from "react-icons/bs";
 import { IoMdMore } from "react-icons/io";
 import { GridSettings } from "../types";
+import { RxPadding } from "react-icons/rx";
 
 interface GridSettingsMenuProps {
   initialSettings: GridSettings;
@@ -35,7 +36,6 @@ const GridSettingsMenu: React.FC<GridSettingsMenuProps> = ({
   });
   const [moreGap, setMoreGap] = useState(false);
   const [selectedGap, setSelectedGap] = useState("large");
-  const [selectedAlignment, setSelectedAlignment] = useState("top");
 
   const handleChange = (key: keyof GridSettings, value: number) => {
     const newSettings = { ...settings, [key]: value };
@@ -98,12 +98,6 @@ const GridSettingsMenu: React.FC<GridSettingsMenuProps> = ({
             onClick={() => setActiveTab("design")}
           >
             Design
-          </button>
-          <button
-            className={`p-3 text-center text-sm font-medium ${activeTab === "grid" ? "border-b-2 border-indigo-600 text-indigo-600" : "text-black hover:text-indigo-500"}`}
-            onClick={() => setActiveTab("grid")}
-          >
-            Grid Settings
           </button>
           <button
             className={`p-3 text-center text-sm font-medium ${activeTab === "background" ? "border-b-2 border-indigo-600 text-indigo-600" : "text-black hover:text-indigo-500"}`}
@@ -223,7 +217,7 @@ const GridSettingsMenu: React.FC<GridSettingsMenuProps> = ({
                 </div>
                 {moreGap && (
                   <div>
-                    <div className="mb-4 flex items-center gap-2">
+                    <div className="my-4 flex items-center gap-2">
                       <span>
                         <BiVerticalCenter className="text-black" />
                       </span>
@@ -244,7 +238,7 @@ const GridSettingsMenu: React.FC<GridSettingsMenuProps> = ({
                         {settings.verticalMargin}px
                       </span>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className=" mb-4 flex items-center gap-2">
                       <span>
                         <BiHorizontalCenter className="text-black" />
                       </span>
@@ -263,6 +257,24 @@ const GridSettingsMenu: React.FC<GridSettingsMenuProps> = ({
                       />
                       <span className="w-8 text-right text-xs text-gray-500">
                         {settings.horizontalMargin}px
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span>
+                        <RxPadding className="text-black" />
+                      </span>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={settings.padding}
+                        onChange={(e) =>
+                          handleChange("padding", parseInt(e.target.value))
+                        }
+                        className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 accent-indigo-600"
+                      />
+                      <span className="w-8 text-right text-xs text-gray-500">
+                        {settings.padding}px
                       </span>
                     </div>
                   </div>
@@ -637,110 +649,6 @@ const GridSettingsMenu: React.FC<GridSettingsMenuProps> = ({
                 sizes.
               </p>
             </div>
-          </div>
-        )}
-
-        {/* Grid Settings Tab Content */}
-        {activeTab === "grid" && (
-          <div className="p-4">
-            <h3 className="mb-3 text-xs font-semibold uppercase text-black">
-              Grid Configuration
-            </h3>
-
-            {/* Rows Setting */}
-            <div className="mb-4">
-              <div className="mb-1 flex items-center justify-between">
-                <label className="text-sm font-medium text-black">Rows</label>
-                <div className="w-16 rounded-md bg-gray-100 px-3 py-1 text-center">
-                  <span className="text-black">{settings.rows}</span>
-                </div>
-              </div>
-              <input
-                type="range"
-                min="5"
-                max="30"
-                value={settings.rows}
-                onChange={(e) => handleChange("rows", parseInt(e.target.value))}
-                className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 accent-indigo-600"
-              />
-            </div>
-
-            {/* Columns Setting */}
-            <div className="mb-4">
-              <div className="mb-1 flex items-center justify-between">
-                <label className="text-sm font-medium text-black">
-                  Columns
-                </label>
-                <div className="w-16 rounded-md bg-gray-100 px-3 py-1 text-center">
-                  <span className="text-black">{settings.columns}</span>
-                </div>
-              </div>
-              <input
-                type="range"
-                min="4"
-                max="24"
-                value={settings.columns}
-                onChange={(e) =>
-                  handleChange("columns", parseInt(e.target.value))
-                }
-                className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 accent-indigo-600"
-              />
-            </div>
-
-            {/* Margin Setting */}
-            <div className="mb-4">
-              <div className="mb-1 flex items-center justify-between">
-                <label className="text-sm font-medium text-black">
-                  Margin (px)
-                </label>
-                <div className="w-16 rounded-md bg-gray-100 px-3 py-1 text-center">
-                  <span className="text-black">{settings.margin}</span>
-                </div>
-              </div>
-              <input
-                type="range"
-                min="0"
-                max="20"
-                value={settings.margin}
-                onChange={(e) =>
-                  handleChange("margin", parseInt(e.target.value))
-                }
-                className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 accent-indigo-600"
-              />
-            </div>
-
-            {/* Padding Setting */}
-            <div className="mb-4">
-              <div className="mb-1 flex items-center justify-between">
-                <label className="text-sm font-medium text-black">
-                  Padding (px)
-                </label>
-                <div className="w-16 rounded-md bg-gray-100 px-3 py-1 text-center">
-                  <span className="text-black">{settings.padding}</span>
-                </div>
-              </div>
-              <input
-                type="range"
-                min="0"
-                max="40"
-                value={settings.padding}
-                onChange={(e) =>
-                  handleChange("padding", parseInt(e.target.value))
-                }
-                className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 accent-indigo-600"
-              />
-            </div>
-
-            {/* Reset Button */}
-            <button
-              onClick={() => {
-                setSettings({ ...initialSettings });
-                onSettingsChange({ ...initialSettings });
-              }}
-              className="mt-2 w-full rounded-md bg-gray-100 px-4 py-2 font-medium text-black transition-colors hover:bg-gray-200"
-            >
-              Reset to Default
-            </button>
           </div>
         )}
 

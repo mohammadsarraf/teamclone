@@ -66,15 +66,18 @@ const defaultGridSettings: GridSettings = {
   padding: 0,
 };
 
-export default function BananaContentEditor({ isFullscreen, onStateChange }: ContentProps) {
+export default function BananaContentEditor({
+  isFullscreen,
+  onStateChange,
+}: ContentProps) {
   // Initialize with default content state
   const initialState: ContentState = {
     layout: [],
     gridSettings: defaultGridSettings,
     backgroundColor: "#ffffff",
-    textColor: "#000000"
+    textColor: "#000000",
   };
-  
+
   // Use history hook for state management
   const {
     state: contentState,
@@ -83,13 +86,13 @@ export default function BananaContentEditor({ isFullscreen, onStateChange }: Con
     undo,
     redo,
     canUndo,
-    canRedo
+    canRedo,
   } = useHistory<ContentState>(initialState, {
     onStateChange, // Pass through to parent if provided
     debounceTime: 300,
-    exposeToWindow: { key: "bananaContentEditor" }
+    exposeToWindow: { key: "bananaContentEditor" },
   });
-  
+
   // Extract current values from history state
   const { layout = [], gridSettings = defaultGridSettings } = contentState;
 
@@ -186,7 +189,7 @@ export default function BananaContentEditor({ isFullscreen, onStateChange }: Con
       fontWeight: "normal",
       shadow: "none",
       layer: maxLayer + 1, // Place new blocks on top
-      shapeType: template.type === "square" ? "square" : undefined, // Set default shape type for squares
+      shapeType: template.type === "square" ? undefined : undefined, // Set default shape type for squares
       // Set default text style for textboxes
       textStyle: template.type === "textbox" ? "paragraph-1" : undefined,
       textDecoration: undefined,
@@ -194,13 +197,13 @@ export default function BananaContentEditor({ isFullscreen, onStateChange }: Con
     };
 
     const newLayout = [...layout, newBlock];
-    
+
     // Add to history
     addState({
       ...contentState,
-      layout: newLayout
+      layout: newLayout,
     });
-    
+
     setShowBlockMenu(false);
   };
 
@@ -224,40 +227,45 @@ export default function BananaContentEditor({ isFullscreen, onStateChange }: Con
   ) => {
     let updatedLayout: GridItem[];
     let updatedSelectedItem: GridItem | null = selectedItem;
-    
+
     if ("_tempLayout" in updates) {
       // Handle layout reordering
       updatedLayout = updates._tempLayout;
-      updatedSelectedItem = updates._tempLayout.find(
-        (item: GridItem) => item.i === selectedItem?.i,
-      ) || null;
+      updatedSelectedItem =
+        updates._tempLayout.find(
+          (item: GridItem) => item.i === selectedItem?.i,
+        ) || null;
     } else {
       // For non-layer updates, just update normally
       updatedLayout = layout.map((item: GridItem) =>
         item.i === selectedItem?.i ? { ...item, ...updates } : item,
       );
-      updatedSelectedItem = selectedItem ? { ...selectedItem, ...updates } as GridItem : null;
+      updatedSelectedItem = selectedItem
+        ? ({ ...selectedItem, ...updates } as GridItem)
+        : null;
     }
-    
+
     // Add to history
     addState({
       ...contentState,
-      layout: updatedLayout
+      layout: updatedLayout,
     });
-    
+
     setSelectedItem(updatedSelectedItem);
   };
 
   const handleDelete = () => {
     // Filter out the selected item from layout
-    const updatedLayout = layout.filter((item: GridItem) => item.i !== selectedItem?.i);
-    
+    const updatedLayout = layout.filter(
+      (item: GridItem) => item.i !== selectedItem?.i,
+    );
+
     // Add to history
     addState({
       ...contentState,
-      layout: updatedLayout
+      layout: updatedLayout,
     });
-    
+
     setSelectedItem(null); // Close the panel
   };
 
@@ -266,11 +274,11 @@ export default function BananaContentEditor({ isFullscreen, onStateChange }: Con
       ...gridSettings,
       [key]: value,
     };
-    
+
     // Add to history (debounced for slider values)
     debouncedAddState({
       ...contentState,
-      gridSettings: updatedSettings
+      gridSettings: updatedSettings,
     });
   };
 
@@ -319,11 +327,11 @@ export default function BananaContentEditor({ isFullscreen, onStateChange }: Con
         newSettings.margin ??
         gridSettings.verticalMargin,
     };
-    
+
     // Add to history
     addState({
       ...contentState,
-      gridSettings: updatedSettings
+      gridSettings: updatedSettings,
     });
   };
 
@@ -336,7 +344,7 @@ export default function BananaContentEditor({ isFullscreen, onStateChange }: Con
     // Add to history
     addState({
       ...contentState,
-      layout: newLayout
+      layout: newLayout,
     });
   };
 
@@ -425,9 +433,9 @@ export default function BananaContentEditor({ isFullscreen, onStateChange }: Con
     // Add duplicated item to layout via history
     addState({
       ...contentState,
-      layout: [...layout, duplicatedItem]
+      layout: [...layout, duplicatedItem],
     });
-    
+
     setShowItemToolbar(false);
     setFocusedItem(null);
   };
@@ -459,14 +467,16 @@ export default function BananaContentEditor({ isFullscreen, onStateChange }: Con
     if (!focusedItemData) return;
 
     // Filter out the focused item from layout
-    const updatedLayout = layout.filter((item: GridItem) => item.i !== focusedItemData.i);
-    
+    const updatedLayout = layout.filter(
+      (item: GridItem) => item.i !== focusedItemData.i,
+    );
+
     // Add to history
     addState({
       ...contentState,
-      layout: updatedLayout
+      layout: updatedLayout,
     });
-    
+
     setShowItemToolbar(false);
     setFocusedItem(null);
   };
@@ -577,31 +587,37 @@ export default function BananaContentEditor({ isFullscreen, onStateChange }: Con
             }}
           >
             {/* Highlight ring container */}
-            <div className={`
-              ${isEditing 
-                ? "p-[4px] bg-gradient-to-r from-indigo-500 to-blue-500 rounded-md shadow-lg" 
-                : isHovered 
-                  ? "p-[2px] bg-indigo-200 rounded-md shadow-md" 
-                  : "p-0"
+            <div
+              className={`
+              ${
+                isEditing
+                  ? "rounded-md bg-gradient-to-r from-indigo-500 to-blue-500 p-[4px] shadow-lg"
+                  : isHovered
+                    ? "rounded-md bg-indigo-200 p-[2px] shadow-md"
+                    : "p-0"
               } 
-              transition-all duration-200 ease-in-out
-              relative
-            `}>
+              relative transition-all duration-200
+              ease-in-out
+            `}
+            >
               {/* Editing indicator label */}
               {isEditing && (
-                <div className="absolute -top-6 right-2 bg-indigo-600 text-white text-xs font-semibold py-1 px-2 rounded shadow-md z-50">
+                <div className="absolute -top-6 right-2 z-50 rounded bg-indigo-600 px-2 py-1 text-xs font-semibold text-white shadow-md">
                   Editing Content
                 </div>
               )}
-              <div className={`
-                relative rounded-sm overflow-hidden
-                ${isEditing 
-                  ? "ring-2 ring-white/80" 
-                  : isHovered 
-                    ? "ring-1 ring-white/60" 
-                    : ""
+              <div
+                className={`
+                relative overflow-hidden rounded-sm
+                ${
+                  isEditing
+                    ? "ring-2 ring-white/80"
+                    : isHovered
+                      ? "ring-1 ring-white/60"
+                      : ""
                 } transition-all
-              `}>
+              `}
+              >
                 <BananaContent
                   className="bg-gray-700"
                   layout={layout}
@@ -656,8 +672,8 @@ export default function BananaContentEditor({ isFullscreen, onStateChange }: Con
       {/* Edit mode overlay blur */}
       {isEditing && (
         <div
-          className="fixed left-0 right-0 bottom-0 z-10 cursor-pointer"
-          style={{ top: '48px' }} // Start below the top toolbar
+          className="fixed inset-x-0 bottom-0 z-10 cursor-pointer"
+          style={{ top: "48px" }} // Start below the top toolbar
           onClick={() => setIsEditing(false)}
         >
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-all duration-300" />

@@ -24,7 +24,6 @@ export default function BananaSidebar() {
         <div className="border-b border-[#404040] px-6 py-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="size-8 rounded-sm bg-white/90"></div>
               <span className="text-sm font-medium text-white">My Website</span>
             </div>
             <button className="rounded-full p-2 text-[#999999] hover:bg-[#404040] hover:text-indigo-400">

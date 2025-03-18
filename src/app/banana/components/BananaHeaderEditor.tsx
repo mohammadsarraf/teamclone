@@ -28,20 +28,20 @@ interface HeaderState {
   linkSpacing: number;
   elementSpacing: number;
   enabledElements: EnabledElements;
-  backgroundColor: string;
+  gradientStartColor: string;
   gradientEndColor?: string;
   isGradient?: boolean;
   textColor: string;
 }
 
-export default function BananaHeaderEditor({ 
+export default function BananaHeaderEditor({
   isFullscreen,
-  onStateChange 
+  onStateChange,
 }: HeaderEditProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [activeMenu, setActiveMenu] = useState<MenuType>("none");
-  
+
   // Initial header state
   const initialState: HeaderState = {
     layout: "Option 1",
@@ -54,12 +54,12 @@ export default function BananaHeaderEditor({
       isCart: false,
       isAccount: false,
     },
-    backgroundColor: "#000000",
+    gradientStartColor: "#000000",
     gradientEndColor: "#4f46e5",
     isGradient: false,
     textColor: "#ffffff",
   };
-  
+
   // Use the history hook
   const {
     state: headerState,
@@ -68,13 +68,13 @@ export default function BananaHeaderEditor({
     undo,
     redo,
     canUndo,
-    canRedo
+    canRedo,
   } = useHistory<HeaderState>(initialState, {
     onStateChange, // Pass through to parent if provided
     debounceTime: 300,
-    exposeToWindow: { key: "bananaHeaderEditor" }
+    exposeToWindow: { key: "bananaHeaderEditor" },
   });
-  
+
   // Destructure current state values from headerState
   const {
     layout: headerLayout,
@@ -82,12 +82,12 @@ export default function BananaHeaderEditor({
     linkSpacing,
     elementSpacing,
     enabledElements,
-    backgroundColor: headerBgColor,
-    gradientEndColor: headerGradientEndColor,
+    gradientStartColor: headerStartColor,
+    gradientEndColor: headerEndColor,
     isGradient,
-    textColor: headerTextColor
+    textColor: headerTextColor,
   } = headerState;
-  
+
   // Header background opacity (not in history)
   const [headerBgOpacity, setHeaderBgOpacity] = useState(`bg-opacity-100`);
 
@@ -166,29 +166,29 @@ export default function BananaHeaderEditor({
   };
 
   const handleBackgroundColorChange = (color: string) => {
-    if (color.startsWith('gradient:')) {
-      const parts = color.split(':');
+    if (color.startsWith("gradient:")) {
+      const parts = color.split(":");
       if (parts.length === 3) {
         const startColor = parts[1];
         const endColor = parts[2];
-        
+
         addState({
           ...headerState,
-          backgroundColor: startColor,
+          gradientStartColor: startColor,
           gradientEndColor: endColor,
           isGradient: true,
         });
       }
-    } else if (color === 'adaptive') {
+    } else if (color === "adaptive") {
       addState({
         ...headerState,
-        backgroundColor: '#f8fafc',
+        gradientStartColor: "#f8fafc",
         isGradient: false,
       });
     } else {
       addState({
         ...headerState,
-        backgroundColor: color,
+        gradientStartColor: color,
         isGradient: false,
       });
     }
@@ -201,13 +201,15 @@ export default function BananaHeaderEditor({
     });
   };
 
-  const handleBackgroundTypeChange = (type: 'solid' | 'gradient' | 'adaptive') => {
-    if (type === 'solid') {
+  const handleBackgroundTypeChange = (
+    type: "solid" | "gradient" | "adaptive",
+  ) => {
+    if (type === "solid") {
       addState({
         ...headerState,
         isGradient: false,
       });
-    } else if (type === 'gradient') {
+    } else if (type === "gradient") {
       addState({
         ...headerState,
         isGradient: true,
@@ -257,8 +259,8 @@ export default function BananaHeaderEditor({
   // Add keyframes for the fade-in animation
   useEffect(() => {
     // Insert the keyframes for the fadeIn animation
-    const styleSheet = document.createElement('style');
-    styleSheet.id = 'banana-header-editor-styles';
+    const styleSheet = document.createElement("style");
+    styleSheet.id = "banana-header-editor-styles";
     styleSheet.textContent = `
       @keyframes fadeIn {
         from { opacity: 0; }
@@ -266,10 +268,12 @@ export default function BananaHeaderEditor({
       }
     `;
     document.head.appendChild(styleSheet);
-    
+
     return () => {
       // Clean up the style element when component unmounts
-      const styleElement = document.getElementById('banana-header-editor-styles');
+      const styleElement = document.getElementById(
+        "banana-header-editor-styles",
+      );
       if (styleElement) {
         styleElement.remove();
       }
@@ -285,31 +289,40 @@ export default function BananaHeaderEditor({
         onMouseLeave={() => setIsHovered(false)}
       >
         {/* Create a double highlight effect - an outer highlight container + inner ring */}
-        <div className={`
-          ${isEditing 
-            ? "p-[4px] bg-gradient-to-r from-indigo-500 to-blue-500 rounded-md shadow-lg" 
-            : isHovered 
-              ? "p-[2px] bg-indigo-200 rounded-md shadow-md" 
-              : "p-0"
+        <div
+          className={`
+          ${
+            isEditing
+              ? "rounded-md bg-gradient-to-r from-indigo-500 to-blue-500 p-[4px] shadow-lg"
+              : isHovered
+                ? "rounded-md bg-indigo-200 p-[2px] shadow-md"
+                : "p-0"
           } 
-          transition-all duration-200 ease-in-out
-          relative
-        `}>
+          relative transition-all duration-200
+          ease-in-out
+        `}
+        >
           {/* Editing indicator label */}
           {isEditing && (
-            <div className="absolute -top-6 right-2 bg-indigo-600 text-white text-xs font-semibold py-1 px-2 rounded shadow-md z-50">
+            <div className="absolute -top-6 right-2 z-50 rounded bg-indigo-600 px-2 py-1 text-xs font-semibold text-white shadow-md">
               Editing Header
             </div>
           )}
-          <div className={`
-            relative rounded-sm overflow-hidden
-          `}>
+          <div
+            className={`
+            relative overflow-hidden rounded-sm
+          `}
+          >
             {/* Actual Header Content */}
-            <div className={`${isEditing 
-              ? "ring-2 ring-indigo-500 ring-offset-2" 
-              : isHovered 
-                ? "ring-1 ring-indigo-300 ring-offset-1" 
-                : ""} transition-all`}>
+            <div
+              className={`${
+                isEditing
+                  ? "ring-2 ring-indigo-500 ring-offset-2"
+                  : isHovered
+                    ? "ring-1 ring-indigo-300 ring-offset-1"
+                    : ""
+              } transition-all`}
+            >
               <BananaHeader
                 isEditing={isEditing}
                 enabledElements={enabledElements}
@@ -317,11 +330,13 @@ export default function BananaHeaderEditor({
                 height={headerHeight}
                 linkSpacing={linkSpacing}
                 elementSpacing={elementSpacing}
-                bgColor={headerBgColor}
-                gradientEndColor={isGradient ? headerGradientEndColor : undefined}
+                bgColor={headerStartColor}
+                gradientEndColor={
+                  isGradient ? headerEndColor : undefined
+                }
                 isGradient={isGradient}
                 bgOpacity={headerBgOpacity}
-                textColor={headerTextColor || '#ffffff'}
+                textColor={headerTextColor || "#ffffff"}
               />
             </div>
           </div>
@@ -345,18 +360,18 @@ export default function BananaHeaderEditor({
         <>
           {/* Page dimming overlay */}
           <div
-            className="fixed left-0 right-0 bottom-0 bg-black/60 backdrop-blur-sm transition-all duration-300 animate-in fade-in" 
-            style={{ 
+            className="animate-in fade-in fixed inset-x-0 bottom-0 bg-black/60 backdrop-blur-sm transition-all duration-300"
+            style={{
               zIndex: 20,
-              animation: 'fadeIn 0.3s ease-out',
-              top: '48px' // Start below the top toolbar
-            }} 
+              animation: "fadeIn 0.3s ease-out",
+              top: "48px", // Start below the top toolbar
+            }}
             onClick={handleExitEdit}
           />
-          
+
           {/* Toolbars */}
           {activeMenu === "element" && (
-            <div className="absolute left-8 top-full z-40 mt-3">
+            <div className="absolute left-4 top-full z-40 mt-3">
               <div className="relative">
                 <ElementToolbar
                   onClose={() => handleMenuClick("none")}
@@ -367,7 +382,7 @@ export default function BananaHeaderEditor({
             </div>
           )}
           {activeMenu === "design" && (
-            <div className="absolute right-8 top-full z-40 mt-3">
+            <div className="absolute right-4 top-full z-40 mt-3">
               <div className="relative">
                 <DesignToolbar
                   onClose={() => handleMenuClick("none")}
@@ -381,15 +396,15 @@ export default function BananaHeaderEditor({
                   initialElementSpacing={elementSpacing}
                   onHeightChangeComplete={handleHeightChangeComplete}
                   onLinkSpacingChangeComplete={handleLinkSpacingChangeComplete}
-                  onElementSpacingChangeComplete={
-                    handleElementSpacingChangeComplete
-                  }
-                  initialBackgroundColor={headerBgColor}
+                  onElementSpacingChangeComplete={handleElementSpacingChangeComplete}
+                  initialGradientStartColor={headerStartColor}
+                  initialGradientEndColor={headerEndColor || "#4f46e5"}
                   initialTextColor={headerTextColor}
                   initialBackgroundType={isGradient ? "gradient" : "solid"}
                   initialOpacity={100}
                   initialBlurBackground={false}
-                  onBackgroundColorChange={handleBackgroundColorChange}
+                  onGradientStartColorChange={handleBackgroundColorChange}
+                  onGradientEndColorChange={handleBackgroundColorChange}
                   onTextColorChange={handleTextColorChange}
                   onBackgroundTypeChange={handleBackgroundTypeChange}
                   onOpacityChange={handleOpacityChange}

@@ -70,32 +70,6 @@ export default function BananaFooterEditor({
   isFullscreen,
   onStateChange,
 }: ContentProps) {
-  // Initialize with default footer state
-  const initialState: FooterState = {
-    layout: [],
-    gridSettings: defaultGridSettings,
-    backgroundColor: "#000000",
-    textColor: "#ffffff",
-  };
-
-  // Use history hook for state management
-  const {
-    state: footerState,
-    addState,
-    debouncedAddState,
-    undo,
-    redo,
-    canUndo,
-    canRedo,
-  } = useHistory<FooterState>(initialState, {
-    onStateChange, // Pass through to parent if provided
-    debounceTime: 300,
-    exposeToWindow: { key: "bananaFooterEditor" },
-  });
-
-  // Extract current values from history state
-  const { layout = [], gridSettings = defaultGridSettings } = footerState;
-
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [showBlockMenu, setShowBlockMenu] = useState(false);
@@ -117,6 +91,52 @@ export default function BananaFooterEditor({
   const [showItemToolbar, setShowItemToolbar] = useState(false);
   const [focusedItemData, setFocusedItemData] = useState<GridItem | null>(null);
   const addBlockButtonRef = useRef<HTMLButtonElement>(null);
+  const hasInitialized = useRef(false);
+
+  // Initial footer state
+  const initialState: FooterState = {
+    layout: [],
+    gridSettings: defaultGridSettings,
+    backgroundColor: "#000000",
+    textColor: "#ffffff",
+  };
+
+  // Use the history hook
+  const {
+    state: footerState,
+    addState,
+    debouncedAddState,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+    applyExternalState,
+  } = useHistory<FooterState>(initialState, {
+    onStateChange,
+    debounceTime: 300,
+    exposeToWindow: { key: "bananaFooterEditor" },
+  });
+  
+  // Wait for external state application before signaling we're initialized
+  useEffect(() => {
+    // Mark as initialized after a small delay
+    // This prevents the initialState from overriding loaded state
+    const timer = setTimeout(() => {
+      if (!hasInitialized.current) {
+        hasInitialized.current = true;
+        
+        // Only call onStateChange with current state if we haven't been initialized with external state
+        if (onStateChange && JSON.stringify(footerState) === JSON.stringify(initialState)) {
+          onStateChange(footerState);
+        }
+      }
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, [footerState, initialState, onStateChange]);
+
+  // Extract current values from history state
+  const { layout = [], gridSettings = defaultGridSettings } = footerState;
 
   // Add keyboard shortcuts for undo/redo
   useEffect(() => {
@@ -590,7 +610,7 @@ export default function BananaFooterEditor({
         <div
           className="fixed z-50"
           style={{
-            left: contextMenuPosition.x,
+            left: contextMenuPosition.x ,
             top: contextMenuPosition.y,
           }}
           data-item-panel-container="true"

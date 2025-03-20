@@ -167,7 +167,9 @@ export default function BananaDesignPanel({
   const [backgroundColor, setBackgroundColor] = useState(
     initialGradientStartColor,
   );
-  const [gradientEndColor, setGradientEndColor] = useState(initialGradientEndColor);
+  const [gradientEndColor, setGradientEndColor] = useState(
+    initialGradientEndColor,
+  );
   const [navigationColor, setNavigationColor] = useState(initialTextColor);
   const [opacity, setOpacity] = useState(initialOpacity);
   const [blurBackground, setBlurBackground] = useState(initialBlurBackground);
@@ -267,7 +269,9 @@ export default function BananaDesignPanel({
         formattedColor,
       );
       if (backgroundType === "gradient") {
-        onGradientStartColorChange(`gradient:${formattedColor}:${gradientEndColor}`);
+        onGradientStartColorChange(
+          `gradient:${formattedColor}:${gradientEndColor}`,
+        );
       } else {
         onGradientStartColorChange(formattedColor);
       }
@@ -278,7 +282,9 @@ export default function BananaDesignPanel({
         formattedColor,
       );
       if (backgroundType === "gradient") {
-        onGradientEndColorChange(`gradient:${backgroundColor}:${formattedColor}`);
+        onGradientEndColorChange(
+          `gradient:${backgroundColor}:${formattedColor}`,
+        );
       }
     } else {
       setNavigationColor(formattedColor);
@@ -400,7 +406,9 @@ export default function BananaDesignPanel({
         formattedColor,
       );
       if (backgroundType === "gradient") {
-        onGradientStartColorChange(`gradient:${formattedColor}:${gradientEndColor}`);
+        onGradientStartColorChange(
+          `gradient:${formattedColor}:${gradientEndColor}`,
+        );
       } else {
         onGradientStartColorChange(formattedColor);
       }
@@ -411,7 +419,9 @@ export default function BananaDesignPanel({
         formattedColor,
       );
       if (backgroundType === "gradient") {
-        onGradientEndColorChange(`gradient:${backgroundColor}:${formattedColor}`);
+        onGradientEndColorChange(
+          `gradient:${backgroundColor}:${formattedColor}`,
+        );
       }
     } else {
       setNavigationColor(formattedColor);
@@ -949,14 +959,19 @@ export default function BananaDesignPanel({
                           {/* Gradient Start Color */}
                           <div className="flex items-center justify-between border-b border-gray-200 py-3">
                             <span className="text-sm font-medium text-black">
-                              {backgroundType === "gradient" ? "Gradient start color" : "Background color"}
+                              {backgroundType === "gradient"
+                                ? "Gradient start color"
+                                : "Background color"}
                             </span>
                             <div
                               className="size-7 cursor-pointer rounded-full border border-gray-300"
                               style={{
-                                backgroundColor: ensureValidColorString(backgroundColor),
+                                backgroundColor:
+                                  ensureValidColorString(backgroundColor),
                               }}
-                              onClick={() => handleOpenColorPicker("background")}
+                              onClick={() =>
+                                handleOpenColorPicker("background")
+                              }
                             ></div>
                           </div>
 
@@ -969,9 +984,12 @@ export default function BananaDesignPanel({
                               <div
                                 className="size-7 cursor-pointer rounded-full border border-gray-300"
                                 style={{
-                                  backgroundColor: ensureValidColorString(gradientEndColor),
+                                  backgroundColor:
+                                    ensureValidColorString(gradientEndColor),
                                 }}
-                                onClick={() => handleOpenColorPicker("gradientEnd")}
+                                onClick={() =>
+                                  handleOpenColorPicker("gradientEnd")
+                                }
                               ></div>
                             </div>
                           )}
@@ -984,9 +1002,12 @@ export default function BananaDesignPanel({
                             <div
                               className="size-7 cursor-pointer rounded-full border border-gray-300"
                               style={{
-                                backgroundColor: ensureValidColorString(navigationColor),
+                                backgroundColor:
+                                  ensureValidColorString(navigationColor),
                               }}
-                              onClick={() => handleOpenColorPicker("navigation")}
+                              onClick={() =>
+                                handleOpenColorPicker("navigation")
+                              }
                             ></div>
                           </div>
                         </>

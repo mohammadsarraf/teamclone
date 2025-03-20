@@ -32,7 +32,7 @@ interface GridSettings {
 // Define Layout as an array of GridItem
 type Layout = GridItem[];
 
-interface BananaFooterProps {
+interface FooterContentProps {
   className?: string;
   layout: Layout;
   onLayoutChange?: (layout: Layout) => void;
@@ -57,7 +57,7 @@ const defaultGridSettings: GridSettings = {
   customHeight: 50,
 };
 
-export default function BananaFooter({
+export default function FooterContent({
   className = "",
   layout: externalLayout,
   onLayoutChange: externalOnLayoutChange,
@@ -68,7 +68,7 @@ export default function BananaFooter({
   isEditing = false,
   isInteracting = false,
   onItemPanelClose,
-}: BananaFooterProps) {
+}: FooterContentProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState<number>(0);
   const mouseStartPosRef = useRef<{ x: number; y: number } | null>(null);
@@ -353,11 +353,27 @@ export default function BananaFooter({
   };
 
   const handleContentChange = (itemId: string, newContent: string) => {
+    console.log("Content changed for item:", itemId, "New content:", newContent.substring(0, 50) + "...");
+    
+    // Find the original item
+    const originalItem = layout.find((item) => item.i === itemId);
+    if (!originalItem) {
+      console.warn("Item not found:", itemId);
+      return;
+    }
+    
     // Update the layout with the new content, preserving HTML formatting
-    const updatedLayout = layout.map((item) =>
-      item.i === itemId ? { ...item, content: newContent } : item,
-    );
+    const updatedLayout = layout.map((item) => {
+      if (item.i === itemId) {
+        return { 
+          ...item, 
+          content: newContent 
+        };
+      }
+      return item;
+    });
 
+    // Call external handlers
     if (!externalLayout) {
       setInternalLayout(updatedLayout);
     }
@@ -487,43 +503,81 @@ export default function BananaFooter({
     const isFocused = focusedItem === item.i;
     const isHovered = hoveredItem === item.i;
 
+    // Wrap each item with a highlight container
+    const wrapWithHighlight = (content: React.ReactNode) => (
+      <div className="relative size-full">
+        {content}
+        {/* Highlight ring and type indicator - only show when hovered and not focused */}
+        {isHovered && !isFocused && !isBeingDragged && (
+          <>
+            {/* Highlight ring */}
+            <div className="absolute inset-0 rounded-md ring-2 ring-indigo-500/50" />
+            {/* Type indicator */}
+            <div className="absolute -top-6 left-0 rounded bg-indigo-500 px-2 py-1 text-xs font-medium text-white shadow-sm">
+              {item.type
+                ? item.type.charAt(0).toUpperCase() + item.type.slice(1)
+                : "Unknown"}
+            </div>
+          </>
+        )}
+
+        {/* Focus ring with resize handles - only show when focused and not being dragged */}
+        {isFocused && !isBeingDragged && (
+          <>
+            {/* Focus ring */}
+            <div className="absolute inset-0 rounded-md ring-2 ring-blue-500" />
+            {/* Corner resize handles */}
+            <div className="absolute -left-1 -top-1 size-3 cursor-nw-resize bg-white ring-1 ring-blue-500" />{" "}
+            <div className="absolute -right-1 -top-1 size-3 cursor-ne-resize bg-white ring-1 ring-blue-500" />
+            <div className="absolute -bottom-1 -left-1 size-3 cursor-sw-resize bg-white ring-1 ring-blue-500" />
+            <div className="absolute -bottom-1 -right-1 size-3 cursor-se-resize bg-white ring-1 ring-blue-500" />
+            {/* Edge resize handles */}
+            <div className="absolute -top-1 left-1/2 size-3 -translate-x-1/2 cursor-n-resize bg-white ring-1 ring-blue-500" />
+            <div className="absolute -bottom-1 left-1/2 size-3 -translate-x-1/2 cursor-s-resize bg-white ring-1 ring-blue-500" />
+            <div className="absolute -left-1 top-1/2 size-3 -translate-y-1/2 cursor-w-resize bg-white ring-1 ring-blue-500" />
+            <div className="absolute -right-1 top-1/2 size-3 -translate-y-1/2 cursor-e-resize bg-white ring-1 ring-blue-500" />
+          </>
+        )}
+      </div>
+    );
+
     // Render triangle shape
     if (item.type === "square" && item.shapeType === "triangle") {
-      return (
+      return wrapWithHighlight(
         <TriangleShape
           item={item}
           isBeingDragged={isBeingDragged}
           isFocused={isFocused}
           isHovered={isHovered}
           shadowClasses={shadowClasses}
-        />
+        />,
       );
     }
 
     switch (item.type) {
       case "square":
         if (item.shapeType === "circle") {
-          return (
+          return wrapWithHighlight(
             <CircleShape
               item={item}
               isBeingDragged={isBeingDragged}
               isFocused={isFocused}
               isHovered={isHovered}
               shadowClasses={shadowClasses}
-            />
+            />,
           );
         }
-        return (
+        return wrapWithHighlight(
           <SquareShape
             item={item}
             isBeingDragged={isBeingDragged}
             isFocused={isFocused}
             isHovered={isHovered}
             shadowClasses={shadowClasses}
-          />
+          />,
         );
       case "textbox":
-        return (
+        return wrapWithHighlight(
           <TextBoxShape
             item={item}
             isBeingDragged={isBeingDragged}
@@ -533,17 +587,17 @@ export default function BananaFooter({
             handleContentChange={handleContentChange}
             textboxContentRef={textboxContentRef}
             isTextStyleMenuOpen={showTextStyleMenu && focusedItem === item.i}
-          />
+          />,
         );
       default: // 'section'
-        return (
+        return wrapWithHighlight(
           <SectionShape
             item={item}
             isBeingDragged={isBeingDragged}
             isFocused={isFocused}
             isHovered={isHovered}
             shadowClasses={shadowClasses}
-          />
+          />,
         );
     }
   };
@@ -732,29 +786,41 @@ export default function BananaFooter({
 
   // Handle text style updates
   const handleTextStyleUpdate = (updates: Partial<GridItem>) => {
-    if (!focusedItem) return;
-
-    // Find the focused item
-    const updatedLayout = layout.map((item) =>
-      item.i === focusedItem ? { ...item, ...updates } : item,
-    );
-
-    // Update layout directly without using handleLayoutChange
-    if (!externalLayout) {
-      setInternalLayout(updatedLayout);
-    }
-
+    // Get the original item
+    const originalItem = layout.find((item) => item.i === focusedItem);
+    
+    if (!originalItem) return;
+    
+    // Create a new layout with the updated item
+    const newLayout = layout.map((item) => {
+      if (item.i === focusedItem) {
+        // Create the updated item using only valid properties from the updates
+        const updatedItem = {
+          ...item,
+          ...updates,
+          // Only include valid style properties
+          textStyle: updates.textStyle !== undefined ? updates.textStyle : item.textStyle,
+          textColor: updates.textColor !== undefined ? updates.textColor : item.textColor,
+          fontSize: updates.fontSize !== undefined ? updates.fontSize : item.fontSize,
+          fontWeight: updates.fontWeight !== undefined ? updates.fontWeight : item.fontWeight,
+          fontStyle: updates.fontStyle !== undefined ? updates.fontStyle : item.fontStyle,
+          textDecoration: updates.textDecoration !== undefined ? updates.textDecoration : item.textDecoration,
+          textAlign: updates.textAlign !== undefined ? updates.textAlign : item.textAlign,
+          fontFamily: updates.fontFamily !== undefined ? updates.fontFamily : item.fontFamily,
+          lineHeight: updates.lineHeight !== undefined ? updates.lineHeight : item.lineHeight,
+          letterSpacing: updates.letterSpacing !== undefined ? updates.letterSpacing : item.letterSpacing,
+        };
+        
+        return updatedItem;
+      }
+      
+      return item;
+    });
+    
+    // Call the external onLayoutChange handler
     if (externalOnLayoutChange) {
-      externalOnLayoutChange(updatedLayout);
+      externalOnLayoutChange(newLayout);
     }
-
-    // Log the updates for debugging
-    console.log(
-      "Applied text style updates:",
-      updates,
-      "to item:",
-      focusedItem,
-    );
   };
 
   return (
@@ -1028,6 +1094,7 @@ export default function BananaFooter({
           width={containerWidth}
           isDraggable={isEditing && !(showTextStyleMenu && focusedItem)}
           isResizable={isEditing && !(showTextStyleMenu && focusedItem)}
+          resizeHandles={["nw", "ne", "se", "sw", "n", "e", "s", "w"]}
           containerPadding={[gridSettings.padding, gridSettings.padding]}
           margin={[gridSettings.horizontalMargin, gridSettings.verticalMargin]}
           onLayoutChange={handleLayoutChange}

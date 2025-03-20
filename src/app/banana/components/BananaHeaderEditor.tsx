@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import HeaderEditMenu from "./BananaHeaderControls";
 import ElementToolbar from "./menus/BananaElementPanel";
 import DesignToolbar from "./menus/BananaDesignPanel";
@@ -41,6 +41,7 @@ export default function BananaHeaderEditor({
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [activeMenu, setActiveMenu] = useState<MenuType>("none");
+  const hasInitialized = useRef(false);
 
   // Initial header state
   const initialState: HeaderState = {
@@ -69,11 +70,30 @@ export default function BananaHeaderEditor({
     redo,
     canUndo,
     canRedo,
+    applyExternalState,
   } = useHistory<HeaderState>(initialState, {
     onStateChange, // Pass through to parent if provided
     debounceTime: 300,
     exposeToWindow: { key: "bananaHeaderEditor" },
   });
+
+  // Wait for external state application before signaling we're initialized
+  useEffect(() => {
+    // Mark as initialized after a small delay
+    // This prevents the initialState from overriding loaded state
+    const timer = setTimeout(() => {
+      if (!hasInitialized.current) {
+        hasInitialized.current = true;
+        
+        // Only call onStateChange with current state if we haven't been initialized with external state
+        if (onStateChange && JSON.stringify(headerState) === JSON.stringify(initialState)) {
+          onStateChange(headerState);
+        }
+      }
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, [headerState, initialState, onStateChange]);
 
   // Destructure current state values from headerState
   const {
@@ -331,9 +351,7 @@ export default function BananaHeaderEditor({
                 linkSpacing={linkSpacing}
                 elementSpacing={elementSpacing}
                 bgColor={headerStartColor}
-                gradientEndColor={
-                  isGradient ? headerEndColor : undefined
-                }
+                gradientEndColor={isGradient ? headerEndColor : undefined}
                 isGradient={isGradient}
                 bgOpacity={headerBgOpacity}
                 textColor={headerTextColor || "#ffffff"}
@@ -396,7 +414,9 @@ export default function BananaHeaderEditor({
                   initialElementSpacing={elementSpacing}
                   onHeightChangeComplete={handleHeightChangeComplete}
                   onLinkSpacingChangeComplete={handleLinkSpacingChangeComplete}
-                  onElementSpacingChangeComplete={handleElementSpacingChangeComplete}
+                  onElementSpacingChangeComplete={
+                    handleElementSpacingChangeComplete
+                  }
                   initialGradientStartColor={headerStartColor}
                   initialGradientEndColor={headerEndColor || "#4f46e5"}
                   initialTextColor={headerTextColor}

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import FooterEdit from "./BananaFooterEditor";
 import HeaderEdit from "./BananaHeaderEditor";
 import MainEdit from "./BananaContentEditor";
@@ -11,6 +11,9 @@ interface BananaEditorHistory {
   footer?: FooterState;
   timestamp: number;
 }
+
+// Local storage key
+const STORAGE_KEY = "banana-editor-state";
 
 export default function BananaEditor({
   isFullscreen,
@@ -27,6 +30,109 @@ export default function BananaEditor({
     { timestamp: Date.now() },
   ]);
   const [currentHistoryIndex, setCurrentHistoryIndex] = useState(0);
+  
+  // Refs to track component initialization
+  const componentsInitialized = useRef({
+    header: false,
+    content: false,
+    footer: false,
+  });
+  
+  // Flag to track if we've loaded from storage
+  const loadedFromStorage = useRef(false);
+  
+  // Load saved state on initial mount
+  useEffect(() => {
+    if (loadedFromStorage.current) return;
+    
+    try {
+      const savedData = localStorage.getItem(STORAGE_KEY);
+      if (savedData) {
+        console.log("Loading saved editor state from localStorage");
+        const { history, index } = JSON.parse(savedData);
+        
+        if (Array.isArray(history) && history.length > 0) {
+          loadedFromStorage.current = true;
+          setEditorHistory(history);
+          setCurrentHistoryIndex(index);
+          
+          // Save the states separately so we can apply them when components are ready
+          const lastState = history[index];
+          
+          if (lastState.header) {
+            setHeaderState(lastState.header);
+          }
+          
+          if (lastState.content) {
+            setContentState(lastState.content);
+          }
+          
+          if (lastState.footer) {
+            setFooterState(lastState.footer);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error loading editor state:", error);
+    }
+  }, []);
+
+  // Apply states to components when they're available
+  useEffect(() => {
+    if (!loadedFromStorage.current) return;
+    
+    // Apply header state if we have it and the window API is available
+    if (headerState && window.bananaHeaderEditor?.applyExternalState) {
+      console.log("Applying saved header state");
+      window.bananaHeaderEditor.applyExternalState(headerState);
+    }
+    
+    // Apply content state if we have it and the window API is available
+    if (contentState && window.bananaContentEditor?.applyExternalState) {
+      console.log("Applying saved content state");
+      window.bananaContentEditor.applyExternalState(contentState);
+    }
+    
+    // Apply footer state if we have it and the window API is available
+    if (footerState && window.bananaFooterEditor?.applyExternalState) {
+      console.log("Applying saved footer state");
+      window.bananaFooterEditor.applyExternalState(footerState);
+    }
+  }, [
+    headerState, 
+    contentState, 
+    footerState, 
+    // Check when window APIs become available
+    typeof window !== 'undefined' && window.bananaHeaderEditor,
+    typeof window !== 'undefined' && window.bananaContentEditor,
+    typeof window !== 'undefined' && window.bananaFooterEditor,
+  ]);
+
+  // Save state to localStorage whenever history changes
+  useEffect(() => {
+    // Skip saving during initial load or if no components have initialized
+    if (!componentsInitialized.current.header && 
+        !componentsInitialized.current.content && 
+        !componentsInitialized.current.footer) {
+      return;
+    }
+    
+    // Skip saving if we're just initializing and haven't loaded saved state yet
+    if (editorHistory.length === 1 && !headerState && !contentState && !footerState) {
+      return;
+    }
+    
+    try {
+      const dataToSave = {
+        history: editorHistory,
+        index: currentHistoryIndex
+      };
+      console.log("Saving editor state to localStorage");
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
+    } catch (error) {
+      console.error("Error saving editor state:", error);
+    }
+  }, [editorHistory, currentHistoryIndex, headerState, contentState, footerState]);
 
   // Derived state for undo/redo availability
   const canUndo = currentHistoryIndex > 0;
@@ -36,6 +142,10 @@ export default function BananaEditor({
   const handleHeaderStateChange = useCallback(
     (state: HeaderState) => {
       setHeaderState(state);
+      componentsInitialized.current.header = true;
+
+      // Skip adding to history if we're still loading from storage
+      if (!loadedFromStorage.current) return;
 
       // Add to global history
       const newEntry: BananaEditorHistory = {
@@ -56,6 +166,10 @@ export default function BananaEditor({
   const handleContentStateChange = useCallback(
     (state: ContentState) => {
       setContentState(state);
+      componentsInitialized.current.content = true;
+
+      // Skip adding to history if we're still loading from storage
+      if (!loadedFromStorage.current) return;
 
       // Add to global history
       const newEntry: BananaEditorHistory = {
@@ -76,6 +190,10 @@ export default function BananaEditor({
   const handleFooterStateChange = useCallback(
     (state: FooterState) => {
       setFooterState(state);
+      componentsInitialized.current.footer = true;
+
+      // Skip adding to history if we're still loading from storage
+      if (!loadedFromStorage.current) return;
 
       // Add to global history
       const newEntry: BananaEditorHistory = {
@@ -91,6 +209,17 @@ export default function BananaEditor({
     },
     [editorHistory, currentHistoryIndex],
   );
+  
+  // Mark loading as complete after components have mounted
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!loadedFromStorage.current) {
+        loadedFromStorage.current = true;
+      }
+    }, 1000);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   // Global undo handler
   const handleGlobalUndo = useCallback(() => {

@@ -70,7 +70,11 @@ export default function BananaContentEditor({
   isFullscreen,
   onStateChange,
 }: ContentProps) {
-  // Initialize with default content state
+  const [isEditing, setIsEditing] = useState(false);
+  const [activeMenu, setActiveMenu] = useState<MenuType>("none");
+  const hasInitialized = useRef(false);
+
+  // Initial content state
   const initialState: ContentState = {
     layout: [],
     gridSettings: defaultGridSettings,
@@ -78,7 +82,7 @@ export default function BananaContentEditor({
     textColor: "#000000",
   };
 
-  // Use history hook for state management
+  // Use the history hook
   const {
     state: contentState,
     addState,
@@ -87,16 +91,34 @@ export default function BananaContentEditor({
     redo,
     canUndo,
     canRedo,
+    applyExternalState,
   } = useHistory<ContentState>(initialState, {
-    onStateChange, // Pass through to parent if provided
+    onStateChange,
     debounceTime: 300,
     exposeToWindow: { key: "bananaContentEditor" },
   });
+  
+  // Wait for external state application before signaling we're initialized
+  useEffect(() => {
+    // Mark as initialized after a small delay
+    // This prevents the initialState from overriding loaded state
+    const timer = setTimeout(() => {
+      if (!hasInitialized.current) {
+        hasInitialized.current = true;
+        
+        // Only call onStateChange with current state if we haven't been initialized with external state
+        if (onStateChange && JSON.stringify(contentState) === JSON.stringify(initialState)) {
+          onStateChange(contentState);
+        }
+      }
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, [contentState, initialState, onStateChange]);
 
   // Extract current values from history state
   const { layout = [], gridSettings = defaultGridSettings } = contentState;
 
-  const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [showBlockMenu, setShowBlockMenu] = useState(false);
   const [showGridSettings, setShowGridSettings] = useState(false);

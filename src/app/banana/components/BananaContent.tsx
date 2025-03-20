@@ -498,22 +498,23 @@ export default function BananaContent({
             <div className="absolute inset-0 rounded-md ring-2 ring-indigo-500/50" />
             {/* Type indicator */}
             <div className="absolute -top-6 left-0 rounded bg-indigo-500 px-2 py-1 text-xs font-medium text-white shadow-sm">
-              {item.type ? item.type.charAt(0).toUpperCase() + item.type.slice(1) : 'Unknown'}
+              {item.type
+                ? item.type.charAt(0).toUpperCase() + item.type.slice(1)
+                : "Unknown"}
             </div>
           </>
         )}
-        
+
         {/* Focus ring with resize handles - only show when focused and not being dragged */}
         {isFocused && !isBeingDragged && (
           <>
             {/* Focus ring */}
             <div className="absolute inset-0 rounded-md ring-2 ring-blue-500" />
-            
             {/* Corner resize handles */}
-            <div className="absolute -left-1 -top-1 size-3 cursor-nw-resize bg-white ring-1 ring-blue-500" />            <div className="absolute -right-1 -top-1 size-3 cursor-ne-resize bg-white ring-1 ring-blue-500" />
-            <div className="absolute -left-1 -bottom-1 size-3 cursor-sw-resize bg-white ring-1 ring-blue-500" />
-            <div className="absolute -right-1 -bottom-1 size-3 cursor-se-resize bg-white ring-1 ring-blue-500" />
-            
+            <div className="absolute -left-1 -top-1 size-3 cursor-nw-resize bg-white ring-1 ring-blue-500" />{" "}
+            <div className="absolute -right-1 -top-1 size-3 cursor-ne-resize bg-white ring-1 ring-blue-500" />
+            <div className="absolute -bottom-1 -left-1 size-3 cursor-sw-resize bg-white ring-1 ring-blue-500" />
+            <div className="absolute -bottom-1 -right-1 size-3 cursor-se-resize bg-white ring-1 ring-blue-500" />
             {/* Edge resize handles */}
             <div className="absolute -top-1 left-1/2 size-3 -translate-x-1/2 cursor-n-resize bg-white ring-1 ring-blue-500" />
             <div className="absolute -bottom-1 left-1/2 size-3 -translate-x-1/2 cursor-s-resize bg-white ring-1 ring-blue-500" />
@@ -533,7 +534,7 @@ export default function BananaContent({
           isFocused={isFocused}
           isHovered={isHovered}
           shadowClasses={shadowClasses}
-        />
+        />,
       );
     }
 
@@ -547,7 +548,7 @@ export default function BananaContent({
               isFocused={isFocused}
               isHovered={isHovered}
               shadowClasses={shadowClasses}
-            />
+            />,
           );
         }
         return wrapWithHighlight(
@@ -557,7 +558,7 @@ export default function BananaContent({
             isFocused={isFocused}
             isHovered={isHovered}
             shadowClasses={shadowClasses}
-          />
+          />,
         );
       case "textbox":
         return wrapWithHighlight(
@@ -570,7 +571,7 @@ export default function BananaContent({
             handleContentChange={handleContentChange}
             textboxContentRef={textboxContentRef}
             isTextStyleMenuOpen={showTextStyleMenu && focusedItem === item.i}
-          />
+          />,
         );
       default: // 'section'
         return wrapWithHighlight(
@@ -580,7 +581,7 @@ export default function BananaContent({
             isFocused={isFocused}
             isHovered={isHovered}
             shadowClasses={shadowClasses}
-          />
+          />,
         );
     }
   };

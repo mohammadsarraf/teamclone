@@ -82,7 +82,8 @@ export default function Home() {
         <button
           onClick={() =>
             router.push(
-              `/deploy?primaryColor=${colors.primaryColor}&secondaryColor=${colors.secondaryColor}&bgColor=${colors.bgColor}`,
+              // `/deploy?primaryColor=${colors.primaryColor}&secondaryColor=${colors.secondaryColor}&bgColor=${colors.bgColor}`,
+              `/figma`,
             )
           }
           className="m-10 flex items-center justify-center rounded-lg border bg-black px-6 py-3 text-white transition duration-300 hover:bg-gray-800"

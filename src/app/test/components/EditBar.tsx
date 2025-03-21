@@ -6,6 +6,8 @@ import {
   MdStyle,
   MdSave,
   MdRestartAlt,
+  MdUndo,
+  MdRedo,
 } from "react-icons/md";
 import AddBlock from "../../figma/addBlock";
 import { SettingsMenu } from "./menus/SettingsMenu";
@@ -24,6 +26,13 @@ interface EditBarProps {
   onColsChange: (cols: number) => void;
   onRowsChange: (rows: number) => void;
   stateKey: string;
+  position?: "fixed" | "relative";
+  offset?: number;
+  onClose?: () => void;
+  onUndo?: () => void;
+  onRedo?: () => void;
+  canUndo?: boolean;
+  canRedo?: boolean;
 }
 
 export const EditBar = ({
@@ -40,6 +49,13 @@ export const EditBar = ({
   onColsChange,
   onRowsChange,
   stateKey,
+  position,
+  offset,
+  onClose,
+  onUndo,
+  onRedo,
+  canUndo = false,
+  canRedo = false,
 }: EditBarProps) => {
   const [isMenuVisible, setIsMenuVisible] = React.useState(false);
   const [isSettingsVisible, setIsSettingsVisible] = React.useState(false);
@@ -67,11 +83,16 @@ export const EditBar = ({
     onSettingsClick?.();
   };
 
+  const handleSave = () => {
+    handleSaveChanges?.();
+    onClose?.();
+  };
+
   return (
     <>
-      {/* Bottom Edit Bar */}
+      {/* Bottom Edit Bar - Make it fixed to viewport */}
       <div
-        className={`absolute bottom-0 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-lg bg-blue-900 p-2 text-white shadow-xl ${
+        className={`fixed bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-lg bg-blue-900 p-2 text-white shadow-xl ${
           showEditBar ? "opacity-100" : "opacity-0"
         } transition-opacity duration-200`}
         style={{ zIndex: 1000 }}
@@ -86,7 +107,7 @@ export const EditBar = ({
           Add Block
         </button>
         <div className="h-4 w-px bg-gray-700"></div>
-        <button
+        {/* <button
           type="button"
           onClick={handleEditClick}
           className={`edit-bar-button pointer-events-auto flex items-center gap-2 rounded px-3 py-1.5 text-sm transition-colors ${
@@ -96,7 +117,7 @@ export const EditBar = ({
         >
           <MdEdit className="text-lg" />
           {isEditing ? "Done" : "Edit"}
-        </button>
+        </button> */}
         <button
           type="button"
           onClick={handleDesignClick}
@@ -118,7 +139,7 @@ export const EditBar = ({
         <div className="h-4 w-px bg-gray-700"></div>
         <button
           type="button"
-          onClick={handleSaveChanges}
+          onClick={handleSave}
           className="edit-bar-button pointer-events-auto flex items-center gap-2 rounded px-3 py-1.5 text-sm text-green-400 transition-colors hover:bg-gray-700 active:bg-gray-600"
         >
           <MdSave className="text-lg" />
@@ -131,6 +152,27 @@ export const EditBar = ({
         >
           <MdRestartAlt className="text-lg" />
           Reset
+        </button>
+        <div className="h-4 w-px bg-gray-700"></div>
+        <button
+          type="button"
+          onClick={onUndo}
+          disabled={!canUndo}
+          className={`edit-bar-button pointer-events-auto flex items-center gap-2 rounded px-3 py-1.5 text-sm transition-colors 
+            ${canUndo ? "hover:bg-gray-700 active:bg-gray-600" : "cursor-not-allowed opacity-50"}`}
+        >
+          <MdUndo className="text-lg" />
+          Undo
+        </button>
+        <button
+          type="button"
+          onClick={onRedo}
+          disabled={!canRedo}
+          className={`edit-bar-button pointer-events-auto flex items-center gap-2 rounded px-3 py-1.5 text-sm transition-colors
+            ${canRedo ? "hover:bg-gray-700 active:bg-gray-600" : "cursor-not-allowed opacity-50"}`}
+        >
+          <MdRedo className="text-lg" />
+          Redo
         </button>
       </div>
 

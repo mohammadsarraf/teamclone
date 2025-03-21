@@ -32,6 +32,7 @@ const ShapeItem = ({
   onEnterPress,
   onHeightChange,
   unitSize,
+  onTextAlign,
 }: ShapeItemProps) => {
   if (!type) return null;
 
@@ -39,7 +40,12 @@ const ShapeItem = ({
     return (
       <TextBox
         text={text || ""}
-        onTextChange={onTextChange!}
+        onTextChange={(newText, newAlignment) => {
+          onTextChange?.(newText);
+          if (newAlignment) {
+            onTextAlign?.(newAlignment);
+          }
+        }}
         isActive={isActive}
         onStartEdit={onStartEdit}
         onEnterPress={onEnterPress}

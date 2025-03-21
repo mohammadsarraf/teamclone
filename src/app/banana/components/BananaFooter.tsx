@@ -352,21 +352,26 @@ export default function FooterContent({
   };
 
   const handleContentChange = (itemId: string, newContent: string) => {
-    console.log("Content changed for item:", itemId, "New content:", newContent.substring(0, 50) + "...");
-    
+    console.log(
+      "Content changed for item:",
+      itemId,
+      "New content:",
+      newContent.substring(0, 50) + "...",
+    );
+
     // Find the original item
     const originalItem = layout.find((item) => item.i === itemId);
     if (!originalItem) {
       console.warn("Item not found:", itemId);
       return;
     }
-    
+
     // Update the layout with the new content, preserving HTML formatting
     const updatedLayout = layout.map((item) => {
       if (item.i === itemId) {
-        return { 
-          ...item, 
-          content: newContent 
+        return {
+          ...item,
+          content: newContent,
         };
       }
       return item;
@@ -787,9 +792,9 @@ export default function FooterContent({
   const handleTextStyleUpdate = (updates: Partial<GridItem>) => {
     // Get the original item
     const originalItem = layout.find((item) => item.i === focusedItem);
-    
+
     if (!originalItem) return;
-    
+
     // Create a new layout with the updated item
     const newLayout = layout.map((item) => {
       if (item.i === focusedItem) {
@@ -798,24 +803,52 @@ export default function FooterContent({
           ...item,
           ...updates,
           // Only include valid style properties
-          textStyle: updates.textStyle !== undefined ? updates.textStyle : item.textStyle,
-          textColor: updates.textColor !== undefined ? updates.textColor : item.textColor,
-          fontSize: updates.fontSize !== undefined ? updates.fontSize : item.fontSize,
-          fontWeight: updates.fontWeight !== undefined ? updates.fontWeight : item.fontWeight,
-          fontStyle: updates.fontStyle !== undefined ? updates.fontStyle : item.fontStyle,
-          textDecoration: updates.textDecoration !== undefined ? updates.textDecoration : item.textDecoration,
-          textAlign: updates.textAlign !== undefined ? updates.textAlign : item.textAlign,
-          fontFamily: updates.fontFamily !== undefined ? updates.fontFamily : item.fontFamily,
-          lineHeight: updates.lineHeight !== undefined ? updates.lineHeight : item.lineHeight,
-          letterSpacing: updates.letterSpacing !== undefined ? updates.letterSpacing : item.letterSpacing,
+          textStyle:
+            updates.textStyle !== undefined
+              ? updates.textStyle
+              : item.textStyle,
+          textColor:
+            updates.textColor !== undefined
+              ? updates.textColor
+              : item.textColor,
+          fontSize:
+            updates.fontSize !== undefined ? updates.fontSize : item.fontSize,
+          fontWeight:
+            updates.fontWeight !== undefined
+              ? updates.fontWeight
+              : item.fontWeight,
+          fontStyle:
+            updates.fontStyle !== undefined
+              ? updates.fontStyle
+              : item.fontStyle,
+          textDecoration:
+            updates.textDecoration !== undefined
+              ? updates.textDecoration
+              : item.textDecoration,
+          textAlign:
+            updates.textAlign !== undefined
+              ? updates.textAlign
+              : item.textAlign,
+          fontFamily:
+            updates.fontFamily !== undefined
+              ? updates.fontFamily
+              : item.fontFamily,
+          lineHeight:
+            updates.lineHeight !== undefined
+              ? updates.lineHeight
+              : item.lineHeight,
+          letterSpacing:
+            updates.letterSpacing !== undefined
+              ? updates.letterSpacing
+              : item.letterSpacing,
         };
-        
+
         return updatedItem;
       }
-      
+
       return item;
     });
-    
+
     // Call the external onLayoutChange handler
     if (externalOnLayoutChange) {
       externalOnLayoutChange(newLayout);

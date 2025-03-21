@@ -45,10 +45,10 @@ export default function Banana() {
 
     // Check initially
     const timer = setTimeout(checkUndoRedoState, 1000);
-    
+
     // Set up interval to check periodically
     const interval = setInterval(checkUndoRedoState, 500);
-    
+
     return () => {
       clearTimeout(timer);
       clearInterval(interval);
@@ -77,7 +77,7 @@ export default function Banana() {
         {/* Main Content with Window Bar */}
         <div className="flex flex-1 flex-col">
           {/* Main Content Area */}
-          <div className="flex-1 bg-[#1b1b1b] p-8 overflow-hidden">
+          <div className="flex-1 overflow-hidden bg-[#1b1b1b] p-8">
             <div className="flex h-full flex-col">
               {/* Window Bar Skeleton */}
               <div className="flex items-center justify-between rounded-t-lg border border-gray-700 bg-[#2a2a2a] p-3">
@@ -89,31 +89,31 @@ export default function Banana() {
                     <div className="size-3 rounded-full bg-green-500/50"></div>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <div className="h-6 w-6 rounded bg-gray-600/50"></div>
-                    <div className="h-6 w-6 rounded bg-gray-600/50"></div>
+                    <div className="size-6 rounded bg-gray-600/50"></div>
+                    <div className="size-6 rounded bg-gray-600/50"></div>
                   </div>
                 </div>
-                
+
                 {/* Center - Title Skeleton */}
                 <div className="h-4 w-24 rounded bg-gray-600/50"></div>
-                
+
                 {/* Right Side - Save Button Skeleton */}
                 <div className="h-8 w-32 rounded-md bg-indigo-600/50"></div>
               </div>
 
               {/* Content Container Skeleton */}
-              <div className="flex-1 rounded-b-lg overflow-hidden border border-t-0 border-gray-700 bg-[#2a2a2a]">
+              <div className="flex-1 overflow-hidden rounded-b-lg border border-t-0 border-gray-700 bg-[#2a2a2a]">
                 {/* Header Skeleton */}
                 <div className="h-12 w-full animate-pulse bg-gray-700/30"></div>
-                
+
                 {/* Content Skeleton */}
-                <div className="flex flex-1 h-96 flex-col space-y-4 p-8">
+                <div className="flex h-96 flex-1 flex-col space-y-4 p-8">
                   <div className="h-4 w-3/4 rounded bg-gray-700/30"></div>
                   <div className="h-4 w-1/2 rounded bg-gray-700/30"></div>
                   <div className="h-4 w-5/6 rounded bg-gray-700/30"></div>
                   <div className="h-4 w-2/3 rounded bg-gray-700/30"></div>
                 </div>
-                
+
                 {/* Footer Skeleton */}
                 <div className="h-12 w-full animate-pulse bg-gray-700/30"></div>
               </div>

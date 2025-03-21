@@ -782,34 +782,41 @@ export default function BananaContent({
       if (item.i === focusedItem) {
         // Check if the update includes content changes (from inline formatting)
         if (updates.content) {
-          console.log(`Updating item ${item.i} with new formatted content:`, updates.content);
-          
+          console.log(
+            `Updating item ${item.i} with new formatted content:`,
+            updates.content,
+          );
+
           // Content update from inline formatting should take precedence
-          return { 
-            ...item, 
+          return {
+            ...item,
             ...updates,
           };
         }
-        
+
         // For non-content updates, preserve existing content
         const textboxElement = document.getElementById(item.i);
         let currentContent = item.content;
-        
+
         if (textboxElement) {
-          const contentElement = textboxElement.querySelector('[contenteditable]');
+          const contentElement =
+            textboxElement.querySelector("[contenteditable]");
           if (contentElement) {
             // Capture the current HTML content with all formatting
             currentContent = contentElement.innerHTML;
-            console.log(`Preserving inline formatting for ${item.i}:`, currentContent);
+            console.log(
+              `Preserving inline formatting for ${item.i}:`,
+              currentContent,
+            );
           }
         }
-        
+
         // Return the updated item with style updates and preserved content
-        return { 
-          ...item, 
+        return {
+          ...item,
           ...updates,
           // Preserve current content with formatting
-          content: currentContent 
+          content: currentContent,
         };
       }
       return item;

@@ -116,7 +116,7 @@ export default function BananaFooterEditor({
     debounceTime: 300,
     exposeToWindow: { key: "bananaFooterEditor" },
   });
-  
+
   // Wait for external state application before signaling we're initialized
   useEffect(() => {
     // Mark as initialized after a small delay
@@ -124,14 +124,17 @@ export default function BananaFooterEditor({
     const timer = setTimeout(() => {
       if (!hasInitialized.current) {
         hasInitialized.current = true;
-        
+
         // Only call onStateChange with current state if we haven't been initialized with external state
-        if (onStateChange && JSON.stringify(footerState) === JSON.stringify(initialState)) {
+        if (
+          onStateChange &&
+          JSON.stringify(footerState) === JSON.stringify(initialState)
+        ) {
           onStateChange(footerState);
         }
       }
     }, 100);
-    
+
     return () => clearTimeout(timer);
   }, [footerState, initialState, onStateChange]);
 
@@ -455,7 +458,14 @@ export default function BananaFooterEditor({
       {/* Main Content Area */}
       <div>
         {/* Content Container */}
-        <div className="relative h-full" onClick={() => {if (isFullscreen){setIsEditing(true)}}}>
+        <div
+          className="relative h-full"
+          onClick={() => {
+            if (isFullscreen) {
+              setIsEditing(true);
+            }
+          }}
+        >
           {/* Edit Tools Container - Sticky */}
           {isEditing &&
             !isDragging &&
@@ -612,11 +622,10 @@ export default function BananaFooterEditor({
         <div
           className="fixed z-50"
           style={{
-            left: contextMenuPosition.x ,
+            left: contextMenuPosition.x,
             top: contextMenuPosition.y,
           }}
           data-item-panel-container="true"
-          
         >
           <div className="w-64 rounded-lg bg-white shadow-xl">
             <BananaItemPanel
@@ -652,7 +661,7 @@ export default function BananaFooterEditor({
 
       {/* Edit Overlay - Fixed to viewport */}
       {isFullscreen && !isEditing && isHovered && !isDragging && (
-        <div className="pointer-events-none fixed inset-0 z-50" >
+        <div className="pointer-events-none fixed inset-0 z-50">
           <div className="absolute inset-0 bg-black/20 transition-opacity" />
           <button
             onClick={() => setIsEditing(true)}

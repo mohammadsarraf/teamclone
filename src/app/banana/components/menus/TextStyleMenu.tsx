@@ -193,31 +193,37 @@ const TextStyleMenu: React.FC<TextStyleMenuProps> = ({
     // Apply the command to the selected text
     document.execCommand(command, false, value);
     console.log(`Applied ${command} to selected text`);
-    
+
     // CRITICAL: Force immediate content update to ensure formatting is saved
     // Find the contentEditable div inside the textbox
     const textboxElement = document.getElementById(item.i);
     if (textboxElement) {
       // Log to help debug section conflicts
-      const isFooter = item.i.startsWith('footer-');
-      console.log(`Found ${isFooter ? 'FOOTER' : 'CONTENT'} textbox element with ID: ${item.i}`);
-      
-      const contentElement = textboxElement.querySelector('[contenteditable]');
+      const isFooter = item.i.startsWith("footer-");
+      console.log(
+        `Found ${isFooter ? "FOOTER" : "CONTENT"} textbox element with ID: ${item.i}`,
+      );
+
+      const contentElement = textboxElement.querySelector("[contenteditable]");
       if (contentElement) {
         // Get the updated HTML content with formatting
         const updatedContent = contentElement.innerHTML;
 
         // Force an update to the item's content in the layout
-        onUpdate({ 
-          content: updatedContent 
+        onUpdate({
+          content: updatedContent,
         });
-        
-        console.log(`Updated content after ${command} formatting:`, updatedContent.substring(0, 50) + (updatedContent.length > 50 ? '...' : ''));
+
+        console.log(
+          `Updated content after ${command} formatting:`,
+          updatedContent.substring(0, 50) +
+            (updatedContent.length > 50 ? "..." : ""),
+        );
       }
     } else {
       console.error(`Cannot find textbox element with ID: ${item.i}`);
     }
-    
+
     return true;
   };
 
@@ -226,18 +232,25 @@ const TextStyleMenu: React.FC<TextStyleMenuProps> = ({
     if (applyFormatToSelection("bold")) {
       // The formatting was applied to the selection
       console.log("Applied bold formatting to selection");
-      
+
       // Find the text element to get the complete updated content with bold tags
       const textboxElement = document.getElementById(item.i);
       if (textboxElement) {
-        const isFooter = item.i.startsWith('footer-');
-        console.log(`Checking bold format in ${isFooter ? 'FOOTER' : 'CONTENT'} textbox: ${item.i}`);
-        
-        const contentElement = textboxElement.querySelector('[contenteditable]');
+        const isFooter = item.i.startsWith("footer-");
+        console.log(
+          `Checking bold format in ${isFooter ? "FOOTER" : "CONTENT"} textbox: ${item.i}`,
+        );
+
+        const contentElement =
+          textboxElement.querySelector("[contenteditable]");
         if (contentElement) {
           // The updated HTML content including <b> or <strong> tags
           const formattedContent = contentElement.innerHTML;
-          console.log("Bold formatted content:", formattedContent.substring(0, 50) + (formattedContent.length > 50 ? '...' : ''));
+          console.log(
+            "Bold formatted content:",
+            formattedContent.substring(0, 50) +
+              (formattedContent.length > 50 ? "..." : ""),
+          );
         }
       }
     } else {
@@ -251,18 +264,25 @@ const TextStyleMenu: React.FC<TextStyleMenuProps> = ({
     if (applyFormatToSelection("italic")) {
       // The formatting was applied to the selection
       console.log("Applied italic formatting to selection");
-      
+
       // Find the text element to get the complete updated content with italic tags
       const textboxElement = document.getElementById(item.i);
       if (textboxElement) {
-        const isFooter = item.i.startsWith('footer-');
-        console.log(`Checking italic format in ${isFooter ? 'FOOTER' : 'CONTENT'} textbox: ${item.i}`);
-        
-        const contentElement = textboxElement.querySelector('[contenteditable]');
+        const isFooter = item.i.startsWith("footer-");
+        console.log(
+          `Checking italic format in ${isFooter ? "FOOTER" : "CONTENT"} textbox: ${item.i}`,
+        );
+
+        const contentElement =
+          textboxElement.querySelector("[contenteditable]");
         if (contentElement) {
           // The updated HTML content including <i> or <em> tags
           const formattedContent = contentElement.innerHTML;
-          console.log("Italic formatted content:", formattedContent.substring(0, 50) + (formattedContent.length > 50 ? '...' : ''));
+          console.log(
+            "Italic formatted content:",
+            formattedContent.substring(0, 50) +
+              (formattedContent.length > 50 ? "..." : ""),
+          );
         }
       }
     } else {

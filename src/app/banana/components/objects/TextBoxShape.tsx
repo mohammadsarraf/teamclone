@@ -24,7 +24,7 @@ export default function TextBoxShape({
 }: TextBoxProps) {
   const baseStyles = getBaseStyles(item);
   const contentRef = useRef<HTMLDivElement>(null);
-  
+
   // Get text style classes based on the textStyle property
   const getTextStyleClasses = () => {
     switch (item.textStyle) {
@@ -65,21 +65,24 @@ export default function TextBoxShape({
     if (contentRef.current) {
       // IMPORTANT: Always set the innerHTML to apply the formatted content
       // This ensures bold, italic, and other HTML formatting tags are displayed
-      contentRef.current.innerHTML = item.content || '';
-      
+      contentRef.current.innerHTML = item.content || "";
+
       // Log for debugging
-      if (item.content && item.content.includes('<')) {
+      if (item.content && item.content.includes("<")) {
         // Log with ID to help identify footer vs content textboxes
-        const isFooter = item.i.startsWith('footer-');
-        console.log(`Applied formatted HTML to ${isFooter ? 'FOOTER' : 'CONTENT'} textbox ${item.i}:`, 
-          item.content.substring(0, 50) + (item.content.length > 50 ? '...' : ''));
+        const isFooter = item.i.startsWith("footer-");
+        console.log(
+          `Applied formatted HTML to ${isFooter ? "FOOTER" : "CONTENT"} textbox ${item.i}:`,
+          item.content.substring(0, 50) +
+            (item.content.length > 50 ? "..." : ""),
+        );
       }
-      
+
       // Track the content in the ref
-      textboxContentRef.current[item.i] = item.content || '';
+      textboxContentRef.current[item.i] = item.content || "";
     }
   }, [item.i, item.content]);
-  
+
   // Additional useEffect to handle reapplication of content on focus changes
   useEffect(() => {
     // When an item becomes focused, ensure its formatted content is correctly displayed
@@ -108,7 +111,8 @@ export default function TextBoxShape({
         onFocus={() => {
           // Store the current content when focusing
           if (contentRef.current) {
-            textboxContentRef.current[item.i] = contentRef.current.innerHTML || "";
+            textboxContentRef.current[item.i] =
+              contentRef.current.innerHTML || "";
           }
         }}
         onBlur={(e) => {
@@ -120,9 +124,12 @@ export default function TextBoxShape({
           // This is important for inline formatting like bold, italic, etc.
           handleContentChange(item.i, newContent);
           textboxContentRef.current[item.i] = newContent;
-          
+
           // Log to confirm the content being saved has formatting preserved
-          console.log(`Saving textbox ${item.i} content with formatting:`, newContent);
+          console.log(
+            `Saving textbox ${item.i} content with formatting:`,
+            newContent,
+          );
         }}
         data-placeholder={item.placeholder || "Click to edit text"}
       >

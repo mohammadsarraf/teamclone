@@ -97,7 +97,7 @@ export default function BananaContentEditor({
     debounceTime: 300,
     exposeToWindow: { key: "bananaContentEditor" },
   });
-  
+
   // Wait for external state application before signaling we're initialized
   useEffect(() => {
     // Mark as initialized after a small delay
@@ -105,24 +105,33 @@ export default function BananaContentEditor({
     const timer = setTimeout(() => {
       if (!hasInitialized.current) {
         hasInitialized.current = true;
-        
+
         // Only call onStateChange with current state if we haven't been initialized with external state
-        if (onStateChange && JSON.stringify(contentState) === JSON.stringify(initialState)) {
+        if (
+          onStateChange &&
+          JSON.stringify(contentState) === JSON.stringify(initialState)
+        ) {
           onStateChange(contentState);
         }
-        
+
         // Log loaded content state to verify text formatting is present
         if (contentState.layout && contentState.layout.length > 0) {
-          const textboxes = contentState.layout.filter(item => item.type === "textbox");
+          const textboxes = contentState.layout.filter(
+            (item) => item.type === "textbox",
+          );
           if (textboxes.length > 0) {
-            console.log("Loaded textboxes with content:", 
-              textboxes.map(item => ({id: item.i, hasContent: !!item.content}))
+            console.log(
+              "Loaded textboxes with content:",
+              textboxes.map((item) => ({
+                id: item.i,
+                hasContent: !!item.content,
+              })),
             );
           }
         }
       }
     }, 100);
-    
+
     return () => clearTimeout(timer);
   }, [contentState, initialState, onStateChange]);
 
@@ -518,7 +527,14 @@ export default function BananaContentEditor({
       {/* Main Content Area */}
       <div>
         {/* Content Container */}
-        <div className="relative h-full" onClick={() => {if (isFullscreen){setIsEditing(true)}}}>
+        <div
+          className="relative h-full"
+          onClick={() => {
+            if (isFullscreen) {
+              setIsEditing(true);
+            }
+          }}
+        >
           {/* Edit Tools Container - Sticky */}
           {isEditing &&
             !isDragging &&

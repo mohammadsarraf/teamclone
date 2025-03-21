@@ -84,14 +84,17 @@ export default function BananaHeaderEditor({
     const timer = setTimeout(() => {
       if (!hasInitialized.current) {
         hasInitialized.current = true;
-        
+
         // Only call onStateChange with current state if we haven't been initialized with external state
-        if (onStateChange && JSON.stringify(headerState) === JSON.stringify(initialState)) {
+        if (
+          onStateChange &&
+          JSON.stringify(headerState) === JSON.stringify(initialState)
+        ) {
           onStateChange(headerState);
         }
       }
     }, 100);
-    
+
     return () => clearTimeout(timer);
   }, [headerState, initialState, onStateChange]);
 
@@ -301,7 +304,14 @@ export default function BananaHeaderEditor({
   }, []);
 
   return (
-    <div className="relative bg-white" onClick={() => {if (isFullscreen){setIsEditing(true)}}}>
+    <div
+      className="relative bg-white"
+      onClick={() => {
+        if (isFullscreen) {
+          setIsEditing(true);
+        }
+      }}
+    >
       {/* Header Container with hover detection */}
       <div
         className={`relative ${isEditing ? "z-40" : "z-10"}`}

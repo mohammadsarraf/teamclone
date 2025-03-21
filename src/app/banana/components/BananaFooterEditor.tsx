@@ -455,7 +455,7 @@ export default function BananaFooterEditor({
       {/* Main Content Area */}
       <div>
         {/* Content Container */}
-        <div className="relative h-full" onClick={() => setIsEditing(true)}>
+        <div className="relative h-full" onClick={() => {if (isFullscreen){setIsEditing(true)}}}>
           {/* Edit Tools Container - Sticky */}
           {isEditing &&
             !isDragging &&

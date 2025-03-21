@@ -301,7 +301,7 @@ export default function BananaHeaderEditor({
   }, []);
 
   return (
-    <div className="relative bg-white" onClick={() => setIsEditing(true)}>
+    <div className="relative bg-white" onClick={() => {if (isFullscreen){setIsEditing(true)}}}>
       {/* Header Container with hover detection */}
       <div
         className={`relative ${isEditing ? "z-40" : "z-10"}`}

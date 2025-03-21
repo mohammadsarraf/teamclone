@@ -110,6 +110,16 @@ export default function BananaContentEditor({
         if (onStateChange && JSON.stringify(contentState) === JSON.stringify(initialState)) {
           onStateChange(contentState);
         }
+        
+        // Log loaded content state to verify text formatting is present
+        if (contentState.layout && contentState.layout.length > 0) {
+          const textboxes = contentState.layout.filter(item => item.type === "textbox");
+          if (textboxes.length > 0) {
+            console.log("Loaded textboxes with content:", 
+              textboxes.map(item => ({id: item.i, hasContent: !!item.content}))
+            );
+          }
+        }
       }
     }, 100);
     
@@ -508,7 +518,8 @@ export default function BananaContentEditor({
       {/* Main Content Area */}
       <div>
         {/* Content Container */}
-        <div className="relative h-full">
+        <div className="relative h-full"             onClick={() => setIsEditing(true)}
+        >
           {/* Edit Tools Container - Sticky */}
           {isEditing &&
             !isDragging &&

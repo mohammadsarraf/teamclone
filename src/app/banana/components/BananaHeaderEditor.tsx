@@ -301,7 +301,7 @@ export default function BananaHeaderEditor({
   }, []);
 
   return (
-    <div className="relative">
+    <div className="relative bg-white" onClick={() => setIsEditing(true)}>
       {/* Header Container with hover detection */}
       <div
         className={`relative ${isEditing ? "z-40" : "z-10"}`}
@@ -384,7 +384,10 @@ export default function BananaHeaderEditor({
               animation: "fadeIn 0.3s ease-out",
               top: "48px", // Start below the top toolbar
             }}
-            onClick={handleExitEdit}
+            onClick={(e) => {
+              e.stopPropagation(); // Stop event from reaching parent container
+              handleExitEdit();
+            }}
           />
 
           {/* Toolbars */}

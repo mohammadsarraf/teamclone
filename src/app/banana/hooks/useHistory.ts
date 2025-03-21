@@ -82,6 +82,9 @@ export default function useHistory<T>(
   // Apply an external state (e.g., from parent component)
   const applyExternalState = useCallback(
     (state: T) => {
+      // Log the state being applied to verify content formatting is preserved
+      console.log("Applying external state:", state);
+      
       // Add the external state to history
       addState(state);
     },

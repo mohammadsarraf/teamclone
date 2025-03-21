@@ -354,9 +354,14 @@ export default function BananaContent({
 
   const handleContentChange = (itemId: string, newContent: string) => {
     // Update the layout with the new content, preserving HTML formatting
-    const updatedLayout = layout.map((item) =>
-      item.i === itemId ? { ...item, content: newContent } : item,
-    );
+    const updatedLayout = layout.map((item) => {
+      if (item.i === itemId) {
+        // Log to confirm content is being saved with formatting
+        console.log(`Saving formatted content for ${itemId}:`, newContent);
+        return { ...item, content: newContent };
+      }
+      return item;
+    });
 
     if (!externalLayout) {
       setInternalLayout(updatedLayout);
@@ -773,9 +778,42 @@ export default function BananaContent({
     if (!focusedItem) return;
 
     // Find the focused item
-    const updatedLayout = layout.map((item) =>
-      item.i === focusedItem ? { ...item, ...updates } : item,
-    );
+    const updatedLayout = layout.map((item) => {
+      if (item.i === focusedItem) {
+        // Check if the update includes content changes (from inline formatting)
+        if (updates.content) {
+          console.log(`Updating item ${item.i} with new formatted content:`, updates.content);
+          
+          // Content update from inline formatting should take precedence
+          return { 
+            ...item, 
+            ...updates,
+          };
+        }
+        
+        // For non-content updates, preserve existing content
+        const textboxElement = document.getElementById(item.i);
+        let currentContent = item.content;
+        
+        if (textboxElement) {
+          const contentElement = textboxElement.querySelector('[contenteditable]');
+          if (contentElement) {
+            // Capture the current HTML content with all formatting
+            currentContent = contentElement.innerHTML;
+            console.log(`Preserving inline formatting for ${item.i}:`, currentContent);
+          }
+        }
+        
+        // Return the updated item with style updates and preserved content
+        return { 
+          ...item, 
+          ...updates,
+          // Preserve current content with formatting
+          content: currentContent 
+        };
+      }
+      return item;
+    });
 
     // Update layout directly without using handleLayoutChange
     if (!externalLayout) {

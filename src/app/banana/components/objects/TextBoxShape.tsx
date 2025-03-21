@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import ShapeBase, {
   ShapeProps,
   getBaseStyles,
@@ -23,7 +23,8 @@ export default function TextBoxShape({
   isTextStyleMenuOpen = false,
 }: TextBoxProps) {
   const baseStyles = getBaseStyles(item);
-
+  const contentRef = useRef<HTMLDivElement>(null);
+  
   // Get text style classes based on the textStyle property
   const getTextStyleClasses = () => {
     switch (item.textStyle) {
@@ -58,6 +59,37 @@ export default function TextBoxShape({
     };
   };
 
+  // Use useEffect to apply content whenever item.content changes
+  useEffect(() => {
+    // Always apply content to ensure formatting is preserved
+    if (contentRef.current) {
+      // IMPORTANT: Always set the innerHTML to apply the formatted content
+      // This ensures bold, italic, and other HTML formatting tags are displayed
+      contentRef.current.innerHTML = item.content || '';
+      
+      // Log for debugging
+      if (item.content && item.content.includes('<')) {
+        // Log with ID to help identify footer vs content textboxes
+        const isFooter = item.i.startsWith('footer-');
+        console.log(`Applied formatted HTML to ${isFooter ? 'FOOTER' : 'CONTENT'} textbox ${item.i}:`, 
+          item.content.substring(0, 50) + (item.content.length > 50 ? '...' : ''));
+      }
+      
+      // Track the content in the ref
+      textboxContentRef.current[item.i] = item.content || '';
+    }
+  }, [item.i, item.content]);
+  
+  // Additional useEffect to handle reapplication of content on focus changes
+  useEffect(() => {
+    // When an item becomes focused, ensure its formatted content is correctly displayed
+    if (isFocused && contentRef.current && item.content) {
+      // Force reapplication of HTML content to fix any display issues
+      contentRef.current.innerHTML = item.content;
+      console.log(`Reapplied content on focus for ${item.i}`);
+    }
+  }, [isFocused, item.i, item.content]);
+
   return (
     <ShapeBase
       item={item}
@@ -72,20 +104,11 @@ export default function TextBoxShape({
         suppressContentEditableWarning
         className={`size-full empty:before:text-gray-400 empty:before:opacity-70 empty:before:content-[attr(data-placeholder)] focus:outline-none ${getTextStyleClasses()} ${isTextStyleMenuOpen ? "editing-with-menu" : ""}`}
         style={getCustomStyles()}
-        ref={(el) => {
-          // Set initial content only once when the element is first rendered
-          if (el && !el.innerHTML && item.content) {
-            // Use innerHTML to preserve formatting
-            el.innerHTML = item.content;
-          }
-        }}
+        ref={contentRef}
         onFocus={() => {
           // Store the current content when focusing
-          const element = document
-            .getElementById(item.i)
-            ?.querySelector("[contenteditable]");
-          if (element) {
-            textboxContentRef.current[item.i] = element.innerHTML || "";
+          if (contentRef.current) {
+            textboxContentRef.current[item.i] = contentRef.current.innerHTML || "";
           }
         }}
         onBlur={(e) => {
@@ -93,11 +116,13 @@ export default function TextBoxShape({
           const newContent = e.currentTarget.innerHTML || "";
           const oldContent = textboxContentRef.current[item.i] || "";
 
-          // Only update if content has actually changed
-          if (newContent !== oldContent) {
-            handleContentChange(item.i, newContent);
-            textboxContentRef.current[item.i] = newContent;
-          }
+          // Always update content to ensure formatting changes are saved
+          // This is important for inline formatting like bold, italic, etc.
+          handleContentChange(item.i, newContent);
+          textboxContentRef.current[item.i] = newContent;
+          
+          // Log to confirm the content being saved has formatting preserved
+          console.log(`Saving textbox ${item.i} content with formatting:`, newContent);
         }}
         data-placeholder={item.placeholder || "Click to edit text"}
       >

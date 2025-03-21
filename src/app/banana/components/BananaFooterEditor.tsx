@@ -60,10 +60,10 @@ const blockTemplates: BlockTemplate[] = [
 const defaultGridSettings: GridSettings = {
   rows: 20,
   columns: 50,
-  margin: 8, // For backward compatibility
+  margin: 0, // For backward compatibility
   horizontalMargin: 0,
   verticalMargin: 0,
-  padding: 16,
+  padding: 0,
 };
 
 export default function BananaFooterEditor({
@@ -191,7 +191,8 @@ export default function BananaFooterEditor({
         : 0;
 
     const newBlock: GridItem = {
-      i: `${template.type}-${layout.length + 1}`,
+      // Add 'footer-' prefix to ensure unique IDs across sections
+      i: `footer-${template.type}-${layout.length + 1}`,
       x: 0,
       y: template.type === "textbox" ? 5 : 0,
       w: template.type === "textbox" ? 10 : 3,
@@ -395,7 +396,8 @@ export default function BananaFooterEditor({
     // Create a duplicate with a new ID
     const duplicatedItem: GridItem = {
       ...focusedItemData,
-      i: `${focusedItemData.type}-${layout.length + 1}`,
+      // Ensure the duplicated item maintains the footer- prefix
+      i: `footer-${focusedItemData.type}-${layout.length + 1}`,
       x: focusedItemData.x + 1, // Offset slightly
       y: focusedItemData.y + 1, // Offset slightly
       layer: maxLayer + 1, // Place on top
@@ -453,7 +455,7 @@ export default function BananaFooterEditor({
       {/* Main Content Area */}
       <div>
         {/* Content Container */}
-        <div className="relative h-full">
+        <div className="relative h-full" onClick={() => setIsEditing(true)}>
           {/* Edit Tools Container - Sticky */}
           {isEditing &&
             !isDragging &&
@@ -614,6 +616,7 @@ export default function BananaFooterEditor({
             top: contextMenuPosition.y,
           }}
           data-item-panel-container="true"
+          
         >
           <div className="w-64 rounded-lg bg-white shadow-xl">
             <BananaItemPanel
@@ -649,7 +652,7 @@ export default function BananaFooterEditor({
 
       {/* Edit Overlay - Fixed to viewport */}
       {isFullscreen && !isEditing && isHovered && !isDragging && (
-        <div className="pointer-events-none fixed inset-0 z-50">
+        <div className="pointer-events-none fixed inset-0 z-50" >
           <div className="absolute inset-0 bg-black/20 transition-opacity" />
           <button
             onClick={() => setIsEditing(true)}

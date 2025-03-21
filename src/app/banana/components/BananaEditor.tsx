@@ -90,6 +90,21 @@ export default function BananaEditor({
     // Apply content state if we have it and the window API is available
     if (contentState && window.bananaContentEditor?.applyExternalState) {
       console.log("Applying saved content state");
+      
+      // Log textbox content to verify formatting is preserved
+      if (contentState.layout && contentState.layout.length > 0) {
+        const textboxes = contentState.layout.filter(item => item.type === "textbox");
+        if (textboxes.length > 0) {
+          console.log("Content state contains textboxes with HTML content:", 
+            textboxes.map(item => ({
+              id: item.i, 
+              content: item.content,
+              hasFormatting: item.content?.includes('<') || false
+            }))
+          );
+        }
+      }
+      
       window.bananaContentEditor.applyExternalState(contentState);
     }
     

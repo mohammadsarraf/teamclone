@@ -14,7 +14,6 @@ import {
   ItemActionMenu,
 } from "./objects";
 import { GridItem } from "../types";
-// Import TextStyleMenu component
 import TextStyleMenu from "./menus/TextStyleMenu";
 
 interface GridSettings {
@@ -48,10 +47,10 @@ interface FooterContentProps {
 const defaultGridSettings: GridSettings = {
   rows: 20,
   columns: 12,
-  margin: 8, // For backward compatibility
+  margin: 0, // For backward compatibility
   horizontalMargin: 8,
   verticalMargin: 8,
-  padding: 16,
+  padding: 0,
   fillScreen: false,
   heightSetting: "medium",
   customHeight: 50,

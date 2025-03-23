@@ -42,6 +42,7 @@ interface FooterContentProps {
   isEditing?: boolean;
   isInteracting?: boolean;
   onItemPanelClose?: () => void;
+  isFullscreen?: boolean;
 }
 
 const defaultGridSettings: GridSettings = {
@@ -67,6 +68,7 @@ export default function FooterContent({
   isEditing = false,
   isInteracting = false,
   onItemPanelClose,
+  isFullscreen = false,
 }: FooterContentProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState<number>(0);
@@ -494,6 +496,12 @@ export default function FooterContent({
   };
 
   const renderGridItem = (item: GridItem) => {
+    const isBeingDragged =
+      currentDragItem === item.i || currentResizeItem === item.i;
+    const isFocused = focusedItem === item.i;
+    const isHovered = hoveredItem === item.i;
+
+    // Shadow classes with the correct type
     const shadowClasses = {
       none: "",
       sm: "shadow-sm",
@@ -502,106 +510,77 @@ export default function FooterContent({
       xl: "shadow-xl",
     };
 
-    const itemIndex = layout.findIndex((i) => i.i === item.i);
-    const isBeingDragged = currentDragItem === item.i;
-    const isFocused = focusedItem === item.i;
-    const isHovered = hoveredItem === item.i;
+    // Get appropriate shadow level based on item state
+    const getShadowLevel = () => {
+      if (isBeingDragged) return "lg"; 
+      if (isFocused) return "md"; 
+      if (isHovered) return "sm";
+      return "none";
+    };
 
-    // Wrap each item with a highlight container
-    const wrapWithHighlight = (content: React.ReactNode) => (
-      <div className="relative size-full">
-        {content}
-        {/* Highlight ring and type indicator - only show when hovered and not focused */}
-        {isHovered && !isFocused && !isBeingDragged && (
-          <>
-            {/* Highlight ring */}
-            <div className="absolute inset-0 rounded-md ring-2 ring-indigo-500/50" />
-            {/* Type indicator */}
-            <div className="absolute -top-6 left-0 rounded bg-indigo-500 px-2 py-1 text-xs font-medium text-white shadow-sm">
-              {item.type
-                ? item.type.charAt(0).toUpperCase() + item.type.slice(1)
-                : "Unknown"}
-            </div>
-          </>
-        )}
-
-        {/* Focus ring with resize handles - only show when focused and not being dragged */}
-        {isFocused && !isBeingDragged && (
-          <>
-            {/* Focus ring */}
-            <div className="absolute inset-0 rounded-md ring-2 ring-blue-500" />
-            {/* Corner resize handles */}
-            <div className="absolute -left-1 -top-1 size-3 cursor-nw-resize bg-white ring-1 ring-blue-500" />{" "}
-            <div className="absolute -right-1 -top-1 size-3 cursor-ne-resize bg-white ring-1 ring-blue-500" />
-            <div className="absolute -bottom-1 -left-1 size-3 cursor-sw-resize bg-white ring-1 ring-blue-500" />
-            <div className="absolute -bottom-1 -right-1 size-3 cursor-se-resize bg-white ring-1 ring-blue-500" />
-            {/* Edge resize handles */}
-            <div className="absolute -top-1 left-1/2 size-3 -translate-x-1/2 cursor-n-resize bg-white ring-1 ring-blue-500" />
-            <div className="absolute -bottom-1 left-1/2 size-3 -translate-x-1/2 cursor-s-resize bg-white ring-1 ring-blue-500" />
-            <div className="absolute -left-1 top-1/2 size-3 -translate-y-1/2 cursor-w-resize bg-white ring-1 ring-blue-500" />
-            <div className="absolute -right-1 top-1/2 size-3 -translate-y-1/2 cursor-e-resize bg-white ring-1 ring-blue-500" />
-          </>
-        )}
-      </div>
-    );
+    // For TextBox type
+    if (item.type === "textbox") {
+      return (
+        <TextBoxShape
+          key={`${item.i}`}
+          item={item}
+          isBeingDragged={isBeingDragged}
+          isFocused={isFocused}
+          isHovered={isHovered}
+          shadowClasses={shadowClasses}
+          handleContentChange={handleContentChange}
+          textboxContentRef={textboxContentRef}
+          isTextStyleMenuOpen={showTextStyleMenu && isFocused}
+          isFullscreen={isFullscreen}
+        />
+      );
+    }
 
     // Render triangle shape
     if (item.type === "square" && item.shapeType === "triangle") {
-      return wrapWithHighlight(
+      return (
         <TriangleShape
           item={item}
           isBeingDragged={isBeingDragged}
           isFocused={isFocused}
           isHovered={isHovered}
           shadowClasses={shadowClasses}
-        />,
+        />
       );
     }
 
+    // For other shape types
     switch (item.type) {
       case "square":
         if (item.shapeType === "circle") {
-          return wrapWithHighlight(
+          return (
             <CircleShape
               item={item}
               isBeingDragged={isBeingDragged}
               isFocused={isFocused}
               isHovered={isHovered}
               shadowClasses={shadowClasses}
-            />,
+            />
           );
         }
-        return wrapWithHighlight(
+        return (
           <SquareShape
             item={item}
             isBeingDragged={isBeingDragged}
             isFocused={isFocused}
             isHovered={isHovered}
             shadowClasses={shadowClasses}
-          />,
-        );
-      case "textbox":
-        return wrapWithHighlight(
-          <TextBoxShape
-            item={item}
-            isBeingDragged={isBeingDragged}
-            isFocused={isFocused}
-            isHovered={isHovered}
-            shadowClasses={shadowClasses}
-            handleContentChange={handleContentChange}
-            textboxContentRef={textboxContentRef}
-            isTextStyleMenuOpen={showTextStyleMenu && focusedItem === item.i}
-          />,
+          />
         );
       default: // 'section'
-        return wrapWithHighlight(
+        return (
           <SectionShape
             item={item}
             isBeingDragged={isBeingDragged}
             isFocused={isFocused}
             isHovered={isHovered}
             shadowClasses={shadowClasses}
-          />,
+          />
         );
     }
   };

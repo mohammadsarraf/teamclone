@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import BananaContent from "./BananaContent";
 import BananaItemPanel from "./menus/BananaItemPanel";
-import GridSettingsMenu from "./GridSettingsMenu";
+import GridSettingsMenu from "./menus/GridSettingsMenu";
 import BlockMenu from "./menus/BlockMenu";
 import { ItemActionMenu } from "./objects";
 import { GridItem, BlockTemplate, GridSettings } from "../types";

@@ -360,7 +360,7 @@ const TextStyleMenu: React.FC<TextStyleMenuProps> = ({
 
   // Increase font size
   const increaseFontSize = () => {
-    const newSize = Math.min((item.fontSize || 16) + 2, 48);
+    const newSize = Math.min((item.fontSize || 16) + 2, 100);
     handleFontSizeChange(newSize);
   };
 

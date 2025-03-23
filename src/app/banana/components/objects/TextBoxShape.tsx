@@ -10,6 +10,7 @@ interface TextBoxProps extends ShapeProps {
   handleContentChange: (itemId: string, newContent: string) => void;
   textboxContentRef: React.MutableRefObject<{ [key: string]: string }>;
   isTextStyleMenuOpen?: boolean;
+  isFullscreen?: boolean;
 }
 
 export default function TextBoxShape({
@@ -21,6 +22,7 @@ export default function TextBoxShape({
   handleContentChange,
   textboxContentRef,
   isTextStyleMenuOpen = false,
+  isFullscreen = true,
 }: TextBoxProps) {
   const baseStyles = getBaseStyles(item);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -44,6 +46,14 @@ export default function TextBoxShape({
 
   // Apply custom styles from the item properties
   const getCustomStyles = () => {
+    // Calculate font size based on isFullscreen state
+    // In non-fullscreen mode, reduce the font size by 20px
+    const fontSize = item.fontSize
+      ? isFullscreen
+        ? `${item.fontSize}px`
+        : `${Math.max(item.fontSize - 12, 8)}px` // Ensure font size doesn't go below 8px
+      : "inherit";
+
     return {
       display: "block", // Override flex display for proper text alignment
       textAlign: item.textAlign || "left",
@@ -53,7 +63,7 @@ export default function TextBoxShape({
       lineHeight: item.lineHeight ? `${item.lineHeight}` : "normal",
       letterSpacing: item.letterSpacing ? `${item.letterSpacing}px` : "normal",
       fontFamily: item.fontFamily || "inherit",
-      fontSize: item.fontSize ? `${item.fontSize}px` : "inherit",
+      fontSize: fontSize,
       color: item.textColor || "inherit",
       cursor: isTextStyleMenuOpen ? "text" : "inherit", // Change cursor to text when TextStyleMenu is open
     };

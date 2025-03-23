@@ -6,7 +6,7 @@ import {
 } from "react-icons/bi";
 import { BsGrid3X3, BsGrid3X3Gap, BsGrid3X3GapFill } from "react-icons/bs";
 import { IoMdMore } from "react-icons/io";
-import { GridSettings } from "../types";
+import { GridSettings } from "../../types";
 import { RxPadding } from "react-icons/rx";
 
 interface GridSettingsMenuProps {

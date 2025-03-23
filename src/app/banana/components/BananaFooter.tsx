@@ -512,8 +512,8 @@ export default function FooterContent({
 
     // Get appropriate shadow level based on item state
     const getShadowLevel = () => {
-      if (isBeingDragged) return "lg"; 
-      if (isFocused) return "md"; 
+      if (isBeingDragged) return "lg";
+      if (isFocused) return "md";
       if (isHovered) return "sm";
       return "none";
     };

@@ -946,12 +946,12 @@ export default function BananaDesignPanel({
                         >
                           Color
                         </button>
-                        <button
+                        {/* <button
                           className={`flex-1 py-2 text-center text-sm font-medium ${activeColorTab === "theme" ? "border-b-2 border-black text-black" : "text-gray-500"}`}
                           onClick={() => setActiveColorTab("theme")}
                         >
                           Theme
-                        </button>
+                        </button> */}
                       </div>
 
                       {activeColorTab === "color" && (
@@ -1027,7 +1027,7 @@ export default function BananaDesignPanel({
               </div>
             </>
           )}
-        </div>
+        </div>  
       </div>
 
       {/* Color Picker Modal */}

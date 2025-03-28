@@ -137,7 +137,7 @@ export default function BananaContentEditor({
 
   // Extract current values from history state
   const { layout = [], gridSettings = defaultGridSettings } = contentState;
-
+  const [bgColor, setBgColor] = useState("bg-gray-700");
   const [isHovered, setIsHovered] = useState(false);
   const [showBlockMenu, setShowBlockMenu] = useState(false);
   const [showGridSettings, setShowGridSettings] = useState(false);
@@ -158,6 +158,12 @@ export default function BananaContentEditor({
   const [showItemToolbar, setShowItemToolbar] = useState(false);
   const [focusedItemData, setFocusedItemData] = useState<GridItem | null>(null);
   const addBlockButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Update bgColor when gridSettings change
+  useEffect(() => {
+    // No need to update bgColor here as we'll handle the background style directly
+    // in the BananaContent component using inline styles
+  }, [gridSettings]);
 
   // Handle ESC key press
   useEffect(() => {
@@ -369,6 +375,9 @@ export default function BananaContentEditor({
         gridSettings.verticalMargin,
     };
 
+    // Log the updated settings to help with debugging
+    console.log("Updated grid settings:", updatedSettings);
+
     // Add to history
     addState({
       ...contentState,
@@ -422,7 +431,13 @@ export default function BananaContentEditor({
     // Close Edit Section Menu when clicking outside
     if (showEditSectionMenu) {
       const menuElement = document.querySelector(".grid-settings-menu");
-      if (menuElement && !menuElement.contains(e.target as Node)) {
+      const colorPickerModal = document.querySelector(".color-picker-modal");
+      
+      // Don't close if click is inside the menu OR inside the color picker
+      const isClickInMenu = menuElement && menuElement.contains(e.target as Node);
+      const isClickInColorPicker = colorPickerModal && colorPickerModal.contains(e.target as Node);
+      
+      if (!isClickInMenu && !isClickInColorPicker) {
         setShowEditSectionMenu(false);
       }
     }
@@ -640,8 +655,8 @@ export default function BananaContentEditor({
               ${
                 isEditing
                   ? "rounded-md bg-gradient-to-r from-indigo-500 to-blue-500 p-[4px] shadow-lg"
-                  : isHovered
-                    ? "rounded-md bg-indigo-200 p-[2px] shadow-md"
+                  : isHovered && isFullscreen
+                    ? "rounded-md bg-opacity-50 p-[2px] shadow-md"
                     : "p-0"
               } 
               relative transition-all duration-200
@@ -660,14 +675,29 @@ export default function BananaContentEditor({
                 ${
                   isEditing
                     ? "ring-2 ring-white/80"
-                    : isHovered
+                    : isHovered && isFullscreen
                       ? "ring-1 ring-white/60"
                       : ""
                 } transition-all
               `}
               >
+                <div 
+                  className="absolute inset-0 z-0" 
+                  style={{
+                    backgroundColor: 
+                      gridSettings.backgroundType === "solid" 
+                        ? gridSettings.backgroundColor || "#000000" // Use the selected color or default to gray-700
+                        : "transparent", // Don't use backgroundColor for gradients
+                    backgroundImage: 
+                      gridSettings.backgroundType === "gradient" && gridSettings.backgroundGradientStart && gridSettings.backgroundGradientEnd 
+                        ? `linear-gradient(to right, ${gridSettings.backgroundGradientStart}, ${gridSettings.backgroundGradientEnd})` 
+                        : "none",
+                    opacity: gridSettings.backgroundOpacity !== undefined ? gridSettings.backgroundOpacity / 100 : 1,
+                    backdropFilter: gridSettings.backgroundBlur ? "blur(8px)" : "none",
+                  }}
+                />
                 <BananaContent
-                  className="bg-gray-700"
+                  className="relative z-10"
                   layout={layout}
                   onLayoutChange={handleLayoutChange}
                   gridSettings={gridSettings}

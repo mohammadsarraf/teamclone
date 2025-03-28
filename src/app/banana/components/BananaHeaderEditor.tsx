@@ -324,7 +324,7 @@ export default function BananaHeaderEditor({
           ${
             isEditing
               ? "rounded-md bg-gradient-to-r from-indigo-500 to-blue-500 p-[4px] shadow-lg"
-              : isHovered
+              : isHovered && isFullscreen
                 ? "rounded-md bg-indigo-200 p-[2px] shadow-md"
                 : "p-0"
           } 
@@ -348,7 +348,7 @@ export default function BananaHeaderEditor({
               className={`${
                 isEditing
                   ? "ring-2 ring-indigo-500 ring-offset-2"
-                  : isHovered
+                  : isHovered && isFullscreen
                     ? "ring-1 ring-indigo-300 ring-offset-1"
                     : ""
               } transition-all`}

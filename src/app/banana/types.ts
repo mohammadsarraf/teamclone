@@ -124,6 +124,12 @@ export interface GridSettings {
   contentWidth?: "narrow" | "medium" | "wide" | "full";
   contentAlignment?: "left" | "center" | "right";
   verticalAlignment?: "top" | "middle" | "bottom";
+  backgroundColor?: string;
+  backgroundType?: "solid" | "gradient" | "adaptive";
+  backgroundGradientStart?: string;
+  backgroundGradientEnd?: string;
+  backgroundOpacity?: number;
+  backgroundBlur?: boolean;
 }
 
 export {};

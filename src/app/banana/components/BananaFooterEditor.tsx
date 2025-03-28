@@ -141,6 +141,19 @@ export default function BananaFooterEditor({
   // Extract current values from history state
   const { layout = [], gridSettings = defaultGridSettings } = footerState;
 
+  // Add a useEffect to handle background colors when gridSettings change
+  useEffect(() => {
+    // This useEffect handles any necessary updates when gridSettings change
+    // The actual background rendering is now handled by the inline styles in the JSX
+    if (gridSettings.backgroundColor || gridSettings.backgroundType === "gradient") {
+      console.log("Footer background color updated:", 
+        gridSettings.backgroundType === "gradient" 
+          ? `Gradient: ${gridSettings.backgroundGradientStart} to ${gridSettings.backgroundGradientEnd}`
+          : gridSettings.backgroundColor
+      );
+    }
+  }, [gridSettings]);
+
   // Add keyboard shortcuts for undo/redo
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -276,6 +289,20 @@ export default function BananaFooterEditor({
       [key]: value,
     };
 
+    // Keep margin in sync with horizontal/vertical for backward compatibility
+    if (key === "horizontalMargin" || key === "verticalMargin") {
+      // If both horizontal and vertical are the same, update margin too
+      if (key === "horizontalMargin" && value === gridSettings.verticalMargin) {
+        updatedSettings.margin = value;
+      } else if (key === "verticalMargin" && value === gridSettings.horizontalMargin) {
+        updatedSettings.margin = value;
+      }
+    } else if (key === "margin") {
+      // If margin is updated, update both horizontal and vertical
+      updatedSettings.horizontalMargin = value;
+      updatedSettings.verticalMargin = value;
+    }
+
     handleGridSettingsChange(updatedSettings);
   };
 
@@ -311,6 +338,9 @@ export default function BananaFooterEditor({
   };
 
   const handleGridSettingsChange = (newSettings: GridSettings) => {
+    // Log the updated settings to help with debugging
+    console.log("Updated footer grid settings:", newSettings);
+    
     // Add to history
     addState({
       ...footerState,
@@ -356,7 +386,13 @@ export default function BananaFooterEditor({
     // Close Edit Section Menu when clicking outside
     if (showEditSectionMenu) {
       const menuElement = document.querySelector(".grid-settings-menu");
-      if (menuElement && !menuElement.contains(e.target as Node)) {
+      const colorPickerModal = document.querySelector(".color-picker-modal");
+      
+      // Don't close if click is inside the menu OR inside the color picker
+      const isClickInMenu = menuElement && menuElement.contains(e.target as Node);
+      const isClickInColorPicker = colorPickerModal && colorPickerModal.contains(e.target as Node);
+      
+      if (!isClickInMenu && !isClickInColorPicker) {
         setShowEditSectionMenu(false);
       }
     }
@@ -571,7 +607,7 @@ export default function BananaFooterEditor({
               ${
                 isEditing
                   ? "rounded-md bg-gradient-to-r from-indigo-500 to-blue-500 p-[4px] shadow-lg"
-                  : isHovered
+                  : isHovered && isFullscreen
                     ? "rounded-md bg-indigo-200 p-[2px] shadow-md"
                     : "p-0"
               } 
@@ -591,14 +627,29 @@ export default function BananaFooterEditor({
                 ${
                   isEditing
                     ? "ring-2 ring-white/80"
-                    : isHovered
+                    : isHovered && isFullscreen
                       ? "ring-1 ring-white/60"
                       : ""
                 } transition-all
               `}
               >
+                <div 
+                  className="absolute inset-0 z-0" 
+                  style={{
+                    backgroundColor: 
+                      gridSettings.backgroundType === "solid" 
+                        ? gridSettings.backgroundColor || "#4B5563" // Use the selected color or default to gray-700
+                        : "transparent", // Don't use backgroundColor for gradients
+                    backgroundImage: 
+                      gridSettings.backgroundType === "gradient" && gridSettings.backgroundGradientStart && gridSettings.backgroundGradientEnd 
+                        ? `linear-gradient(to right, ${gridSettings.backgroundGradientStart}, ${gridSettings.backgroundGradientEnd})` 
+                        : "none",
+                    opacity: gridSettings.backgroundOpacity !== undefined ? gridSettings.backgroundOpacity / 100 : 1,
+                    backdropFilter: gridSettings.backgroundBlur ? "blur(8px)" : "none",
+                  }}
+                />
                 <BananaFooter
-                  className="bg-gray-500"
+                  className="relative z-10"
                   layout={layout}
                   onLayoutChange={handleLayoutChange}
                   gridSettings={gridSettings}

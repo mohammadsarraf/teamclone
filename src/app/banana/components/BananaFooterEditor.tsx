@@ -145,11 +145,15 @@ export default function BananaFooterEditor({
   useEffect(() => {
     // This useEffect handles any necessary updates when gridSettings change
     // The actual background rendering is now handled by the inline styles in the JSX
-    if (gridSettings.backgroundColor || gridSettings.backgroundType === "gradient") {
-      console.log("Footer background color updated:", 
-        gridSettings.backgroundType === "gradient" 
+    if (
+      gridSettings.backgroundColor ||
+      gridSettings.backgroundType === "gradient"
+    ) {
+      console.log(
+        "Footer background color updated:",
+        gridSettings.backgroundType === "gradient"
           ? `Gradient: ${gridSettings.backgroundGradientStart} to ${gridSettings.backgroundGradientEnd}`
-          : gridSettings.backgroundColor
+          : gridSettings.backgroundColor,
       );
     }
   }, [gridSettings]);
@@ -294,7 +298,10 @@ export default function BananaFooterEditor({
       // If both horizontal and vertical are the same, update margin too
       if (key === "horizontalMargin" && value === gridSettings.verticalMargin) {
         updatedSettings.margin = value;
-      } else if (key === "verticalMargin" && value === gridSettings.horizontalMargin) {
+      } else if (
+        key === "verticalMargin" &&
+        value === gridSettings.horizontalMargin
+      ) {
         updatedSettings.margin = value;
       }
     } else if (key === "margin") {
@@ -340,7 +347,7 @@ export default function BananaFooterEditor({
   const handleGridSettingsChange = (newSettings: GridSettings) => {
     // Log the updated settings to help with debugging
     console.log("Updated footer grid settings:", newSettings);
-    
+
     // Add to history
     addState({
       ...footerState,
@@ -387,11 +394,13 @@ export default function BananaFooterEditor({
     if (showEditSectionMenu) {
       const menuElement = document.querySelector(".grid-settings-menu");
       const colorPickerModal = document.querySelector(".color-picker-modal");
-      
+
       // Don't close if click is inside the menu OR inside the color picker
-      const isClickInMenu = menuElement && menuElement.contains(e.target as Node);
-      const isClickInColorPicker = colorPickerModal && colorPickerModal.contains(e.target as Node);
-      
+      const isClickInMenu =
+        menuElement && menuElement.contains(e.target as Node);
+      const isClickInColorPicker =
+        colorPickerModal && colorPickerModal.contains(e.target as Node);
+
       if (!isClickInMenu && !isClickInColorPicker) {
         setShowEditSectionMenu(false);
       }
@@ -633,19 +642,26 @@ export default function BananaFooterEditor({
                 } transition-all
               `}
               >
-                <div 
-                  className="absolute inset-0 z-0" 
+                <div
+                  className="absolute inset-0 z-0"
                   style={{
-                    backgroundColor: 
-                      gridSettings.backgroundType === "solid" 
+                    backgroundColor:
+                      gridSettings.backgroundType === "solid"
                         ? gridSettings.backgroundColor || "#4B5563" // Use the selected color or default to gray-700
                         : "transparent", // Don't use backgroundColor for gradients
-                    backgroundImage: 
-                      gridSettings.backgroundType === "gradient" && gridSettings.backgroundGradientStart && gridSettings.backgroundGradientEnd 
-                        ? `linear-gradient(to right, ${gridSettings.backgroundGradientStart}, ${gridSettings.backgroundGradientEnd})` 
+                    backgroundImage:
+                      gridSettings.backgroundType === "gradient" &&
+                      gridSettings.backgroundGradientStart &&
+                      gridSettings.backgroundGradientEnd
+                        ? `linear-gradient(to right, ${gridSettings.backgroundGradientStart}, ${gridSettings.backgroundGradientEnd})`
                         : "none",
-                    opacity: gridSettings.backgroundOpacity !== undefined ? gridSettings.backgroundOpacity / 100 : 1,
-                    backdropFilter: gridSettings.backgroundBlur ? "blur(8px)" : "none",
+                    opacity:
+                      gridSettings.backgroundOpacity !== undefined
+                        ? gridSettings.backgroundOpacity / 100
+                        : 1,
+                    backdropFilter: gridSettings.backgroundBlur
+                      ? "blur(8px)"
+                      : "none",
                   }}
                 />
                 <BananaFooter

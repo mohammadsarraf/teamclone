@@ -432,11 +432,13 @@ export default function BananaContentEditor({
     if (showEditSectionMenu) {
       const menuElement = document.querySelector(".grid-settings-menu");
       const colorPickerModal = document.querySelector(".color-picker-modal");
-      
+
       // Don't close if click is inside the menu OR inside the color picker
-      const isClickInMenu = menuElement && menuElement.contains(e.target as Node);
-      const isClickInColorPicker = colorPickerModal && colorPickerModal.contains(e.target as Node);
-      
+      const isClickInMenu =
+        menuElement && menuElement.contains(e.target as Node);
+      const isClickInColorPicker =
+        colorPickerModal && colorPickerModal.contains(e.target as Node);
+
       if (!isClickInMenu && !isClickInColorPicker) {
         setShowEditSectionMenu(false);
       }
@@ -681,19 +683,26 @@ export default function BananaContentEditor({
                 } transition-all
               `}
               >
-                <div 
-                  className="absolute inset-0 z-0" 
+                <div
+                  className="absolute inset-0 z-0"
                   style={{
-                    backgroundColor: 
-                      gridSettings.backgroundType === "solid" 
+                    backgroundColor:
+                      gridSettings.backgroundType === "solid"
                         ? gridSettings.backgroundColor || "#000000" // Use the selected color or default to gray-700
                         : "transparent", // Don't use backgroundColor for gradients
-                    backgroundImage: 
-                      gridSettings.backgroundType === "gradient" && gridSettings.backgroundGradientStart && gridSettings.backgroundGradientEnd 
-                        ? `linear-gradient(to right, ${gridSettings.backgroundGradientStart}, ${gridSettings.backgroundGradientEnd})` 
+                    backgroundImage:
+                      gridSettings.backgroundType === "gradient" &&
+                      gridSettings.backgroundGradientStart &&
+                      gridSettings.backgroundGradientEnd
+                        ? `linear-gradient(to right, ${gridSettings.backgroundGradientStart}, ${gridSettings.backgroundGradientEnd})`
                         : "none",
-                    opacity: gridSettings.backgroundOpacity !== undefined ? gridSettings.backgroundOpacity / 100 : 1,
-                    backdropFilter: gridSettings.backgroundBlur ? "blur(8px)" : "none",
+                    opacity:
+                      gridSettings.backgroundOpacity !== undefined
+                        ? gridSettings.backgroundOpacity / 100
+                        : 1,
+                    backdropFilter: gridSettings.backgroundBlur
+                      ? "blur(8px)"
+                      : "none",
                   }}
                 />
                 <BananaContent

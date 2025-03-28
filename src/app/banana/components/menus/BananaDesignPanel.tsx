@@ -1027,7 +1027,7 @@ export default function BananaDesignPanel({
               </div>
             </>
           )}
-        </div>  
+        </div>
       </div>
 
       {/* Color Picker Modal */}

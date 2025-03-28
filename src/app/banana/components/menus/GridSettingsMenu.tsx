@@ -57,24 +57,25 @@ const GridSettingsMenu: React.FC<GridSettingsMenuProps> = ({
   // Color picker state
   const [showColorPickerModal, setShowColorPickerModal] = useState(false);
   const [colorPickerTab, setColorPickerTab] = useState<"palette" | "custom">(
-    "palette"
+    "palette",
   );
   const [activeColorField, setActiveColorField] = useState<
     "background" | "gradientEnd"
   >("background");
   const [selectedHexColor, setSelectedHexColor] = useState("#ffffff");
-  
+
   // Explicitly type the colorPickerPosition to fix TypeScript errors
   interface ColorPickerPosition {
     x: number;
     y: number;
   }
-  
-  const [colorPickerPosition, setColorPickerPosition] = useState<ColorPickerPosition>({
-    x: 0,
-    y: 0,
-  });
-  
+
+  const [colorPickerPosition, setColorPickerPosition] =
+    useState<ColorPickerPosition>({
+      x: 0,
+      y: 0,
+    });
+
   const [huePosition, setHuePosition] = useState(0);
 
   // Color palette
@@ -151,9 +152,9 @@ const GridSettingsMenu: React.FC<GridSettingsMenuProps> = ({
         // Don't call onSettingsChange yet - will be called on Apply
       } else {
         // Update local state
-        const newSettings = { 
-          ...settings, 
-          backgroundColor: formattedColor 
+        const newSettings = {
+          ...settings,
+          backgroundColor: formattedColor,
         };
         setSettings(newSettings);
         // Don't call onSettingsChange yet - will be called on Apply
@@ -175,7 +176,7 @@ const GridSettingsMenu: React.FC<GridSettingsMenuProps> = ({
   const handleColorPickerMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     // Prevent event from bubbling up and closing the modal
     e.stopPropagation();
-    
+
     const rect = e.currentTarget.getBoundingClientRect();
     const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
     const y = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
@@ -186,7 +187,7 @@ const GridSettingsMenu: React.FC<GridSettingsMenuProps> = ({
     const handleMouseMove = (e: MouseEvent) => {
       // Prevent the default behavior to ensure smooth dragging
       e.preventDefault();
-      
+
       const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
       const y = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
 
@@ -206,7 +207,7 @@ const GridSettingsMenu: React.FC<GridSettingsMenuProps> = ({
   const handleHueSliderMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     // Prevent event from bubbling up and closing the modal
     e.stopPropagation();
-    
+
     const rect = e.currentTarget.getBoundingClientRect();
     const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
 
@@ -216,7 +217,7 @@ const GridSettingsMenu: React.FC<GridSettingsMenuProps> = ({
     const handleMouseMove = (e: MouseEvent) => {
       // Prevent the default behavior to ensure smooth dragging
       e.preventDefault();
-      
+
       const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
 
       setHuePosition(x);
@@ -316,20 +317,23 @@ const GridSettingsMenu: React.FC<GridSettingsMenuProps> = ({
   };
 
   // Handle opening the color picker
-  const handleOpenColorPicker = (field: "background" | "gradientEnd", e?: React.MouseEvent) => {
+  const handleOpenColorPicker = (
+    field: "background" | "gradientEnd",
+    e?: React.MouseEvent,
+  ) => {
     // Stop event propagation to prevent closing the main menu
     if (e) {
       e.stopPropagation();
     }
-    
+
     // Prevent any existing color picker from closing the main menu
     const color = field === "background" ? backgroundColor : gradientEndColor;
     setActiveColorField(field);
     setSelectedHexColor(color || "#ffffff");
-    
+
     // Show the color picker modal without closing the main menu
     setShowColorPickerModal(true);
-    
+
     // Set the appropriate color picker tab based on the color
     if (color && colorPalette.includes(color)) {
       setColorPickerTab("palette");
@@ -414,9 +418,9 @@ const GridSettingsMenu: React.FC<GridSettingsMenuProps> = ({
   useEffect(() => {
     if (showColorPickerModal) {
       const handleColorPickerOutsideClick = (e: MouseEvent) => {
-        // Get references to the color picker modal 
-        const colorPickerModal = document.querySelector('.color-picker-modal');
-        
+        // Get references to the color picker modal
+        const colorPickerModal = document.querySelector(".color-picker-modal");
+
         // If we click outside the color picker modal, close ONLY the color picker - not the parent menu
         if (colorPickerModal && !colorPickerModal.contains(e.target as Node)) {
           // Don't stop propagation here - we only want to close the color picker
@@ -426,11 +430,14 @@ const GridSettingsMenu: React.FC<GridSettingsMenuProps> = ({
       };
 
       // Add the event listener
-      document.addEventListener('mousedown', handleColorPickerOutsideClick);
+      document.addEventListener("mousedown", handleColorPickerOutsideClick);
 
       // Clean up
       return () => {
-        document.removeEventListener('mousedown', handleColorPickerOutsideClick);
+        document.removeEventListener(
+          "mousedown",
+          handleColorPickerOutsideClick,
+        );
       };
     }
   }, [showColorPickerModal]);
@@ -447,7 +454,7 @@ const GridSettingsMenu: React.FC<GridSettingsMenuProps> = ({
     top: "280px",
     right: "340px",
   };
-  
+
   const customPickerPosition = {
     top: "180px",
     right: "340px",
@@ -1060,7 +1067,9 @@ const GridSettingsMenu: React.FC<GridSettingsMenuProps> = ({
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      setShowBackgroundTypeDropdown(!showBackgroundTypeDropdown);
+                      setShowBackgroundTypeDropdown(
+                        !showBackgroundTypeDropdown,
+                      );
                     }}
                     className="flex w-full items-center justify-between rounded-lg border border-gray-200 bg-gray-100 p-3 text-left"
                   >
@@ -1193,7 +1202,9 @@ const GridSettingsMenu: React.FC<GridSettingsMenuProps> = ({
                             backgroundColor:
                               ensureValidColorString(backgroundColor),
                           }}
-                          onClick={(e) => handleOpenColorPicker("background", e)}
+                          onClick={(e) =>
+                            handleOpenColorPicker("background", e)
+                          }
                         ></div>
                       </div>
 
@@ -1209,7 +1220,9 @@ const GridSettingsMenu: React.FC<GridSettingsMenuProps> = ({
                               backgroundColor:
                                 ensureValidColorString(gradientEndColor),
                             }}
-                            onClick={(e) => handleOpenColorPicker("gradientEnd", e)}
+                            onClick={(e) =>
+                              handleOpenColorPicker("gradientEnd", e)
+                            }
                           ></div>
                         </div>
                       )}
@@ -1290,16 +1303,20 @@ const GridSettingsMenu: React.FC<GridSettingsMenuProps> = ({
           }}
         >
           <div
-            className="absolute z-50 w-[320px] rounded-lg border border-gray-200 bg-white shadow-lg color-picker-modal"
-            style={colorPickerTab === "palette" ? palettePickerPosition : customPickerPosition}
+            className="color-picker-modal absolute z-50 w-[320px] rounded-lg border border-gray-200 bg-white shadow-lg"
+            style={
+              colorPickerTab === "palette"
+                ? palettePickerPosition
+                : customPickerPosition
+            }
             onClick={(e) => e.stopPropagation()}
-          > 
+          >
             {/* Color Picker Tabs */}
             <div className="flex w-full border-b">
               <button
                 className={`flex-1 py-3 text-center text-sm font-medium ${colorPickerTab === "palette" ? "border-b-2 border-black text-black" : "text-gray-500"}`}
                 onClick={(e) => {
-                  e.stopPropagation(); 
+                  e.stopPropagation();
                   setColorPickerTab("palette");
                 }}
               >
@@ -1403,7 +1420,7 @@ const GridSettingsMenu: React.FC<GridSettingsMenuProps> = ({
                         }}
                       ></div>
                       <div
-                        className="pointer-events-none absolute size-6-translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white"
+                        className="size-6-translate-x-1/2 pointer-events-none absolute -translate-y-1/2 rounded-full border-2 border-white"
                         style={{
                           left: `${colorPickerPosition.x * 100}%`,
                           top: `${colorPickerPosition.y * 100}%`,
@@ -1437,7 +1454,7 @@ const GridSettingsMenu: React.FC<GridSettingsMenuProps> = ({
                     {/* Hex Input */}
                     <div className="flex items-center text-black">
                       <div className="flex-1">
-                        <select 
+                        <select
                           className="rounded-md border border-gray-300 bg-white px-2 py-1 text-sm"
                           onClick={(e) => e.stopPropagation()}
                         >

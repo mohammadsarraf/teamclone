@@ -49,19 +49,26 @@ export default function BananaHeaderEditor({
   const [isDragging, setIsDragging] = useState(false);
 
   // Use forcedIsEditing from parent if provided, otherwise use internal state
-  const isEditing = forcedIsEditing !== undefined ? forcedIsEditing : isEditingInternal;
+  const isEditing =
+    forcedIsEditing !== undefined ? forcedIsEditing : isEditingInternal;
 
   // Update the parent component when editing state changes internally
-  const setIsEditing = useCallback((value: boolean) => {
-    setIsEditingInternal(value);
-    if (onEditingChange) {
-      onEditingChange(value);
-    }
-  }, [onEditingChange]);
+  const setIsEditing = useCallback(
+    (value: boolean) => {
+      setIsEditingInternal(value);
+      if (onEditingChange) {
+        onEditingChange(value);
+      }
+    },
+    [onEditingChange],
+  );
 
   // Effect to handle forcedIsEditing changes
   useEffect(() => {
-    if (forcedIsEditing !== undefined && isEditingInternal !== forcedIsEditing) {
+    if (
+      forcedIsEditing !== undefined &&
+      isEditingInternal !== forcedIsEditing
+    ) {
       setIsEditingInternal(forcedIsEditing);
     }
   }, [forcedIsEditing, isEditingInternal]);
@@ -406,8 +413,8 @@ export default function BananaHeaderEditor({
         {isFullscreen && !isEditing && isHovered && !isDragging && (
           <div className="pointer-events-none absolute inset-0 z-50">
             {/* Dark overlay just for the header area */}
-            <div 
-              className="absolute inset-0 transition-opacity" 
+            <div
+              className="absolute inset-0 transition-opacity"
               style={{
                 backgroundColor: "rgba(0, 0, 0, 0.6)", // Darker overlay only for this component
               }}

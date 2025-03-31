@@ -26,7 +26,9 @@ export default function BananaEditor({
   const [footerState, setFooterState] = useState<FooterState | undefined>();
 
   // Track which component is currently being edited
-  const [activeEditor, setActiveEditor] = useState<"header" | "content" | "footer" | null>(null);
+  const [activeEditor, setActiveEditor] = useState<
+    "header" | "content" | "footer" | null
+  >(null);
 
   // Global history management
   const [editorHistory, setEditorHistory] = useState<BananaEditorHistory[]>([
@@ -245,29 +247,38 @@ export default function BananaEditor({
   );
 
   // Handle editing state changes
-  const handleHeaderEditingChange = useCallback((isEditing: boolean) => {
-    if (isEditing) {
-      setActiveEditor("header");
-    } else if (activeEditor === "header") {
-      setActiveEditor(null);
-    }
-  }, [activeEditor]);
+  const handleHeaderEditingChange = useCallback(
+    (isEditing: boolean) => {
+      if (isEditing) {
+        setActiveEditor("header");
+      } else if (activeEditor === "header") {
+        setActiveEditor(null);
+      }
+    },
+    [activeEditor],
+  );
 
-  const handleContentEditingChange = useCallback((isEditing: boolean) => {
-    if (isEditing) {
-      setActiveEditor("content");
-    } else if (activeEditor === "content") {
-      setActiveEditor(null);
-    }
-  }, [activeEditor]);
+  const handleContentEditingChange = useCallback(
+    (isEditing: boolean) => {
+      if (isEditing) {
+        setActiveEditor("content");
+      } else if (activeEditor === "content") {
+        setActiveEditor(null);
+      }
+    },
+    [activeEditor],
+  );
 
-  const handleFooterEditingChange = useCallback((isEditing: boolean) => {
-    if (isEditing) {
-      setActiveEditor("footer");
-    } else if (activeEditor === "footer") {
-      setActiveEditor(null);
-    }
-  }, [activeEditor]);
+  const handleFooterEditingChange = useCallback(
+    (isEditing: boolean) => {
+      if (isEditing) {
+        setActiveEditor("footer");
+      } else if (activeEditor === "footer") {
+        setActiveEditor(null);
+      }
+    },
+    [activeEditor],
+  );
 
   // Mark loading as complete after components have mounted
   useEffect(() => {

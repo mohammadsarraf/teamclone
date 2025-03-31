@@ -98,19 +98,26 @@ export default function BananaFooterEditor({
   const hasInitialized = useRef(false);
 
   // Use forcedIsEditing from parent if provided, otherwise use internal state
-  const isEditing = forcedIsEditing !== undefined ? forcedIsEditing : isEditingInternal;
+  const isEditing =
+    forcedIsEditing !== undefined ? forcedIsEditing : isEditingInternal;
 
   // Update the parent component when editing state changes internally
-  const setIsEditing = useCallback((value: boolean) => {
-    setIsEditingInternal(value);
-    if (onEditingChange) {
-      onEditingChange(value);
-    }
-  }, [onEditingChange]);
+  const setIsEditing = useCallback(
+    (value: boolean) => {
+      setIsEditingInternal(value);
+      if (onEditingChange) {
+        onEditingChange(value);
+      }
+    },
+    [onEditingChange],
+  );
 
   // Effect to handle forcedIsEditing changes
   useEffect(() => {
-    if (forcedIsEditing !== undefined && isEditingInternal !== forcedIsEditing) {
+    if (
+      forcedIsEditing !== undefined &&
+      isEditingInternal !== forcedIsEditing
+    ) {
       setIsEditingInternal(forcedIsEditing);
     }
   }, [forcedIsEditing, isEditingInternal]);
@@ -121,7 +128,7 @@ export default function BananaFooterEditor({
     gridSettings: {
       ...defaultGridSettings,
       backgroundType: "solid",
-      backgroundColor: "#000000"
+      backgroundColor: "#000000",
     },
     backgroundColor: "#000000",
     textColor: "#ffffff",
@@ -760,8 +767,8 @@ export default function BananaFooterEditor({
       {/* Edit Overlay - Fixed to viewport */}
       {isFullscreen && !isEditing && isHovered && !isDragging && (
         <div className="pointer-events-none absolute inset-0 z-50">
-          <div 
-            className="absolute inset-0 transition-opacity" 
+          <div
+            className="absolute inset-0 transition-opacity"
             style={{
               backgroundColor: "rgba(0, 0, 0, 0.6)", // Darker overlay only for this component
             }}

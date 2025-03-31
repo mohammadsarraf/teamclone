@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import HeaderEditMenu from "./BananaHeaderControls";
 import ElementToolbar from "./menus/BananaElementPanel";
 import DesignToolbar from "./menus/BananaDesignPanel";
@@ -10,6 +10,8 @@ import useHistory from "../hooks/useHistory";
 interface HeaderEditProps {
   isFullscreen: boolean;
   onStateChange?: (state: HeaderState) => void;
+  forcedIsEditing?: boolean;
+  onEditingChange?: (isEditing: boolean) => void;
 }
 
 type MenuType = "none" | "element" | "design";
@@ -37,11 +39,32 @@ interface HeaderState {
 export default function BananaHeaderEditor({
   isFullscreen,
   onStateChange,
+  forcedIsEditing,
+  onEditingChange,
 }: HeaderEditProps) {
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditingInternal, setIsEditingInternal] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [activeMenu, setActiveMenu] = useState<MenuType>("none");
   const hasInitialized = useRef(false);
+  const [isDragging, setIsDragging] = useState(false);
+
+  // Use forcedIsEditing from parent if provided, otherwise use internal state
+  const isEditing = forcedIsEditing !== undefined ? forcedIsEditing : isEditingInternal;
+
+  // Update the parent component when editing state changes internally
+  const setIsEditing = useCallback((value: boolean) => {
+    setIsEditingInternal(value);
+    if (onEditingChange) {
+      onEditingChange(value);
+    }
+  }, [onEditingChange]);
+
+  // Effect to handle forcedIsEditing changes
+  useEffect(() => {
+    if (forcedIsEditing !== undefined && isEditingInternal !== forcedIsEditing) {
+      setIsEditingInternal(forcedIsEditing);
+    }
+  }, [forcedIsEditing, isEditingInternal]);
 
   // Initial header state
   const initialState: HeaderState = {
@@ -141,6 +164,14 @@ export default function BananaHeaderEditor({
         ...headerState,
         layout,
       });
+    }
+  };
+
+  const handleDragStateChange = (dragging: boolean) => {
+    setIsDragging(dragging);
+    if (dragging) {
+      // Hide all menus when dragging starts
+      setActiveMenu("none");
     }
   };
 
@@ -365,21 +396,30 @@ export default function BananaHeaderEditor({
                 isGradient={isGradient}
                 bgOpacity={headerBgOpacity}
                 textColor={headerTextColor || "#ffffff"}
+                onDragStateChange={handleDragStateChange}
               />
             </div>
           </div>
         </div>
 
         {/* Edit Overlay */}
-        {isFullscreen && (isHovered || isEditing) && (
-          <HeaderEditMenu
-            isEditing={isEditing}
-            onEditClick={() => setIsEditing(true)}
-            isHovered={isHovered}
-            onElementClick={() => handleMenuClick("element")}
-            onDesignClick={() => handleMenuClick("design")}
-            activeMenu={activeMenu}
-          />
+        {isFullscreen && !isEditing && isHovered && !isDragging && (
+          <div className="pointer-events-none absolute inset-0 z-50">
+            {/* Dark overlay just for the header area */}
+            <div 
+              className="absolute inset-0 transition-opacity" 
+              style={{
+                backgroundColor: "rgba(0, 0, 0, 0.6)", // Darker overlay only for this component
+              }}
+            />
+            <button
+              onClick={() => setIsEditing(true)}
+              onMouseEnter={() => setIsHovered(true)}
+              className="pointer-events-auto absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-md bg-white/90 px-4 py-2 text-sm font-medium text-gray-700 shadow-lg transition-all hover:bg-white"
+            >
+              Edit Header
+            </button>
+          </div>
         )}
       </div>
 
@@ -388,17 +428,17 @@ export default function BananaHeaderEditor({
         <>
           {/* Page dimming overlay */}
           <div
-            className="animate-in fade-in fixed inset-x-0 bottom-0 bg-black/60 backdrop-blur-sm transition-all duration-300"
+            className="fixed inset-x-0 bottom-0 z-10 cursor-pointer"
             style={{
-              zIndex: 20,
-              animation: "fadeIn 0.3s ease-out",
               top: "48px", // Start below the top toolbar
             }}
             onClick={(e) => {
               e.stopPropagation(); // Stop event from reaching parent container
               handleExitEdit();
             }}
-          />
+          >
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-all duration-300" />
+          </div>
 
           {/* Toolbars */}
           {activeMenu === "element" && (

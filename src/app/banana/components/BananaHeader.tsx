@@ -29,6 +29,7 @@ interface HeaderProps {
     isCart: boolean;
     isAccount: boolean;
   };
+  onDragStateChange?: (dragging: boolean) => void;
 }
 
 export default function BananaHeader({

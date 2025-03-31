@@ -11,6 +11,8 @@ import useHistory from "../hooks/useHistory";
 interface ContentProps {
   isFullscreen: boolean;
   onStateChange?: (state: any) => void;
+  forcedIsEditing?: boolean;
+  onEditingChange?: (isEditing: boolean) => void;
 }
 
 // Define footer state here until types are correctly resolved
@@ -69,8 +71,10 @@ const defaultGridSettings: GridSettings = {
 export default function BananaFooterEditor({
   isFullscreen,
   onStateChange,
+  forcedIsEditing,
+  onEditingChange,
 }: ContentProps) {
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditingInternal, setIsEditingInternal] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [showBlockMenu, setShowBlockMenu] = useState(false);
   const [showGridSettings, setShowGridSettings] = useState(false);
@@ -93,10 +97,32 @@ export default function BananaFooterEditor({
   const addBlockButtonRef = useRef<HTMLButtonElement>(null);
   const hasInitialized = useRef(false);
 
+  // Use forcedIsEditing from parent if provided, otherwise use internal state
+  const isEditing = forcedIsEditing !== undefined ? forcedIsEditing : isEditingInternal;
+
+  // Update the parent component when editing state changes internally
+  const setIsEditing = useCallback((value: boolean) => {
+    setIsEditingInternal(value);
+    if (onEditingChange) {
+      onEditingChange(value);
+    }
+  }, [onEditingChange]);
+
+  // Effect to handle forcedIsEditing changes
+  useEffect(() => {
+    if (forcedIsEditing !== undefined && isEditingInternal !== forcedIsEditing) {
+      setIsEditingInternal(forcedIsEditing);
+    }
+  }, [forcedIsEditing, isEditingInternal]);
+
   // Initial footer state
   const initialState: FooterState = {
     layout: [],
-    gridSettings: defaultGridSettings,
+    gridSettings: {
+      ...defaultGridSettings,
+      backgroundType: "solid",
+      backgroundColor: "#000000"
+    },
     backgroundColor: "#000000",
     textColor: "#ffffff",
   };
@@ -520,7 +546,7 @@ export default function BananaFooterEditor({
                 <div className="relative">
                   {/* Left Button with Dropdown - Only show when no menu is open */}
                   {!showEditSectionMenu && !showBlockMenu && (
-                    <div className="absolute left-0">
+                    <div className="absolute left-0 top-4">
                       <button
                         ref={addBlockButtonRef}
                         onClick={handleAddBlockClick}
@@ -554,7 +580,7 @@ export default function BananaFooterEditor({
                   )}
 
                   {/* Right Menu - Only show Edit Section button when no menu is open */}
-                  <div className="absolute right-0">
+                  <div className="absolute right-0 top-4">
                     {!showEditSectionMenu && !showBlockMenu ? (
                       <button
                         ref={(ref) => setEditSectionButtonRef(ref)}
@@ -633,52 +659,56 @@ export default function BananaFooterEditor({
               <div
                 className={`
                 relative overflow-hidden rounded-sm
-                ${
-                  isEditing
-                    ? "ring-2 ring-white/80"
-                    : isHovered && isFullscreen
-                      ? "ring-1 ring-white/60"
-                      : ""
-                } transition-all
               `}
               >
+                {/* Actual Footer Content with ring */}
                 <div
-                  className="absolute inset-0 z-0"
-                  style={{
-                    backgroundColor:
-                      gridSettings.backgroundType === "solid"
-                        ? gridSettings.backgroundColor || "#4B5563" // Use the selected color or default to gray-700
-                        : "transparent", // Don't use backgroundColor for gradients
-                    backgroundImage:
-                      gridSettings.backgroundType === "gradient" &&
-                      gridSettings.backgroundGradientStart &&
-                      gridSettings.backgroundGradientEnd
-                        ? `linear-gradient(to right, ${gridSettings.backgroundGradientStart}, ${gridSettings.backgroundGradientEnd})`
+                  className={`${
+                    isEditing
+                      ? "ring-2 ring-indigo-500 ring-offset-2"
+                      : isHovered && isFullscreen
+                        ? "ring-1 ring-indigo-300 ring-offset-1"
+                        : ""
+                  } transition-all`}
+                >
+                  <div
+                    className="absolute inset-0 z-0"
+                    style={{
+                      backgroundColor:
+                        gridSettings.backgroundType === "solid"
+                          ? gridSettings.backgroundColor || "#000000" // Use the selected color or default to black
+                          : "transparent", // Don't use backgroundColor for gradients
+                      backgroundImage:
+                        gridSettings.backgroundType === "gradient" &&
+                        gridSettings.backgroundGradientStart &&
+                        gridSettings.backgroundGradientEnd
+                          ? `linear-gradient(to right, ${gridSettings.backgroundGradientStart}, ${gridSettings.backgroundGradientEnd})`
+                          : "none",
+                      opacity:
+                        gridSettings.backgroundOpacity !== undefined
+                          ? gridSettings.backgroundOpacity / 100
+                          : 1,
+                      backdropFilter: gridSettings.backgroundBlur
+                        ? "blur(8px)"
                         : "none",
-                    opacity:
-                      gridSettings.backgroundOpacity !== undefined
-                        ? gridSettings.backgroundOpacity / 100
-                        : 1,
-                    backdropFilter: gridSettings.backgroundBlur
-                      ? "blur(8px)"
-                      : "none",
-                  }}
-                />
-                <BananaFooter
-                  className="relative z-10"
-                  layout={layout}
-                  onLayoutChange={handleLayoutChange}
-                  gridSettings={gridSettings}
-                  onItemClick={handleItemClick}
-                  onDragStateChange={handleDragStateChange}
-                  onFocusChange={handleFocusChange}
-                  isEditing={isEditing}
-                  isInteracting={
-                    showEditSectionMenu || showBlockMenu || showItemToolbar
-                  }
-                  onItemPanelClose={handleCloseContextMenu}
-                  isFullscreen={isFullscreen}
-                />
+                    }}
+                  />
+                  <BananaFooter
+                    className="relative z-10"
+                    layout={layout}
+                    onLayoutChange={handleLayoutChange}
+                    gridSettings={gridSettings}
+                    onItemClick={handleItemClick}
+                    onDragStateChange={handleDragStateChange}
+                    onFocusChange={handleFocusChange}
+                    isEditing={isEditing}
+                    isInteracting={
+                      showEditSectionMenu || showBlockMenu || showItemToolbar
+                    }
+                    onItemPanelClose={handleCloseContextMenu}
+                    isFullscreen={isFullscreen}
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -729,8 +759,13 @@ export default function BananaFooterEditor({
 
       {/* Edit Overlay - Fixed to viewport */}
       {isFullscreen && !isEditing && isHovered && !isDragging && (
-        <div className="pointer-events-none fixed inset-0 z-50">
-          <div className="absolute inset-0 bg-black/20 transition-opacity" />
+        <div className="pointer-events-none absolute inset-0 z-50">
+          <div 
+            className="absolute inset-0 transition-opacity" 
+            style={{
+              backgroundColor: "rgba(0, 0, 0, 0.6)", // Darker overlay only for this component
+            }}
+          />
           <button
             onClick={() => setIsEditing(true)}
             onMouseEnter={() => setIsHovered(true)}

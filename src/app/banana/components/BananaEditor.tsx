@@ -25,6 +25,9 @@ export default function BananaEditor({
   const [contentState, setContentState] = useState<ContentState | undefined>();
   const [footerState, setFooterState] = useState<FooterState | undefined>();
 
+  // Track which component is currently being edited
+  const [activeEditor, setActiveEditor] = useState<"header" | "content" | "footer" | null>(null);
+
   // Global history management
   const [editorHistory, setEditorHistory] = useState<BananaEditorHistory[]>([
     { timestamp: Date.now() },
@@ -241,6 +244,31 @@ export default function BananaEditor({
     [editorHistory, currentHistoryIndex],
   );
 
+  // Handle editing state changes
+  const handleHeaderEditingChange = useCallback((isEditing: boolean) => {
+    if (isEditing) {
+      setActiveEditor("header");
+    } else if (activeEditor === "header") {
+      setActiveEditor(null);
+    }
+  }, [activeEditor]);
+
+  const handleContentEditingChange = useCallback((isEditing: boolean) => {
+    if (isEditing) {
+      setActiveEditor("content");
+    } else if (activeEditor === "content") {
+      setActiveEditor(null);
+    }
+  }, [activeEditor]);
+
+  const handleFooterEditingChange = useCallback((isEditing: boolean) => {
+    if (isEditing) {
+      setActiveEditor("footer");
+    } else if (activeEditor === "footer") {
+      setActiveEditor(null);
+    }
+  }, [activeEditor]);
+
   // Mark loading as complete after components have mounted
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -359,16 +387,22 @@ export default function BananaEditor({
       <HeaderEdit
         isFullscreen={isFullscreen}
         onStateChange={handleHeaderStateChange}
+        forcedIsEditing={activeEditor === "header"}
+        onEditingChange={handleHeaderEditingChange}
       />
       <div className="flex-1">
         <MainEdit
           isFullscreen={isFullscreen}
           onStateChange={handleContentStateChange}
+          forcedIsEditing={activeEditor === "content"}
+          onEditingChange={handleContentEditingChange}
         />
       </div>
       <FooterEdit
         isFullscreen={isFullscreen}
         onStateChange={handleFooterStateChange}
+        forcedIsEditing={activeEditor === "footer"}
+        onEditingChange={handleFooterEditingChange}
       />
     </div>
   );

@@ -370,11 +370,29 @@ export default function BananaHeaderEditor({
           ease-in-out
         `}
         >
-          {/* Editing indicator label */}
-          {isEditing && (
-            <div className="absolute -top-6 right-2 z-50 rounded bg-indigo-600 px-2 py-1 text-xs font-semibold text-white shadow-md">
-              Editing Header
-            </div>
+          {/* Edit Overlay */}
+          {isFullscreen && (isHovered || isEditing) && (
+            <>
+              {/* Dark overlay just for the header when hovering (not when editing) */}
+              {isHovered && !isEditing && (
+                <div className="pointer-events-none absolute inset-0 z-40">
+                  <div
+                    className="absolute inset-0 transition-opacity"
+                    style={{
+                      backgroundColor: "rgba(0, 0, 0, 0.6)", // Darker overlay only for this component
+                    }}
+                  />
+                </div>
+              )}
+              <HeaderEditMenu
+                isEditing={isEditing}
+                onEditClick={() => setIsEditing(true)}
+                isHovered={isHovered}
+                onElementClick={() => handleMenuClick("element")}
+                onDesignClick={() => handleMenuClick("design")}
+                activeMenu={activeMenu}
+              />
+            </>
           )}
           <div
             className={`

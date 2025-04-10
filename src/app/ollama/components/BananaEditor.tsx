@@ -22,9 +22,11 @@ export default function BananaEditor({
   isFullscreen: boolean;
 }) {
   // Get state setters from context
-  const { setHeaderState: setGlobalHeaderState, 
-          setContentState: setGlobalContentState, 
-          setFooterState: setGlobalFooterState } = useEditorState();
+  const {
+    setHeaderState: setGlobalHeaderState,
+    setContentState: setGlobalContentState,
+    setFooterState: setGlobalFooterState,
+  } = useEditorState();
 
   // Track current state of each component (local to this component)
   const [headerState, setHeaderState] = useState<HeaderState | undefined>();

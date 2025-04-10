@@ -342,9 +342,7 @@ export default function BananaHeaderEditor({
   }, []);
 
   return (
-    <div
-      className="relative bg-white"
-    >
+    <div className="relative bg-white">
       {/* Header Container with hover detection */}
       <div
         className={`relative ${isEditing ? "z-40" : "z-10"}`}

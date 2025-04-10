@@ -13,8 +13,8 @@ const STORAGE_KEY = "banana-editor-state";
 
 // Interface for change instructions from LLM
 interface ChangeInstructions {
-  type: 'color' | 'text' | 'size' | 'layout' | 'gradient';
-  target: 'header' | 'content' | 'footer';
+  type: "color" | "text" | "size" | "layout" | "gradient";
+  target: "header" | "content" | "footer";
   element: string; // ID of element or 'background'
   property: string; // Property to change
   value: any; // New value
@@ -48,11 +48,15 @@ function Banana() {
   const [isProcessing, setIsProcessing] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  
+
   // Get editor state from context
-  const { 
-    headerState, contentState, footerState,
-    setHeaderState, setContentState, setFooterState 
+  const {
+    headerState,
+    contentState,
+    footerState,
+    setHeaderState,
+    setContentState,
+    setFooterState,
   } = useEditorState();
 
   // State for pending changes that need to be applied
@@ -67,19 +71,28 @@ function Banana() {
     if (!pendingChanges) return;
 
     // Apply header changes
-    if (pendingChanges.header && window.bananaHeaderEditor?.applyExternalState) {
+    if (
+      pendingChanges.header &&
+      window.bananaHeaderEditor?.applyExternalState
+    ) {
       setHeaderState(pendingChanges.header);
       window.bananaHeaderEditor.applyExternalState(pendingChanges.header);
     }
 
     // Apply content changes
-    if (pendingChanges.content && window.bananaContentEditor?.applyExternalState) {
+    if (
+      pendingChanges.content &&
+      window.bananaContentEditor?.applyExternalState
+    ) {
       setContentState(pendingChanges.content);
       window.bananaContentEditor.applyExternalState(pendingChanges.content);
     }
 
     // Apply footer changes
-    if (pendingChanges.footer && window.bananaFooterEditor?.applyExternalState) {
+    if (
+      pendingChanges.footer &&
+      window.bananaFooterEditor?.applyExternalState
+    ) {
       setFooterState(pendingChanges.footer);
       window.bananaFooterEditor.applyExternalState(pendingChanges.footer);
     }
@@ -108,7 +121,8 @@ function Banana() {
   // Scroll to bottom when chat history updates
   useEffect(() => {
     if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
     }
   }, [chatHistory]);
 
@@ -157,232 +171,268 @@ function Banana() {
   };
 
   // Process and apply change instructions from LLM
-  const applyChangeInstructions = useCallback((instructionsText: string) => {
-    try {
-      // Extract the instructions block with regex
-      const match = instructionsText.match(/CHANGE_INSTRUCTIONS:\s*SIMPLE_FORMAT\s*([\s\S]*?)(?=\n\n|$)/);
-      if (!match || !match[1]) {
-        console.error("No CHANGE_INSTRUCTIONS block found in:", instructionsText);
-        return false;
-      }
-      
-      // Log the raw instructions for debugging
-      console.log("Raw instructions:", match[1]);
-      
-      // Parse the simple key-value format
-      const lines = match[1].trim().split('\n');
-      const instructions: Record<string, string> = {};
-      
-      // Process each line to extract key-value pairs
-      lines.forEach(line => {
-        const parts = line.split(':');
-        if (parts.length >= 2) {
-          const key = parts[0].trim();
-          const value = parts.slice(1).join(':').trim(); // Rejoin in case value contains colons
-          instructions[key] = value;
+  const applyChangeInstructions = useCallback(
+    (instructionsText: string) => {
+      try {
+        // Extract the instructions block with regex
+        const match = instructionsText.match(
+          /CHANGE_INSTRUCTIONS:\s*SIMPLE_FORMAT\s*([\s\S]*?)(?=\n\n|$)/,
+        );
+        if (!match || !match[1]) {
+          console.error(
+            "No CHANGE_INSTRUCTIONS block found in:",
+            instructionsText,
+          );
+          return false;
         }
-      });
-      
-      console.log("Parsed instructions:", instructions);
-      
-      // Convert to our ChangeInstructions format
-      const changeInstructions: ChangeInstructions = {
-        type: instructions.TYPE as any,
-        target: instructions.TARGET as any,
-        element: instructions.ELEMENT,
-        property: instructions.PROPERTY,
-        value: instructions.VALUE
-      };
-      
-      // Add additionalInfo for gradients
-      if (instructions.ADDITIONAL_START_COLOR && instructions.ADDITIONAL_END_COLOR) {
-        changeInstructions.additionalInfo = {
-          startColor: instructions.ADDITIONAL_START_COLOR,
-          endColor: instructions.ADDITIONAL_END_COLOR
-        };
-      }
-      
-      console.log("Converted instructions:", changeInstructions);
-      
-      // Prepare changes but don't apply them directly
-      const changes: { header?: any; content?: any; footer?: any } = {};
-      
-      // Apply changes based on target
-      switch (changeInstructions.target) {
-        case 'header':
-          if (headerState) {
-            // Use type assertion to access dynamic properties
-            const newState = { ...headerState } as any;
-            if (changeInstructions.element === 'background') {
-              // Handle background changes
-              if (changeInstructions.property === 'backgroundColor' || 
-                  changeInstructions.property === 'textColor') {
-                newState[changeInstructions.property] = changeInstructions.value;
-              }
-            } else {
-              // Handle other header element changes
-              // ...
-            }
-            changes.header = newState;
+
+        // Log the raw instructions for debugging
+        console.log("Raw instructions:", match[1]);
+
+        // Parse the simple key-value format
+        const lines = match[1].trim().split("\n");
+        const instructions: Record<string, string> = {};
+
+        // Process each line to extract key-value pairs
+        lines.forEach((line) => {
+          const parts = line.split(":");
+          if (parts.length >= 2) {
+            const key = parts[0].trim();
+            const value = parts.slice(1).join(":").trim(); // Rejoin in case value contains colons
+            instructions[key] = value;
           }
-          break;
-          
-        case 'content':
-          if (contentState) {
-            const newState = { ...contentState };
-            
-            if (changeInstructions.element === 'background') {
-              if (!newState.gridSettings) {
-                newState.gridSettings = {} as any;
+        });
+
+        console.log("Parsed instructions:", instructions);
+
+        // Convert to our ChangeInstructions format
+        const changeInstructions: ChangeInstructions = {
+          type: instructions.TYPE as any,
+          target: instructions.TARGET as any,
+          element: instructions.ELEMENT,
+          property: instructions.PROPERTY,
+          value: instructions.VALUE,
+        };
+
+        // Add additionalInfo for gradients
+        if (
+          instructions.ADDITIONAL_START_COLOR &&
+          instructions.ADDITIONAL_END_COLOR
+        ) {
+          changeInstructions.additionalInfo = {
+            startColor: instructions.ADDITIONAL_START_COLOR,
+            endColor: instructions.ADDITIONAL_END_COLOR,
+          };
+        }
+
+        console.log("Converted instructions:", changeInstructions);
+
+        // Prepare changes but don't apply them directly
+        const changes: { header?: any; content?: any; footer?: any } = {};
+
+        // Apply changes based on target
+        switch (changeInstructions.target) {
+          case "header":
+            if (headerState) {
+              // Use type assertion to access dynamic properties
+              const newState = { ...headerState } as any;
+              if (changeInstructions.element === "background") {
+                // Handle background changes
+                if (
+                  changeInstructions.property === "backgroundColor" ||
+                  changeInstructions.property === "textColor"
+                ) {
+                  newState[changeInstructions.property] =
+                    changeInstructions.value;
+                }
+              } else {
+                // Handle other header element changes
+                // ...
               }
-              
-              // Use type assertion for grid settings
-              const gridSettings = newState.gridSettings as any;
-              
-              if (changeInstructions.type === 'color') {
-                gridSettings.backgroundType = 'solid';
-                gridSettings.backgroundColor = changeInstructions.value;
-              } else if (changeInstructions.type === 'gradient' && changeInstructions.additionalInfo) {
-                gridSettings.backgroundType = 'gradient';
-                gridSettings.backgroundGradientStart = changeInstructions.additionalInfo.startColor;
-                gridSettings.backgroundGradientEnd = changeInstructions.additionalInfo.endColor;
-              }
-            } else {
-              // Handle specific element changes
-              if (newState.layout) {
-                const elementIndex = newState.layout.findIndex(item => item.i === changeInstructions.element);
-                if (elementIndex >= 0) {
-                  newState.layout[elementIndex] = {
-                    ...newState.layout[elementIndex],
-                    [changeInstructions.property]: changeInstructions.value
-                  };
+              changes.header = newState;
+            }
+            break;
+
+          case "content":
+            if (contentState) {
+              const newState = { ...contentState };
+
+              if (changeInstructions.element === "background") {
+                if (!newState.gridSettings) {
+                  newState.gridSettings = {} as any;
+                }
+
+                // Use type assertion for grid settings
+                const gridSettings = newState.gridSettings as any;
+
+                if (changeInstructions.type === "color") {
+                  gridSettings.backgroundType = "solid";
+                  gridSettings.backgroundColor = changeInstructions.value;
+                } else if (
+                  changeInstructions.type === "gradient" &&
+                  changeInstructions.additionalInfo
+                ) {
+                  gridSettings.backgroundType = "gradient";
+                  gridSettings.backgroundGradientStart =
+                    changeInstructions.additionalInfo.startColor;
+                  gridSettings.backgroundGradientEnd =
+                    changeInstructions.additionalInfo.endColor;
+                }
+              } else {
+                // Handle specific element changes
+                if (newState.layout) {
+                  const elementIndex = newState.layout.findIndex(
+                    (item) => item.i === changeInstructions.element,
+                  );
+                  if (elementIndex >= 0) {
+                    newState.layout[elementIndex] = {
+                      ...newState.layout[elementIndex],
+                      [changeInstructions.property]: changeInstructions.value,
+                    };
+                  }
                 }
               }
+
+              changes.content = newState;
             }
-            
-            changes.content = newState;
-          }
-          break;
-          
-        case 'footer':
-          if (footerState) {
-            const newState = { ...footerState } as any;
-            // Process footer changes
-            changes.footer = newState;
-          }
-          break;
+            break;
+
+          case "footer":
+            if (footerState) {
+              const newState = { ...footerState } as any;
+              // Process footer changes
+              changes.footer = newState;
+            }
+            break;
+        }
+
+        // Queue the changes to be applied via useEffect
+        if (Object.keys(changes).length > 0) {
+          setPendingChanges(changes);
+          return true;
+        }
+
+        return false;
+      } catch (error) {
+        console.error("Error applying change instructions:", error);
+        return false;
       }
-      
-      // Queue the changes to be applied via useEffect
-      if (Object.keys(changes).length > 0) {
-        setPendingChanges(changes);
-        return true;
-      }
-      
-      return false;
-    } catch (error) {
-      console.error("Error applying change instructions:", error);
-      return false;
-    }
-  }, [headerState, contentState, footerState]);
+    },
+    [headerState, contentState, footerState],
+  );
 
   // Handle chat submission
   const handleChatSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!chatMessage.trim() || isProcessing) return;
-    
+
     setIsProcessing(true);
-    
+
     // Save the user's message to display in the chat
     const userMsg = chatMessage;
     setChatMessage(""); // Clear input field right away for better UX
-    
+
     // Add user message to chat history
     const userChatMessage: ChatMessage = {
       role: "user",
       content: userMsg,
       timestamp: Date.now(),
     };
-    
-    setChatHistory(prev => [...prev, userChatMessage]);
-    
+
+    setChatHistory((prev) => [...prev, userChatMessage]);
+
     // Add a temporary "processing" message
     const processingMessage: ChatMessage = {
       role: "system",
       content: "Processing...",
       timestamp: Date.now() + 1, // +1 to ensure it sorts after the user message
     };
-    
-    setChatHistory(prev => [...prev, processingMessage]);
-    
+
+    setChatHistory((prev) => [...prev, processingMessage]);
+
     try {
       // Extract only the necessary parts of the editor state to reduce payload size
       const editorStateForLLM = {
-        header: headerState ? {
-          layout: headerState.layout,
-          height: headerState.height,
-          enabledElements: headerState.enabledElements,
-          // Add other relevant header properties
-        } : null,
-        content: contentState ? {
-          layout: contentState.layout,
-          gridSettings: contentState.gridSettings ? {
-            // Include base properties we know exist
-            rows: contentState.gridSettings.rows,
-            columns: contentState.gridSettings.columns,
-            margin: contentState.gridSettings.margin,
-            padding: contentState.gridSettings.padding,
-            
-            // Safely include potentially missing properties
-            ...(contentState.gridSettings as any),
-          } : undefined,
-          // Filter out large properties if needed
-        } : null,
-        footer: footerState ? {
-          layout: footerState.layout,
-          // Add other relevant footer properties
-        } : null,
+        header: headerState
+          ? {
+              layout: headerState.layout,
+              height: headerState.height,
+              enabledElements: headerState.enabledElements,
+              // Add other relevant header properties
+            }
+          : null,
+        content: contentState
+          ? {
+              layout: contentState.layout,
+              gridSettings: contentState.gridSettings
+                ? {
+                    // Include base properties we know exist
+                    rows: contentState.gridSettings.rows,
+                    columns: contentState.gridSettings.columns,
+                    margin: contentState.gridSettings.margin,
+                    padding: contentState.gridSettings.padding,
+
+                    // Safely include potentially missing properties
+                    ...(contentState.gridSettings as any),
+                  }
+                : undefined,
+              // Filter out large properties if needed
+            }
+          : null,
+        footer: footerState
+          ? {
+              layout: footerState.layout,
+              // Add other relevant footer properties
+            }
+          : null,
       };
-      
-      const response = await fetch('/api/chat', {
-        method: 'POST',
+
+      const response = await fetch("/api/chat", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           message: userMsg,
           model: "llama3",
-          editorState: editorStateForLLM
+          editorState: editorStateForLLM,
         }),
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || `Server responded with status ${response.status}`);
-      }
-      
-      const data = await response.json();
-      
-      // Remove the processing message and add the assistant's response
-      setChatHistory(prev => {
-        // Filter out the processing message
-        const filteredHistory = prev.filter(msg => 
-          !(msg.role === "system" && msg.content === "Processing...")
+        throw new Error(
+          errorData.error || `Server responded with status ${response.status}`,
         );
-        
+      }
+
+      const data = await response.json();
+
+      // Remove the processing message and add the assistant's response
+      setChatHistory((prev) => {
+        // Filter out the processing message
+        const filteredHistory = prev.filter(
+          (msg) => !(msg.role === "system" && msg.content === "Processing..."),
+        );
+
         // Get the response content
         const responseContent = data.content || "No response received";
-        
+
         // Check if the response contains change instructions
-        const hasChangeInstructions = responseContent.includes("CHANGE_INSTRUCTIONS: SIMPLE_FORMAT");
-        
+        const hasChangeInstructions = responseContent.includes(
+          "CHANGE_INSTRUCTIONS: SIMPLE_FORMAT",
+        );
+
         // Add the assistant's response
-        const newHistory: ChatMessage[] = [...filteredHistory, {
-          role: "assistant", 
-          content: responseContent,
-          timestamp: Date.now() + 2, // +2 to ensure it sorts after user message
-        }];
-        
+        const newHistory: ChatMessage[] = [
+          ...filteredHistory,
+          {
+            role: "assistant",
+            content: responseContent,
+            timestamp: Date.now() + 2, // +2 to ensure it sorts after user message
+          },
+        ];
+
         // Apply change instructions if present
         if (hasChangeInstructions) {
           const success = applyChangeInstructions(responseContent);
@@ -402,25 +452,28 @@ function Banana() {
             });
           }
         }
-        
+
         return newHistory;
       });
     } catch (error) {
       console.error("Error fetching from LLM:", error);
-      
+
       // Remove the processing message and add error message
-      setChatHistory(prev => {
+      setChatHistory((prev) => {
         // Filter out the processing message
-        const filteredHistory = prev.filter(msg => 
-          !(msg.role === "system" && msg.content === "Processing...")
+        const filteredHistory = prev.filter(
+          (msg) => !(msg.role === "system" && msg.content === "Processing..."),
         );
-        
+
         // Add the error message
-        return [...filteredHistory, {
-          role: "system", 
-          content: `Error: ${error instanceof Error ? error.message : "Could not connect to Ollama. Make sure it's running with 'llama3' model loaded."}`,
-          timestamp: Date.now() + 2,
-        }];
+        return [
+          ...filteredHistory,
+          {
+            role: "system",
+            content: `Error: ${error instanceof Error ? error.message : "Could not connect to Ollama. Make sure it's running with 'llama3' model loaded."}`,
+            timestamp: Date.now() + 2,
+          },
+        ];
       });
     } finally {
       setIsProcessing(false);
@@ -562,7 +615,7 @@ function Banana() {
         {/* Chat Button */}
         <button
           onClick={() => setIsChatOpen(!isChatOpen)}
-          className="flex h-12 w-12 items-center justify-center rounded-full bg-indigo-600 text-white shadow-lg transition-all hover:bg-indigo-700"
+          className="flex size-12 items-center justify-center rounded-full bg-indigo-600 text-white shadow-lg transition-all hover:bg-indigo-700"
         >
           <FiMessageSquare className="size-5" />
         </button>
@@ -571,23 +624,24 @@ function Banana() {
         {isChatOpen && (
           <div className="absolute bottom-16 right-0 w-80 rounded-lg border border-gray-700 bg-[#2a2a2a] shadow-xl">
             {/* Chat Response Area */}
-            <div 
+            <div
               ref={chatContainerRef}
-              className="h-60 overflow-y-auto p-4 text-white space-y-3"
+              className="h-60 space-y-3 overflow-y-auto p-4 text-white"
             >
               {chatHistory.length > 0 ? (
                 chatHistory.map((msg, index) => (
-                  <div 
-                    key={index} 
+                  <div
+                    key={index}
                     className={`${
-                      msg.role === "user" 
-                        ? "ml-4 bg-indigo-600/30" 
-                        : msg.role === "system" 
-                          ? "bg-gray-700/50" 
+                      msg.role === "user"
+                        ? "ml-4 bg-indigo-600/30"
+                        : msg.role === "system"
+                          ? "bg-gray-700/50"
                           : "mr-4 bg-[#3a3a3a]"
                     } rounded-lg p-3 text-sm`}
                   >
-                    {msg.role === "system" && msg.content.startsWith("Error:") ? (
+                    {msg.role === "system" &&
+                    msg.content.startsWith("Error:") ? (
                       <div className="text-red-400">{msg.content}</div>
                     ) : (
                       <div>{msg.content}</div>
@@ -602,7 +656,10 @@ function Banana() {
             </div>
 
             {/* Input Area */}
-            <form onSubmit={handleChatSubmit} className="flex border-t border-gray-700 p-2">
+            <form
+              onSubmit={handleChatSubmit}
+              className="flex border-t border-gray-700 p-2"
+            >
               <input
                 ref={inputRef}
                 type="text"

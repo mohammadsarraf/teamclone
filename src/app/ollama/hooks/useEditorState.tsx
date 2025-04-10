@@ -1,5 +1,5 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
-import { HeaderState, ContentState, FooterState } from '../types/index';
+import { createContext, useContext, useState, ReactNode } from "react";
+import { HeaderState, ContentState, FooterState } from "../types/index";
 
 interface EditorStateContextType {
   headerState?: HeaderState;
@@ -10,7 +10,9 @@ interface EditorStateContextType {
   setFooterState: (state?: FooterState) => void;
 }
 
-const EditorStateContext = createContext<EditorStateContextType | undefined>(undefined);
+const EditorStateContext = createContext<EditorStateContextType | undefined>(
+  undefined,
+);
 
 export function EditorStateProvider({ children }: { children: ReactNode }) {
   const [headerState, setHeaderState] = useState<HeaderState | undefined>();
@@ -18,14 +20,14 @@ export function EditorStateProvider({ children }: { children: ReactNode }) {
   const [footerState, setFooterState] = useState<FooterState | undefined>();
 
   return (
-    <EditorStateContext.Provider 
-      value={{ 
-        headerState, 
-        contentState, 
-        footerState, 
-        setHeaderState, 
-        setContentState, 
-        setFooterState 
+    <EditorStateContext.Provider
+      value={{
+        headerState,
+        contentState,
+        footerState,
+        setHeaderState,
+        setContentState,
+        setFooterState,
       }}
     >
       {children}
@@ -36,7 +38,9 @@ export function EditorStateProvider({ children }: { children: ReactNode }) {
 export function useEditorState() {
   const context = useContext(EditorStateContext);
   if (context === undefined) {
-    throw new Error('useEditorState must be used within an EditorStateProvider');
+    throw new Error(
+      "useEditorState must be used within an EditorStateProvider",
+    );
   }
   return context;
-} 
+}

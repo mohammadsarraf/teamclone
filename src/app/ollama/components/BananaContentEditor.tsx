@@ -134,9 +134,15 @@ export default function BananaContentEditor({
   useEffect(() => {
     console.log("🔍 BananaContentEditor: Checking window exposure");
     if (typeof window !== "undefined") {
-      console.log("🪟 window.bananaContentEditor available:", !!window.bananaContentEditor);
+      console.log(
+        "🪟 window.bananaContentEditor available:",
+        !!window.bananaContentEditor,
+      );
       if (window.bananaContentEditor) {
-        console.log("📝 window.bananaContentEditor.applyExternalState available:", !!window.bananaContentEditor.applyExternalState);
+        console.log(
+          "📝 window.bananaContentEditor.applyExternalState available:",
+          !!window.bananaContentEditor.applyExternalState,
+        );
       }
     }
   }, []);

@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   try {
@@ -7,15 +7,15 @@ export async function POST(request: Request) {
     if (!message) {
       return NextResponse.json(
         { error: "Message is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
-    
+
     console.log(`[Ollama] Sending message to ${model}: ${message}`);
-    
+
     // Format editor state to be included in the prompt
     let editorStateDescription = "";
-    
+
     if (editorState) {
       // Process header data
       if (editorState.header) {
@@ -24,81 +24,87 @@ export async function POST(request: Request) {
         editorStateDescription += `Height: ${editorState.header.height}px\n`;
         if (editorState.header.enabledElements) {
           editorStateDescription += "Enabled Elements: ";
-          editorStateDescription += Object.entries(editorState.header.enabledElements)
+          editorStateDescription += Object.entries(
+            editorState.header.enabledElements,
+          )
             .filter(([_, value]) => value)
-            .map(([key]) => key.replace('is', ''))
-            .join(', ');
+            .map(([key]) => key.replace("is", ""))
+            .join(", ");
           editorStateDescription += "\n";
         }
         editorStateDescription += "\n";
       }
-      
+
       // Process content data
       if (editorState.content && editorState.content.layout) {
         editorStateDescription += "--- CONTENT DATA ---\n";
-        
+
         if (editorState.content.gridSettings) {
           const settings = editorState.content.gridSettings;
           editorStateDescription += `Grid: ${settings.columns} columns x ${settings.rows} rows\n`;
-          
+
           // Improved background information handling
-          if (settings.backgroundType === 'gradient' && settings.backgroundGradientStart && settings.backgroundGradientEnd) {
+          if (
+            settings.backgroundType === "gradient" &&
+            settings.backgroundGradientStart &&
+            settings.backgroundGradientEnd
+          ) {
             editorStateDescription += `Background: Gradient from ${settings.backgroundGradientStart} to ${settings.backgroundGradientEnd}\n`;
           } else if (settings.backgroundColor) {
             editorStateDescription += `Background Color: ${settings.backgroundColor}\n`;
           }
-          
+
           // Add other grid settings that might be relevant
           if (settings.contentWidth) {
             editorStateDescription += `Content Width: ${settings.contentWidth}\n`;
           }
-          
+
           if (settings.contentAlignment) {
             editorStateDescription += `Content Alignment: ${settings.contentAlignment}\n`;
           }
-          
+
           if (settings.verticalAlignment) {
             editorStateDescription += `Vertical Alignment: ${settings.verticalAlignment}\n`;
           }
-          
+
           editorStateDescription += "\n";
         }
-        
+
         // Process layout items
         if (editorState.content.layout.length > 0) {
           editorStateDescription += "Content Items:\n";
-          
+
           editorState.content.layout.forEach((item: any, index: number) => {
-            editorStateDescription += `${index + 1}. ${item.type || 'Item'} (${item.i})\n`;
-            
-            if (item.type === 'textbox' && item.content) {
+            editorStateDescription += `${index + 1}. ${item.type || "Item"} (${item.i})\n`;
+
+            if (item.type === "textbox" && item.content) {
               // Clean content from HTML tags for better readability
-              const textContent = item.content.replace(/<[^>]*>?/gm, '');
-              editorStateDescription += `   Text: "${textContent.substring(0, 50)}${textContent.length > 50 ? '...' : ''}"\n`;
+              const textContent = item.content.replace(/<[^>]*>?/gm, "");
+              editorStateDescription += `   Text: "${textContent.substring(0, 50)}${textContent.length > 50 ? "..." : ""}"\n`;
             }
-            
+
             if (item.backgroundColor) {
               editorStateDescription += `   Background: ${item.backgroundColor}\n`;
             }
-            
+
             if (item.textColor) {
               editorStateDescription += `   Text Color: ${item.textColor}\n`;
             }
-            
+
             if (item.fontSize) {
               editorStateDescription += `   Font Size: ${item.fontSize}px\n`;
             }
-            
+
             if (item.fontFamily) {
               editorStateDescription += `   Font Family: ${item.fontFamily}\n`;
             }
-            
+
             editorStateDescription += `   Position: x=${item.x}, y=${item.y}, w=${item.w}, h=${item.h}\n`;
             editorStateDescription += "\n";
           });
         }
       }
-      
+
       // Process footer data
       if (editorState.footer) {
         editorStateDescription += "--- FOOTER DATA ---\n";
@@ -106,9 +112,9 @@ export async function POST(request: Request) {
         editorStateDescription += "\n";
       }
     }
-    
+
     // Create a system prompt that includes editor state information
-    const systemPrompt = editorState 
+    const systemPrompt = editorState
       ? `You are an AI assistant for a website editor called Banana. 
 You have access to the current state of the editor which is designing a website.
 The user will ask questions about the design or request changes.
@@ -165,44 +171,46 @@ HANDLING CHANGE REQUESTS:
 
 Be helpful and provide accurate information based on the editor state.`
       : "You are an AI assistant for a website editor called Banana.";
-    
+
     // Connect to local Ollama instance
-    const response = await fetch('http://localhost:11434/api/chat', {
-      method: 'POST',
+    const response = await fetch("http://localhost:11434/api/chat", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         model: model,
         messages: [
           {
             role: "system",
-            content: systemPrompt
+            content: systemPrompt,
           },
           {
             role: "user",
             content: message,
           },
         ],
-        stream: false
+        stream: false,
       }),
     });
-    
+
     if (!response.ok) {
       throw new Error(`Ollama API returned ${response.status}`);
     }
-    
+
     const data = await response.json();
-    
+
     return NextResponse.json({
       content: data.message.content,
     });
-    
   } catch (error) {
-    console.error('Error processing chat request:', error);
+    console.error("Error processing chat request:", error);
     return NextResponse.json(
-      { error: "Failed to connect to Ollama. Make sure Ollama is running on your machine with 'llama3' model loaded." },
-      { status: 500 }
+      {
+        error:
+          "Failed to connect to Ollama. Make sure Ollama is running on your machine with 'llama3' model loaded.",
+      },
+      { status: 500 },
     );
   }
-} 
+}

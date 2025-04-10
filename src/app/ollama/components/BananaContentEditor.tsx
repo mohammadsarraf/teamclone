@@ -130,6 +130,17 @@ export default function BananaContentEditor({
     exposeToWindow: { key: "bananaContentEditor" },
   });
 
+  // Debug - verify window exposure
+  useEffect(() => {
+    console.log("🔍 BananaContentEditor: Checking window exposure");
+    if (typeof window !== "undefined") {
+      console.log("🪟 window.bananaContentEditor available:", !!window.bananaContentEditor);
+      if (window.bananaContentEditor) {
+        console.log("📝 window.bananaContentEditor.applyExternalState available:", !!window.bananaContentEditor.applyExternalState);
+      }
+    }
+  }, []);
+
   // Wait for external state application before signaling we're initialized
   useEffect(() => {
     // Mark as initialized after a small delay

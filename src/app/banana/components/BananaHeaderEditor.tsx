@@ -344,11 +344,6 @@ export default function BananaHeaderEditor({
   return (
     <div
       className="relative bg-white"
-      onClick={() => {
-        if (isFullscreen) {
-          setIsEditing(true);
-        }
-      }}
     >
       {/* Header Container with hover detection */}
       <div
@@ -373,17 +368,7 @@ export default function BananaHeaderEditor({
           {/* Edit Overlay */}
           {isFullscreen && (isHovered || isEditing) && (
             <>
-              {/* Dark overlay just for the header when hovering (not when editing) */}
-              {isHovered && !isEditing && (
-                <div className="pointer-events-none absolute inset-0 z-40">
-                  <div
-                    className="absolute inset-0 transition-opacity"
-                    style={{
-                      backgroundColor: "rgba(0, 0, 0, 0.6)", // Darker overlay only for this component
-                    }}
-                  />
-                </div>
-              )}
+              {/* HeaderEditMenu is separate from the overlay */}
               <HeaderEditMenu
                 isEditing={isEditing}
                 onEditClick={() => setIsEditing(true)}

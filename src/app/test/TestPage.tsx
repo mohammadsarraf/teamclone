@@ -14,8 +14,16 @@ import { Block } from "./types";
 import { AiOutlineSearch } from "react-icons/ai";
 import { RiText } from "react-icons/ri";
 import { FaShapes } from "react-icons/fa6";
-import { MdAdd, MdEdit, MdSettings, MdStyle } from "react-icons/md";
+import {
+  MdAdd,
+  MdEdit,
+  MdSettings,
+  MdStyle,
+  MdUndo,
+  MdRedo,
+} from "react-icons/md";
 import { EditBar } from "./components/EditBar";
+import { FooterDesignMenu } from "./components/menus/FooterDesignMenu";
 
 // Dynamically import Zdog components with no SSR
 const ZdogComponents = dynamic(() => import("./components/ZdogComponents"), {
@@ -31,6 +39,23 @@ const TextBox = dynamic(() => import("./components/TextBox"), { ssr: false });
 
 const initialLayout: Block[] = [];
 
+// Update the state interface to include backgroundColor in history entries
+interface HistoryState {
+  layout: Block[];
+  backgroundColor: string;
+}
+
+// Update the state interface to include backgroundColor
+interface SavedState {
+  layout: Block[];
+  positions: {
+    [key: string]: { x: number; y: number; w: number; h: number };
+  };
+  cols: number;
+  rows: number;
+  backgroundColor: string;
+}
+
 // Make sure to export the interface
 export interface TestPageProps {
   className?: string;
@@ -41,6 +66,12 @@ export interface TestPageProps {
   showMenuButton?: boolean;
   stateKey: string;
   editBarPosition?: "fixed" | "relative";
+  editBarOffset?: number;
+  onClose?: () => void;
+  layout?: Block[];
+  onLayoutChange?: (layout: Layout[]) => void;
+  onAddBlock?: (text: string, type?: string) => void;
+  isActiveInstance?: boolean;
 }
 
 const TestPage = ({
@@ -51,9 +82,17 @@ const TestPage = ({
   onHeightChange,
   showMenuButton = true,
   stateKey,
-  editBarPosition = "fixed",
+  editBarPosition = "relative",
+  editBarOffset = 0,
+  onClose,
+  layout,
+  onLayoutChange,
+  onAddBlock,
+  isActiveInstance,
 }: TestPageProps) => {
-  const [layout, setLayout] = useState<Block[]>(initialLayout);
+  const [layoutState, setLayoutState] = useState<Block[]>(
+    layout || initialLayout,
+  );
   const [activeShape, setActiveShape] = useState<string | null>(null);
   const [positions, setPositions] = useState<{
     [key: string]: { x: number; y: number; w: number; h: number };
@@ -67,34 +106,179 @@ const TestPage = ({
   const [showShapesSubmenu, setShowShapesSubmenu] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [showEditBar, setShowEditBar] = useState(false);
+  const [showDesignMenu, setShowDesignMenu] = useState(false);
+  const [backgroundColor, setBackgroundColor] = useState("#ffffff");
 
   const containerWidth = useWindowSize();
   const unitSize = containerWidth / cols;
 
-  // Create ShapeManager instance
+  // Update the history state initialization
+  const [history, setHistory] = useState<HistoryState[]>([
+    { layout: initialLayout, backgroundColor: "#ffffff" },
+  ]);
+  const [historyIndex, setHistoryIndex] = useState<number>(0);
+
+  // Update updateLayoutWithHistory to handle both layout and background color
+  const updateLayoutWithHistory = (
+    newLayout: Block[],
+    newBackgroundColor?: string,
+  ) => {
+    const currentState = history[historyIndex];
+    const nextState = {
+      layout: newLayout,
+      backgroundColor: newBackgroundColor ?? currentState.backgroundColor,
+    };
+
+    const hasChanged =
+      JSON.stringify(currentState) !== JSON.stringify(nextState);
+
+    console.log("History Update:", {
+      action: "attempt",
+      currentHistoryIndex: historyIndex,
+      historyLength: history.length,
+      hasChanged,
+      currentState,
+      nextState,
+      historyStack: history,
+    });
+
+    if (hasChanged) {
+      setLayoutState(nextState.layout);
+      setBackgroundColor(nextState.backgroundColor);
+
+      const newHistory = history.slice(0, historyIndex + 1);
+      const updatedHistory = [...newHistory, nextState];
+
+      setHistory(updatedHistory);
+      setHistoryIndex(updatedHistory.length - 1);
+
+      console.log("History Update:", {
+        action: "success",
+        newHistoryIndex: updatedHistory.length - 1,
+        newHistoryLength: updatedHistory.length,
+        historyStack: updatedHistory,
+      });
+    }
+  };
+
+  // Update handleUndo
+  const handleUndo = () => {
+    if (historyIndex > 0) {
+      const newIndex = historyIndex - 1;
+      const previousState = history[newIndex];
+
+      console.log("Undo:", {
+        action: "start",
+        currentIndex: historyIndex,
+        newIndex,
+        currentState: history[historyIndex],
+        targetState: previousState,
+        historyStack: history,
+      });
+
+      setHistoryIndex(newIndex);
+      setLayoutState(previousState.layout);
+      setBackgroundColor(previousState.backgroundColor);
+      if (onLayoutChange) {
+        onLayoutChange(previousState.layout);
+      }
+    }
+  };
+
+  // Update handleRedo
+  const handleRedo = () => {
+    if (historyIndex < history.length - 1) {
+      const newIndex = historyIndex + 1;
+      const nextState = history[newIndex];
+
+      console.log("Redo:", {
+        action: "start",
+        currentIndex: historyIndex,
+        newIndex,
+        currentState: history[historyIndex],
+        targetState: nextState,
+        historyStack: history,
+      });
+
+      setHistoryIndex(newIndex);
+      setLayoutState(nextState.layout);
+      setBackgroundColor(nextState.backgroundColor);
+      if (onLayoutChange) {
+        onLayoutChange(nextState.layout);
+      }
+    }
+  };
+
+  // Create ShapeManager instance with history-aware updates
   const shapeManager = useMemo(
     () =>
       new ShapeManager(
-        layout,
-        setLayout,
+        layoutState,
+        (newLayout: Block[] | ((prevLayout: Block[]) => Block[])) => {
+          if (typeof newLayout === "function") {
+            const updatedLayout = newLayout(layoutState);
+            updateLayoutWithHistory(updatedLayout);
+          } else {
+            updateLayoutWithHistory(newLayout);
+          }
+        },
         positions,
         setPositions,
         activeShape,
         setActiveShape,
       ),
-    [layout, positions, activeShape],
+    [layoutState, positions, activeShape, updateLayoutWithHistory],
   );
 
-  // Load saved state on component mount
+  // Update existing handleLayoutChange
+  const handleLayoutChange = (newLayout: Layout[]) => {
+    const updatedLayout = layoutState.map((block, index) => ({
+      ...block,
+      ...newLayout[index],
+    }));
+
+    updateLayoutWithHistory(updatedLayout);
+
+    if (onLayoutChange) {
+      onLayoutChange(updatedLayout);
+    }
+  };
+
+  // Add keyboard shortcuts for undo/redo
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "z") {
+        e.preventDefault();
+        if (e.shiftKey) {
+          handleRedo();
+        } else {
+          handleUndo();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, [historyIndex, history]);
+
+  // Update the load state useEffect to reset history when loading saved state
   useEffect(() => {
     const savedState = localStorage.getItem(`${stateKey}State`);
     if (savedState) {
       try {
-        const state = JSON.parse(savedState);
-        if (state.layout) setLayout(state.layout);
+        const state: SavedState = JSON.parse(savedState);
+        if (state.layout) {
+          setLayoutState(state.layout);
+          // Reset history with the loaded layout as the initial state
+          setHistory([
+            { layout: state.layout, backgroundColor: state.backgroundColor },
+          ]);
+          setHistoryIndex(0);
+        }
         if (state.positions) setPositions(state.positions);
         if (state.cols) setCols(state.cols);
         if (state.rows) setRows(state.rows);
+        if (state.backgroundColor) setBackgroundColor(state.backgroundColor);
       } catch (error) {
         console.error(`Error loading ${stateKey} state:`, error);
         localStorage.removeItem(`${stateKey}State`);
@@ -168,8 +352,7 @@ const TestPage = ({
 
   // Function to handle design click
   const handleDesignClick = () => {
-    setShowEditBar(!showEditBar);
-    // Close menu when toggling design mode
+    setShowDesignMenu(!showDesignMenu);
     setActiveMenu(null);
   };
 
@@ -205,33 +388,58 @@ const TestPage = ({
     setActiveMenu(null);
   };
 
+  // Update the save changes handler
   const handleSaveChanges = () => {
-    // Save state to localStorage
-    const state = {
-      layout,
+    const state: SavedState = {
+      layout: layoutState,
       positions,
       cols,
       rows,
+      backgroundColor,
     };
     localStorage.setItem(`${stateKey}State`, JSON.stringify(state));
-    // Close menu after saving
     setActiveMenu(null);
   };
 
+  // Update the reset changes handler
   const handleResetChanges = () => {
-    // Clear localStorage and reset to initial state
     localStorage.removeItem(`${stateKey}State`);
-    setLayout(initialLayout);
+    setLayoutState(initialLayout);
     setPositions({});
     setCols(initialCols);
     setRows(initialRows);
-    // Close menu after resetting
+    setBackgroundColor("#000000");
     setActiveMenu(null);
+  };
+
+  // Add history buttons to EditBar
+  const editBarProps = {
+    onUndo: handleUndo,
+    onRedo: handleRedo,
+    canUndo: historyIndex > 0,
+    canRedo: historyIndex < history.length - 1,
+  };
+
+  // Update handleColorChange
+  const handleColorChange = (color: string) => {
+    updateLayoutWithHistory(layoutState, color);
   };
 
   return (
     <div className="relative size-full">
-      <div className={`relative size-full ${className}`}>
+      <div
+        className={`relative size-full ${className}`}
+        style={{
+          backgroundColor: backgroundColor.startsWith("#")
+            ? backgroundColor
+            : "transparent",
+          backgroundImage: backgroundColor.startsWith("linear-gradient")
+            ? backgroundColor
+            : "none",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
         <GridOverlay
           show={isDragging || isResizing}
           cols={cols}
@@ -249,18 +457,31 @@ const TestPage = ({
             cols={cols}
             rows={rows}
             unitSize={unitSize}
-            layout={layout}
-            onLayoutChange={shapeManager.handleLayoutChange}
+            layout={layoutState}
+            onLayoutChange={(layout) => {
+              // Only handle layout changes that aren't from resize/drag operations
+              if (!isResizing && !isDragging) {
+                handleLayoutChange(layout);
+              }
+            }}
             onResizeStop={(layout, oldItem, newItem) => {
-              shapeManager.handleLayoutChange(layout);
+              // Handle resize completion
+              handleLayoutChange(layout);
               shapeManager.handleResizeStop(layout, oldItem, newItem);
               setIsResizing(false);
             }}
-            onResizeStart={() => setIsResizing(true)}
-            onDragStart={() => setIsDragging(true)}
+            onResizeStart={() => {
+              setIsResizing(true);
+              setActiveMenu(null);
+            }}
+            onDragStart={() => {
+              setIsDragging(true);
+              setActiveMenu(null);
+            }}
             onDragStop={(layout: Layout[]) => {
+              // Handle drag completion
+              handleLayoutChange(layout);
               setIsDragging(false);
-              shapeManager.handleLayoutChange(layout);
             }}
             preventCollision={false}
             allowOverlap={true}
@@ -276,7 +497,7 @@ const TestPage = ({
             style={{ height: "100%", width: "100%" }}
             draggableHandle="[data-drag-handle]"
           >
-            {layout.map((block, index) => (
+            {layoutState.map((block, index) => (
               <div
                 key={block.i}
                 style={{
@@ -316,8 +537,8 @@ const TestPage = ({
                   currentFlipH={block.flipH || false}
                   currentFlipV={block.flipV || false}
                   currentColor={block.color}
-                  totalShapes={layout.length}
-                  index={layout.length - index}
+                  totalShapes={layoutState.length}
+                  index={layoutState.length - index}
                   className="shape-wrapper"
                   onFontChange={(font) =>
                     shapeManager.handleFontChange(block.i, font)
@@ -385,6 +606,15 @@ const TestPage = ({
             ))}
           </GridContainer>
 
+          {/* Add the design menu */}
+          {showDesignMenu && (
+            <FooterDesignMenu
+              onColorChange={handleColorChange}
+              handleClose={() => setShowDesignMenu(false)}
+              currentColor={backgroundColor}
+            />
+          )}
+
           <div className="relative">
             <EditBar
               isEditing={isEditing}
@@ -400,6 +630,13 @@ const TestPage = ({
               onColsChange={setCols}
               onRowsChange={handleRowsChange}
               stateKey={stateKey}
+              position={editBarPosition}
+              offset={editBarOffset}
+              onClose={onClose}
+              onUndo={handleUndo}
+              onRedo={handleRedo}
+              canUndo={historyIndex > 0}
+              canRedo={historyIndex < history.length - 1}
             />
           </div>
         </div>

@@ -74,6 +74,7 @@ export interface ShapeItemProps {
   color: string;
   text?: string;
   onTextChange?: (newText: string) => void;
+  onTextAlign?: (align: "left" | "center" | "right") => void;
   isActive?: boolean;
   opacity: number;
   rotation: number;
@@ -91,4 +92,8 @@ export interface ShapeItemProps {
   onEnterPress?: () => void;
   onHeightChange?: (height: number) => void;
   unitSize: number;
+}
+
+export interface TextBoxProps {
+  onTextChange: (text: string, alignment?: "left" | "center" | "right") => void;
 }

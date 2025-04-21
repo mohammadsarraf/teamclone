@@ -32,36 +32,12 @@ export class ShapeManager {
   }
 
   handleLayoutChange = (newLayout: Layout[]) => {
-    const newPositions = newLayout.reduce(
-      (acc, item) => {
-        acc[item.i] = {
-          x: item.x,
-          y: item.y,
-          w: item.w,
-          h: item.h,
-        };
-        return acc;
-      },
-      {} as { [key: string]: { x: number; y: number; w: number; h: number } },
+    this.setLayout((prevLayout: Block[]) =>
+      prevLayout.map((block) => {
+        const newPos = newLayout.find((item) => item.i === block.i);
+        return newPos ? { ...block, ...newPos } : block;
+      }),
     );
-
-    this.setPositions(newPositions);
-
-    this.setLayout((prevLayout: Block[]) => {
-      return prevLayout.map((block) => {
-        const pos = newPositions[block.i];
-        if (pos) {
-          return {
-            ...block,
-            x: pos.x,
-            y: pos.y,
-            w: pos.w,
-            h: pos.h,
-          };
-        }
-        return block;
-      });
-    });
   };
 
   handleResizeStop = (layout: Layout[], oldItem: Layout, newItem: Layout) => {
@@ -95,10 +71,23 @@ export class ShapeManager {
     }
   };
 
-  handleTextChange = (blockId: string, newText: string) => {
+  handleTextChange = (
+    blockId: string,
+    newText: string,
+    newAlignment?: "left" | "center" | "right",
+  ) => {
     this.setLayout((prevLayout: Block[]) =>
       prevLayout.map((block) =>
-        block.i === blockId ? { ...block, text: newText } : block,
+        block.i === blockId
+          ? {
+              ...block,
+              text: newText
+                .replace(/\r\n/g, "\n") // Normalize Windows line breaks
+                .replace(/\r/g, "\n") // Normalize Mac line breaks
+                .replace(/\n\n+/g, "\n"), // Remove multiple consecutive line breaks
+              ...(newAlignment && { textAlign: newAlignment }), // Update alignment if provided
+            }
+          : block,
       ),
     );
   };
@@ -115,27 +104,11 @@ export class ShapeManager {
   };
 
   handleColorChange = (blockId: string, color: string) => {
-    this.setLayout((prevLayout: Block[]) => {
-      return prevLayout.map((block) => {
-        if (block.i === blockId) {
-          const pos = this.positions[block.i] || {
-            x: block.x,
-            y: block.y,
-            w: block.w,
-            h: block.h,
-          };
-          return {
-            ...block,
-            x: pos.x,
-            y: pos.y,
-            w: pos.w,
-            h: pos.h,
-            color,
-          };
-        }
-        return block;
-      });
-    });
+    this.setLayout((prevLayout: Block[]) =>
+      prevLayout.map((block) =>
+        block.i === blockId ? { ...block, color } : block,
+      ),
+    );
   };
 
   handleDelete = (blockId: string) => {
@@ -321,12 +294,14 @@ export class ShapeManager {
 
   addShape = (type: "triangle" | "circle" | "square") => {
     const newShape = this.createNewShape(type);
-    this.setLayout([...this.layout, newShape]);
+    const newLayout = [...this.layout, newShape];
+    this.setLayout(newLayout);
   };
 
   addTextBox = () => {
     const newTextBox = this.createNewShape("text");
-    this.setLayout([...this.layout, newTextBox]);
+    const newLayout = [...this.layout, newTextBox];
+    this.setLayout(newLayout);
   };
 
   handleEnterPress = (blockId: string) => {

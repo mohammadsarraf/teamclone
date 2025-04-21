@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import HeaderContent from "./headerContent";
 import FooterContent from "./footerContent";
-import MainContent from "./mainContent";
 
 export default function Page() {
   const [isEditing, setIsEditing] = useState(false);
@@ -12,6 +11,7 @@ export default function Page() {
   const [viewMode, setViewMode] = useState<"desktop" | "mobile">("desktop");
   const [selectedLayout, setSelectedLayout] = useState("Option 1");
   const [bgColor, setBgColor] = useState("bg-black");
+  const [isContentLoaded, setIsContentLoaded] = useState(false);
 
   useEffect(() => {
     const savedHeader = localStorage.getItem("headerState");
@@ -20,6 +20,7 @@ export default function Page() {
       setSelectedLayout(parsedState.selectedLayout);
       setBgColor(parsedState.bgColor);
     }
+    setIsContentLoaded(true);
   }, []);
 
   const handleColorChange = (color: string) => {
@@ -36,12 +37,12 @@ export default function Page() {
       <main className={`relative grow ${isEditing ? "p-0" : "p-6"}`}>
         {/* Windows-like container */}
         <div
-          className={`flex flex-col overflow-hidden rounded-lg border border-gray-700 bg-gray-800 shadow-2xl transition-all duration-300
-            ${isEditing ? "fixed inset-0 z-[100] rounded-none border-none" : "h-full"}
+          className={`flex h-full flex-col rounded-lg border border-gray-700 bg-gray-800 shadow-2xl transition-all duration-300
+            ${isEditing ? "fixed inset-0 z-[100] rounded-none border-none" : ""}
             ${viewMode === "mobile" ? "mx-auto max-w-[375px]" : ""}`}
         >
-          {/* Combined Window Title Bar and TopMenu */}
-          <div className="flex h-12 items-center justify-between bg-gray-900 px-4">
+          {/* Window Title Bar - Fixed at top */}
+          <div className="flex h-12 shrink-0 items-center justify-between rounded-t-xl bg-gray-900 px-4">
             <div className="flex items-center space-x-4">
               {/* Window Controls */}
               <div className="flex items-center space-x-2">
@@ -49,8 +50,15 @@ export default function Page() {
                 <div className="size-3 rounded-full bg-yellow-500"></div>
                 <div className="size-3 rounded-full bg-green-500"></div>
               </div>
-              {/* Edit Button */}
-              {!isEditing && (
+              {/* Edit/Exit Button */}
+              {isEditing ? (
+                <button
+                  onClick={() => setIsEditing(false)}
+                  className="flex items-center space-x-2 rounded bg-red-600 px-3 py-1.5 text-white hover:bg-red-700"
+                >
+                  <span className="text-sm">Exit Editor</span>
+                </button>
+              ) : (
                 <button
                   onClick={() => setIsEditing(true)}
                   className="flex items-center space-x-2 rounded bg-blue-600 px-3 py-1.5 text-white hover:bg-blue-700"
@@ -92,22 +100,48 @@ export default function Page() {
             )}
           </div>
 
-          {/* Window Content */}
-          <div className="flex grow flex-col overflow-auto">
-            <HeaderContent
-              selectedLayout={selectedLayout}
-              bgColor={bgColor}
-              handleColorChange={handleColorChange}
-              handleLayoutSelection={handleLayoutSelection}
-              isElementMenuVisible={isElementMenuVisible}
-              setIsElementMenuVisible={setIsElementMenuVisible}
-              isDesignMenuVisible={isDesignMenuVisible}
-              setIsDesignMenuVisible={setIsDesignMenuVisible}
-            />
-            <section className="grow">
-              <FooterContent stateKey="Main" />
-            </section>
-            <FooterContent stateKey="footer" />
+          {/* Scrollable Content Area */}
+          <div
+            className="relative min-h-0 flex-1 overflow-y-auto scroll-smooth"
+            id="content-container"
+            style={{ visibility: isContentLoaded ? "visible" : "hidden" }}
+          >
+            {/* Protective overlay when not editing */}
+            {!isEditing && (
+              <div
+                className="absolute inset-0 z-50 bg-transparent"
+                style={{ pointerEvents: "auto" }}
+                onClick={() => {
+                  // Optional: You could add a tooltip or message here
+                  console.log("Please click 'Edit' to modify the content");
+                }}
+              />
+            )}
+
+            {/* Header */}
+            <div className="z-10 bg-gray-800">
+              <HeaderContent
+                selectedLayout={selectedLayout}
+                bgColor={bgColor}
+                handleColorChange={handleColorChange}
+                handleLayoutSelection={handleLayoutSelection}
+                isElementMenuVisible={isElementMenuVisible}
+                setIsElementMenuVisible={setIsElementMenuVisible}
+                isDesignMenuVisible={isDesignMenuVisible}
+                setIsDesignMenuVisible={setIsDesignMenuVisible}
+                isEditing={isEditing}
+              />
+            </div>
+
+            {/* Main Content Area */}
+            <div className="flex flex-col">
+              <div className="flex-1">
+                <FooterContent stateKey="Main" isEditing={isEditing} />
+              </div>
+              <div className="flex-1">
+                <FooterContent stateKey="Secondary" isEditing={isEditing} />
+              </div>
+            </div>
           </div>
         </div>
       </main>

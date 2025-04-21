@@ -12,7 +12,10 @@ interface ElementToolbarProps {
     isCart: boolean;
     isAccount: boolean;
   };
-  onElementChange: (elementType: "isButton" | "isSocial" | "isCart" | "isAccount", value: boolean) => void;
+  onElementChange: (
+    elementType: "isButton" | "isSocial" | "isCart" | "isAccount",
+    value: boolean,
+  ) => void;
 }
 
 export default function ElementToolbar({
@@ -62,7 +65,12 @@ export default function ElementToolbar({
               type="checkbox"
               className="peer sr-only"
               checked={elements[item.id as keyof typeof elements]}
-              onChange={(e) => onElementChange(item.id as "isButton" | "isSocial" | "isCart" | "isAccount", e.target.checked)}
+              onChange={(e) =>
+                onElementChange(
+                  item.id as "isButton" | "isSocial" | "isCart" | "isAccount",
+                  e.target.checked,
+                )
+              }
             />
             <div className="peer h-6 w-11 rounded-full bg-gray-200 transition-colors peer-checked:bg-blue-600">
               <span
